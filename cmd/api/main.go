@@ -5,25 +5,23 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/YukiAminaka/cycle-route-backend/db"
+	"github.com/YukiAminaka/cycle-route-backend/internal/infrastructure/database/sqlc"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
-	"github.com/paulmach/orb"
 )
 
 func main() {
 	conn, err := pgx.Connect(context.Background(), os.Getenv("DATABASE_URL"))
-    if err != nil {
-            fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
-            os.Exit(1)
-    }
-    defer conn.Close(context.Background())
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
+		os.Exit(1)
+	}
+	defer conn.Close(context.Background())
 
-    q := db.New(conn)
+	q := sqlc.New(conn)
 
-	user_location := orb.Point{139.737763, 35.6646848} 
-	// Create a new user	
-	user, err := q.CreateUser(context.Background(), db.CreateUserParams{
+	// Create a new user
+	user, err := q.CreateUser(context.Background(), sqlc.CreateUserParams{
 		Name:                   "JohnDoe",
 		Email:                  pgtype.Text{String: "example@com", Valid: true},
 		TotalTripDistance:      pgtype.Float8{Float64: 0, Valid: false},

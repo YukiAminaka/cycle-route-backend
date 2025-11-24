@@ -44,9 +44,10 @@ cycle-route-backend/
 │   ├── schema.sql
 │   └── query.sql
 ├── db/                          # データベース関連
-│   ├── migrations/              # マイグレーションファイル
+│   ├── migrations/              # Atlasマイグレーションファイル
 │   └── seeds/                   # シードデータ
 ├── .env                         # 環境変数
+├── atlas.hcl                    # Atlas設定ファイル
 ├── compose.yml                  # Docker Compose設定
 ├── go.mod
 ├── go.sum
@@ -118,11 +119,72 @@ go run cmd/api/main.go
 
 ## 開発ワークフロー
 
-### スキーマ変更の手順
+### Atlas を使ったマイグレーション管理
 
-1. `sqlc/schema.sql` を編集
-2. SQLCでコード生成: `sqlc generate`
-3. Dockerのデータベースに反映: `docker compose exec -T postgres psql -U postgres -d postgres_db < sqlc/schema.sql`
+このプロジェクトでは[Atlas](https://atlasgo.io/)を使用してデータベースマイグレーションを管理します。
+
+#### Atlasのインストール
+
+```bash
+# Linux/macOS
+curl -sSf https://atlasgo.sh | sh
+
+# または Go経由でインストール
+go install ariga.io/atlas/cmd/atlas@latest
+```
+
+#### スキーマ変更の基本フロー（atlas.hclを使用）
+
+```bash
+# 1. sqlc/schema.sql を編集
+vim sqlc/schema.sql
+
+# 2. マイグレーションファイルを自動生成
+atlas migrate diff migration_name --env dev
+
+# 3. 生成されたマイグレーションを確認
+cat db/migrations/[最新のファイル].sql
+
+# 4. マイグレーションを適用
+atlas migrate apply --env dev
+
+# 5. SQLCでGoコードを生成
+sqlc generate
+```
+
+**`atlas.hcl`を使うことで**、長いコマンドが `--env dev` だけで済みます！
+
+#### 便利なAtlasコマンド
+
+```bash
+# マイグレーション状態の確認
+atlas migrate status --env dev
+
+# スキーマの差分を確認（マイグレーション生成前にチェック）
+atlas schema diff --env dev
+
+# 現在のデータベーススキーマを表示
+atlas schema inspect --env dev
+
+# Dry run（実際には適用せずに確認）
+atlas migrate apply --env dev --dry-run
+
+# 特定のバージョンまでマイグレーション
+atlas migrate apply --env dev --to 20240101000001
+```
+
+#### マイグレーションファイルの管理
+
+- マイグレーションファイルは `db/migrations/` に自動生成されます
+- ファイル名形式: `20240101000001_migration_name.sql`
+- Atlas が自動的にバージョン管理とチェックサムを管理します
+
+#### 従来の方法（開発時のクイック確認用）
+
+```bash
+# スキーマを直接適用（マイグレーション履歴なし）
+docker compose exec -T postgres psql -U postgres -d postgres_db < sqlc/schema.sql
+```
 
 ### 新機能追加の手順
 
@@ -136,6 +198,7 @@ go run cmd/api/main.go
 
 - **言語**: Go 1.25.1
 - **データベース**: PostgreSQL with PostGIS
+- **マイグレーション**: Atlas
 - **ORマッパー**: sqlc
 - **DB接続**: pgx/v5
 - **地理情報処理**: paulmach/orb

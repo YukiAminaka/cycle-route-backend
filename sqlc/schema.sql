@@ -5,6 +5,7 @@ CREATE EXTENSION IF NOT EXISTS pg_trgm;    -- 名前/説明/検索用
 
 CREATE TABLE users (
     id BIGSERIAL PRIMARY KEY,                    -- ユーザーID
+    ulid  CHAR(26) NOT NULL UNIQUE,
     name TEXT NOT NULL,                          -- ユーザー名
     highlighted_photo_id BIGINT DEFAULT 0,       -- ハイライト写真ID
     locale VARCHAR(10) DEFAULT 'ja',             -- 言語設定
@@ -23,6 +24,7 @@ CREATE TABLE users (
 
 CREATE TABLE routes (
   id                  BIGSERIAL PRIMARY KEY,                 -- 例: 42125024
+  ulid  CHAR(26) NOT NULL UNIQUE,
   user_id             BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   name                TEXT NOT NULL,
   description         TEXT NOT NULL DEFAULT '',
@@ -45,6 +47,7 @@ CREATE TABLE routes (
 -- トリップの写真
 CREATE TABLE route_images (
   id           BIGSERIAL PRIMARY KEY,
+  ulid  CHAR(26) NOT NULL UNIQUE,
   route_id      BIGINT NOT NULL REFERENCES routes(id) ON DELETE CASCADE,
   s3_key       TEXT NOT NULL,            -- S3等の保存先パス
   width        INTEGER,                             -- 画像の幅
@@ -60,6 +63,7 @@ CREATE TABLE route_images (
 -- キューシート
 CREATE TABLE  course_point(
   id            BIGSERIAL PRIMARY KEY,
+  ulid  CHAR(26) NOT NULL UNIQUE,
   route_id      BIGINT REFERENCES routes(id) ON DELETE CASCADE,
   step_order    INT NOT NULL,          -- 0..n（ルート全体の通し順）
   seg_dist_m    DOUBLE PRECISION,      -- 直前のポイントからこのポイントまでの区間距離(m)
@@ -77,6 +81,7 @@ CREATE TABLE  course_point(
 -- 活動
 CREATE TABLE trips (
   id                     BIGSERIAL PRIMARY KEY,                   -- 例: 342859653
+  ulid  CHAR(26) NOT NULL UNIQUE,
   user_id                BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   -- 表示/識別
   name                   TEXT NOT NULL DEFAULT '',
@@ -136,6 +141,7 @@ CREATE TABLE trips (
 -- トリップの写真
 CREATE TABLE trip_images (
   id           BIGSERIAL PRIMARY KEY,
+  ulid  CHAR(26) NOT NULL UNIQUE,
   trip_id      BIGINT NOT NULL REFERENCES trips(id) ON DELETE CASCADE,
   s3_key       TEXT NOT NULL,            -- S3等の保存先パス
   width        INTEGER,                             -- 画像の幅
@@ -151,6 +157,7 @@ CREATE TABLE trip_images (
 
 CREATE TABLE route_likes (
   id           BIGSERIAL PRIMARY KEY,
+  ulid  CHAR(26) NOT NULL UNIQUE,
   user_id      BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   route_id    BIGINT NOT NULL,
   created_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -160,6 +167,7 @@ CREATE TABLE route_likes (
 
 CREATE TABLE route_comments (
   id           BIGSERIAL PRIMARY KEY,
+  ulid  CHAR(26) NOT NULL UNIQUE,
   user_id      BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   route_id    BIGINT NOT NULL,
   parent_id    BIGINT,                            -- 返信ツリー（同テーブル参照）
@@ -173,6 +181,7 @@ CREATE TABLE route_comments (
 -- ルートのブックマーク（保存）
 CREATE TABLE route_saves (
   id         BIGSERIAL PRIMARY KEY,
+  ulid       CHAR(26) NOT NULL UNIQUE,
   user_id    BIGINT NOT NULL REFERENCES users(id)   ON DELETE CASCADE,
   route_id   BIGINT NOT NULL REFERENCES routes(id)  ON DELETE CASCADE,
   pinned     BOOLEAN NOT NULL DEFAULT FALSE,

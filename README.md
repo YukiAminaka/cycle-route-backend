@@ -1,6 +1,6 @@
 # Cycle Route Backend
 
-サイクリングルート管理アプリケーションのバックエンドAPI
+サイクリングルート管理アプリケーションのバックエンド API
 
 ## プロジェクト構成
 
@@ -56,27 +56,31 @@ cycle-route-backend/
 
 ## クリーンアーキテクチャの層
 
-### 1. Domain層（内側）
+### 1. Domain 層（内側）
+
 - **責務**: ビジネスロジックの核となる部分
 - **依存**: 他のどの層にも依存しない
 - **内容**:
   - Entity: ビジネスルール、ドメインモデル
   - Repository Interface: データアクセスの抽象化
 
-### 2. Usecase層
+### 2. Usecase 層
+
 - **責務**: アプリケーション固有のビジネスロジック
-- **依存**: Domain層のみに依存
+- **依存**: Domain 層のみに依存
 - **内容**: ユースケースの実装、ビジネスフロー
 
-### 3. Interface層
-- **責務**: 外部とのインターフェース
-- **依存**: UsecaseとDomain層に依存
-- **内容**: HTTPハンドラー、プレゼンター、ミドルウェア
+### 3. Interface 層
 
-### 4. Infrastructure層（外側）
+- **責務**: 外部とのインターフェース
+- **依存**: Usecase と Domain 層に依存
+- **内容**: HTTP ハンドラー、プレゼンター、ミドルウェア
+
+### 4. Infrastructure 層（外側）
+
 - **責務**: 技術的な実装詳細
 - **依存**: すべての層に依存可能
-- **内容**: DB接続、外部API、リポジトリ実装
+- **内容**: DB 接続、外部 API、リポジトリ実装
 
 **依存の方向**: Infrastructure → Interface → Usecase → Domain
 
@@ -85,11 +89,6 @@ cycle-route-backend/
 ### 1. 環境変数の設定
 
 `.env`ファイルを作成し、データベース接続情報を設定します。
-
-```bash
-DATABASE_URL=postgres://postgres:password@localhost:5432/postgres_db
-SERVER_PORT=8080
-```
 
 ### 2. データベースの起動
 
@@ -103,9 +102,9 @@ docker compose up -d
 docker compose exec -T postgres psql -U postgres -d postgres_db < sqlc/schema.sql
 ```
 
-### 4. SQLCでコード生成
+### 4. SQLC でコード生成
 
-スキーマやクエリを変更した後は、SQLCでコードを再生成します。
+スキーマやクエリを変更した後は、SQLC でコードを再生成します。
 
 ```bash
 sqlc generate
@@ -123,7 +122,7 @@ go run cmd/api/main.go
 
 このプロジェクトでは[Atlas](https://atlasgo.io/)を使用してデータベースマイグレーションを管理します。
 
-#### Atlasのインストール
+#### Atlas のインストール
 
 ```bash
 # Linux/macOS
@@ -133,7 +132,7 @@ curl -sSf https://atlasgo.sh | sh
 go install ariga.io/atlas/cmd/atlas@latest
 ```
 
-#### スキーマ変更の基本フロー（atlas.hclを使用）
+#### スキーマ変更の基本フロー（atlas.hcl を使用）
 
 ```bash
 # 1. sqlc/schema.sql を編集
@@ -154,7 +153,7 @@ sqlc generate
 
 **`atlas.hcl`を使うことで**、長いコマンドが `--env dev` だけで済みます！
 
-#### 便利なAtlasコマンド
+#### 便利な Atlas コマンド
 
 ```bash
 # マイグレーション状態の確認
@@ -188,10 +187,10 @@ docker compose exec -T postgres psql -U postgres -d postgres_db < sqlc/schema.sq
 
 ### 新機能追加の手順
 
-1. **Domain層**: エンティティとリポジトリインターフェースを定義
-2. **Usecase層**: ビジネスロジックを実装
-3. **Infrastructure層**: リポジトリの実装
-4. **Interface層**: HTTPハンドラーを実装
+1. **Domain 層**: エンティティとリポジトリインターフェースを定義
+2. **Usecase 層**: ビジネスロジックを実装
+3. **Infrastructure 層**: リポジトリの実装
+4. **Interface 層**: HTTP ハンドラーを実装
 5. **Router**: ルーティングを設定
 
 ## 技術スタック
@@ -199,10 +198,6 @@ docker compose exec -T postgres psql -U postgres -d postgres_db < sqlc/schema.sq
 - **言語**: Go 1.25.1
 - **データベース**: PostgreSQL with PostGIS
 - **マイグレーション**: Atlas
-- **ORマッパー**: sqlc
-- **DB接続**: pgx/v5
+- **OR マッパー**: sqlc
+- **DB 接続**: pgx/v5
 - **地理情報処理**: paulmach/orb
-
-## ライセンス
-
-MIT

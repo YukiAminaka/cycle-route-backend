@@ -56,6 +56,19 @@ type RouteComment struct {
 	DeletedAt pgtype.Timestamptz `json:"deleted_at"`
 }
 
+type RouteImage struct {
+	ID         int64              `json:"id"`
+	RouteID    int64              `json:"route_id"`
+	S3Key      string             `json:"s3_key"`
+	Width      pgtype.Int4        `json:"width"`
+	Height     pgtype.Int4        `json:"height"`
+	Size       pgtype.Int8        `json:"size"`
+	Type       string             `json:"type"`
+	Visibility int16              `json:"visibility"`
+	CreatedAt  pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt  pgtype.Timestamptz `json:"updated_at"`
+}
+
 type RouteLike struct {
 	ID        int64              `json:"id"`
 	UserID    int64              `json:"user_id"`
@@ -129,22 +142,19 @@ type TripImage struct {
 }
 
 type User struct {
-	ID                     int64              `json:"id"`
-	Name                   string             `json:"name"`
-	HighlightedPhotoID     pgtype.Int8        `json:"highlighted_photo_id"`
-	Locale                 pgtype.Text        `json:"locale"`
-	CreatedAt              pgtype.Timestamptz `json:"created_at"`
-	Description            pgtype.Text        `json:"description"`
-	Locality               pgtype.Text        `json:"locality"`
-	AdministrativeArea     pgtype.Text        `json:"administrative_area"`
-	CountryCode            pgtype.Text        `json:"country_code"`
-	PostalCode             pgtype.Text        `json:"postal_code"`
-	TotalTripDistance      pgtype.Float8      `json:"total_trip_distance"`
-	TotalTripDuration      pgtype.Float8      `json:"total_trip_duration"`
-	TotalTripElevationGain pgtype.Float8      `json:"total_trip_elevation_gain"`
-	Geom                   *OrbGeometry       `json:"geom"`
-	FirstName              pgtype.Text        `json:"first_name"`
-	LastName               pgtype.Text        `json:"last_name"`
-	Email                  pgtype.Text        `json:"email"`
-	HasSetLocation         pgtype.Bool        `json:"has_set_location"`
+	ID                 int64              `json:"id"`
+	Name               string             `json:"name"`
+	HighlightedPhotoID pgtype.Int8        `json:"highlighted_photo_id"`
+	Locale             pgtype.Text        `json:"locale"`
+	CreatedAt          pgtype.Timestamptz `json:"created_at"`
+	Description        pgtype.Text        `json:"description"`
+	Locality           pgtype.Text        `json:"locality"`
+	AdministrativeArea pgtype.Text        `json:"administrative_area"`
+	CountryCode        pgtype.Text        `json:"country_code"`
+	PostalCode         pgtype.Text        `json:"postal_code"`
+	Geom               *OrbGeometry       `json:"geom"`
+	FirstName          pgtype.Text        `json:"first_name"`
+	LastName           pgtype.Text        `json:"last_name"`
+	Email              pgtype.Text        `json:"email"`
+	HasSetLocation     pgtype.Bool        `json:"has_set_location"`
 }

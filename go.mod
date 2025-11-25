@@ -3,7 +3,9 @@ module github.com/YukiAminaka/cycle-route-backend
 go 1.25.1
 
 require (
+	github.com/google/go-cmp v0.5.5
 	github.com/jackc/pgx/v5 v5.7.6
+	github.com/oklog/ulid/v2 v2.1.1
 	github.com/paulmach/orb v0.12.0
 )
 
@@ -12,4 +14,5 @@ require (
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	golang.org/x/crypto v0.37.0 // indirect
 	golang.org/x/text v0.24.0 // indirect
+	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 )

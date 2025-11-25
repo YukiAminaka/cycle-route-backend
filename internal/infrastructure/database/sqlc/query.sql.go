@@ -13,32 +13,26 @@ import (
 
 const createUser = `-- name: CreateUser :one
 INSERT INTO users (
-    name, email, total_trip_distance, total_trip_duration, total_trip_elevation_gain, geom, first_name, last_name, has_set_location
+    name, email, geom, first_name, last_name, has_set_location
 ) VALUES (
-    $1, $2, $3, $4, $5, ST_SetSRID(ST_MakePoint($6, $7), 4326), $8, $9, $10
-) RETURNING id, name, highlighted_photo_id, locale, created_at, description, locality, administrative_area, country_code, postal_code, total_trip_distance, total_trip_duration, total_trip_elevation_gain, geom, first_name, last_name, email, has_set_location
+    $1, $2, ST_SetSRID(ST_MakePoint($3, $4), 4326), $5, $6, $7
+) RETURNING id, name, highlighted_photo_id, locale, created_at, description, locality, administrative_area, country_code, postal_code, geom, first_name, last_name, email, has_set_location
 `
 
 type CreateUserParams struct {
-	Name                   string        `json:"name"`
-	Email                  pgtype.Text   `json:"email"`
-	TotalTripDistance      pgtype.Float8 `json:"total_trip_distance"`
-	TotalTripDuration      pgtype.Float8 `json:"total_trip_duration"`
-	TotalTripElevationGain pgtype.Float8 `json:"total_trip_elevation_gain"`
-	StMakepoint            interface{}   `json:"st_makepoint"`
-	StMakepoint_2          interface{}   `json:"st_makepoint_2"`
-	FirstName              pgtype.Text   `json:"first_name"`
-	LastName               pgtype.Text   `json:"last_name"`
-	HasSetLocation         pgtype.Bool   `json:"has_set_location"`
+	Name           string      `json:"name"`
+	Email          pgtype.Text `json:"email"`
+	StMakepoint    interface{} `json:"st_makepoint"`
+	StMakepoint_2  interface{} `json:"st_makepoint_2"`
+	FirstName      pgtype.Text `json:"first_name"`
+	LastName       pgtype.Text `json:"last_name"`
+	HasSetLocation pgtype.Bool `json:"has_set_location"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
 	row := q.db.QueryRow(ctx, createUser,
 		arg.Name,
 		arg.Email,
-		arg.TotalTripDistance,
-		arg.TotalTripDuration,
-		arg.TotalTripElevationGain,
 		arg.StMakepoint,
 		arg.StMakepoint_2,
 		arg.FirstName,
@@ -57,9 +51,6 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.AdministrativeArea,
 		&i.CountryCode,
 		&i.PostalCode,
-		&i.TotalTripDistance,
-		&i.TotalTripDuration,
-		&i.TotalTripElevationGain,
 		&i.Geom,
 		&i.FirstName,
 		&i.LastName,
@@ -70,7 +61,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 }
 
 const getUserByID = `-- name: GetUserByID :one
-SELECT id, name, highlighted_photo_id, locale, created_at, description, locality, administrative_area, country_code, postal_code, total_trip_distance, total_trip_duration, total_trip_elevation_gain, geom, first_name, last_name, email, has_set_location FROM users WHERE id = $1
+SELECT id, name, highlighted_photo_id, locale, created_at, description, locality, administrative_area, country_code, postal_code, geom, first_name, last_name, email, has_set_location FROM users WHERE id = $1
 `
 
 func (q *Queries) GetUserByID(ctx context.Context, id int64) (User, error) {
@@ -87,9 +78,6 @@ func (q *Queries) GetUserByID(ctx context.Context, id int64) (User, error) {
 		&i.AdministrativeArea,
 		&i.CountryCode,
 		&i.PostalCode,
-		&i.TotalTripDistance,
-		&i.TotalTripDuration,
-		&i.TotalTripElevationGain,
 		&i.Geom,
 		&i.FirstName,
 		&i.LastName,

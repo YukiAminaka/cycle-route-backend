@@ -1,4 +1,4 @@
-package entity
+package trip
 
 // TODO: Implement Trip entity
 

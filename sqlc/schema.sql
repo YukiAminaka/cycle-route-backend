@@ -30,8 +30,8 @@ CREATE TABLE routes (
   description         TEXT NOT NULL DEFAULT '',
   highlighted_photo_id        BIGINT      DEFAULT 0,
   has_course_points   BOOLEAN NOT NULL DEFAULT FALSE,
-  distance            DOUBLE PRECISION NOT NULL CHECK (distance >= 0),
-  duration            INTEGER CHECK (duration IS NULL OR duration >= 0),
+  distance            DOUBLE PRECISION NOT NULL CHECK (distance >= 0),   -- 距離(m)
+  duration            INTEGER NOT NULL CHECK (duration IS NULL OR duration >= 0), -- 所要時間(s)
   elevation_gain      DOUBLE PRECISION NOT NULL DEFAULT 0 CHECK (elevation_gain >= 0),
   elevation_loss      DOUBLE PRECISION NOT NULL DEFAULT 0 CHECK (elevation_loss >= 0),
   path_geom           geometry(LineString, 4326) NOT NULL CHECK (NOT ST_IsEmpty(path_geom)) CHECK (ST_NPoints(path_geom) >= 2),  -- 経路パス 空ジオメトリや、点が1個だけの線を保存禁止
@@ -68,7 +68,7 @@ CREATE TABLE  course_point(
   step_order    INT NOT NULL,          -- 0..n（ルート全体の通し順）
   seg_dist_m    DOUBLE PRECISION,      -- 直前のポイントからこのポイントまでの区間距離(m)
   cum_dist_m    DOUBLE PRECISION,      -- 直前のポイントからこのポイントまでの区間距離(m)
-  duration      DOUBLE PRECISION,      -- 直前からこのポイントまでの所要時間(s)
+  duration      DOUBLE PRECISION,      -- 直前からこのポイyントまでの所要時間(s)
   instruction   TEXT,
   road_name     TEXT,
   maneuver_type TEXT,                  -- 'turn','depart','arrive'等

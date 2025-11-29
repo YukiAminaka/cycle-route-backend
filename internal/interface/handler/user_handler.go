@@ -1,18 +1,23 @@
 package handler
 
 import (
-	"github.com/YukiAminaka/cycle-route-backend/internal/usecase"
+	userUsecase "github.com/YukiAminaka/cycle-route-backend/internal/usecase/user"
 )
 
 // UserHandler はユーザー関連のHTTPハンドラー
 type UserHandler struct {
-	userUsecase usecase.IUserUsecase
+	createUserUsecase userUsecase.ICreateUserUsecase
+	getUserUsecase    userUsecase.IGetUserByIDUsecase
 }
 
 // NewUserHandler はUserHandlerを作成する
-func NewUserHandler(userUsecase usecase.IUserUsecase) *UserHandler {
+func NewUserHandler(
+	createUserUsecase userUsecase.ICreateUserUsecase,
+	getUserUsecase userUsecase.IGetUserByIDUsecase,
+) *UserHandler {
 	return &UserHandler{
-		userUsecase: userUsecase,
+		createUserUsecase: createUserUsecase,
+		getUserUsecase:    getUserUsecase,
 	}
 }
 

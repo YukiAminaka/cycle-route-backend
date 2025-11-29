@@ -1,4 +1,4 @@
-package entity
+package user
 
 import (
 	"testing"
@@ -7,6 +7,7 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 )
 
+// 文字列のポインタを返すヘルパー関数
 func ptr(s string) *string {
 	return &s
 }

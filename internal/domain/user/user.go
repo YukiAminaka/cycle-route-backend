@@ -1,4 +1,4 @@
-package entity
+package user
 
 import (
 	"crypto/rand"
@@ -35,7 +35,7 @@ type Geometry struct {
 	orb.Geometry
 }
 
-// User はユーザーエンティティを表します
+// ユーザーエンティティ
 type User struct {
 	id                 UserID
 	name               string
@@ -79,7 +79,7 @@ func NewUser(
 	}, nil
 }
 
-// ReconstructUser は既存のユーザーを再構築します（リポジトリからの取得時に使用）
+// 永続化層から取得したデータをドメインに変換（リポジトリからの取得時に使用）
 func ReconstructUser(
 	id UserID,
 	name string,

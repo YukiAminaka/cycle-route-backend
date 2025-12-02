@@ -25,7 +25,8 @@ func TestNewUser(t *testing.T) {
 		want    *User
 		wantErr bool
 	}{
-		{name: "正常系",
+		{
+			name: "正常系",
 			args: args{
 				name:      "John Doe",
 				email:     ptr("test@example.com"),  // ポインタ型

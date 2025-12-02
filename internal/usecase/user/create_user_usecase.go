@@ -9,7 +9,7 @@ import (
 
 // IUserUsecase はユーザーユースケースのインターフェース
 type ICreateUserUsecase interface {
-	CreateUser(ctx context.Context, user *userDomain.User) (*CreateUserUseCaseDto, error)
+	CreateUser(ctx context.Context, user CreateUserUseCaseInputDto) (*CreateUserUseCaseOutputDto, error)
 }
 
 type createUserUsecase struct {
@@ -17,46 +17,61 @@ type createUserUsecase struct {
 }
 
 // ユーザーユースケースを作成する
-func NewUserUsecase(userRepo userDomain.IUserRepository) ICreateUserUsecase {
+func NewCreateUserUsecase(userRepo userDomain.IUserRepository) ICreateUserUsecase {
 	return &createUserUsecase{
 		userRepo: userRepo,
 	}
 }
 
-type CreateUserUseCaseDto struct {
-	id                 string
-	name               string
-	highlightedPhotoID *int64
-	locale             *string
-	description        *string
-	locality           *string
-	administrativeArea *string
-	countryCode        *string
-	postalCode         *string
-	geom               *orb.Point
-	firstName          *string
-	lastName           *string
-	email              *string
-	hasSetLocation     bool
+type CreateUserUseCaseInputDto struct {
+	Name      string
+	Email     *string
+	FirstName *string
+	LastName  *string
 }
 
-func (u *createUserUsecase) CreateUser(ctx context.Context, user *userDomain.User) (*CreateUserUseCaseDto, error) {
-	
-	user, err := u.userRepo.CreateUser(ctx, user)
+type CreateUserUseCaseOutputDto struct {
+	ID                 string
+	Name               string
+	HighlightedPhotoID *int64
+	Locale             *string
+	Description        *string
+	Locality           *string
+	AdministrativeArea *string
+	CountryCode        *string
+	PostalCode         *string
+	Geom               *orb.Point
+	FirstName          *string
+	LastName           *string
+	Email              *string
+	HasSetLocation     bool
+}
+
+func (u *createUserUsecase) CreateUser(ctx context.Context, dto CreateUserUseCaseInputDto) (*CreateUserUseCaseOutputDto, error) {
+	newUser, err := userDomain.NewUser(
+		dto.Name,
+		dto.Email,
+		dto.FirstName,
+		dto.LastName,
+	)
 	if err != nil {
 		return nil, err
 	}
-	return &CreateUserUseCaseDto{
-		id:                 user.ID().String(),
-		name:               user.Name(),
-		highlightedPhotoID: user.HighlightedPhotoID(),
-		locale:             user.Locale(),
-		description:        user.Description(),
-		locality:           user.Locality(),
-		administrativeArea: user.AdministrativeArea(),
-		countryCode:        user.CountryCode(),
-		postalCode:         user.PostalCode(),
-		geom: func() *orb.Point {
+	user, err := u.userRepo.CreateUser(ctx, newUser)
+	if err != nil {
+		return nil, err
+	}
+	return &CreateUserUseCaseOutputDto{
+		ID:                 user.ID().String(),
+		Name:               user.Name(),
+		HighlightedPhotoID: user.HighlightedPhotoID(),
+		Locale:             user.Locale(),
+		Description:        user.Description(),
+		Locality:           user.Locality(),
+		AdministrativeArea: user.AdministrativeArea(),
+		CountryCode:        user.CountryCode(),
+		PostalCode:         user.PostalCode(),
+		Geom: func() *orb.Point {
 			if user.Geom() != nil {
 				if point, ok := user.Geom().Geometry.(orb.Point); ok {
 					return &point
@@ -64,9 +79,9 @@ func (u *createUserUsecase) CreateUser(ctx context.Context, user *userDomain.Use
 			}
 			return nil
 		}(),
-		firstName:      user.FirstName(),
-		lastName:       user.LastName(),
-		email:          user.Email(),
-		hasSetLocation: user.HasSetLocation(),
+		FirstName:      user.FirstName(),
+		LastName:       user.LastName(),
+		Email:          user.Email(),
+		HasSetLocation: user.HasSetLocation(),
 	}, nil
 }

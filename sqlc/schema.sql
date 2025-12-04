@@ -9,7 +9,8 @@ CREATE TABLE users (
     name TEXT NOT NULL,                          -- ユーザー名
     highlighted_photo_id BIGINT DEFAULT 0,       -- ハイライト写真ID
     locale VARCHAR(10) DEFAULT 'ja',             -- 言語設定
-    created_at TIMESTAMPTZ NOT NULL,             -- 作成日時（タイムゾーン付き）
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,             -- 作成日時（タイムゾーン付き）
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,             -- 更新日時（タイムゾーン付き）
     description TEXT,                            -- 自己紹介
     locality TEXT,                               -- 地域（市区）
     administrative_area TEXT,                    -- 行政区（都道府県など）
@@ -19,7 +20,7 @@ CREATE TABLE users (
     first_name TEXT,                             -- 名
     last_name TEXT,                              -- 姓
     email TEXT UNIQUE,                           -- メールアドレス（ユニーク）
-    has_set_location BOOLEAN DEFAULT FALSE       -- 位置情報設定済みフラグ
+    has_set_location BOOLEAN NOT NULL DEFAULT FALSE       -- 位置情報設定済みフラグ
 );
 
 CREATE TABLE routes (
@@ -191,3 +192,48 @@ CREATE TABLE route_saves (
   UNIQUE (user_id, route_id)            -- 同じルートの重複保存を防ぐ
 );
 
+
+-- updated_atを自動更新する関数
+CREATE OR REPLACE FUNCTION set_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW; 
+END;
+$$ LANGUAGE plpgsql;
+
+-- usersテーブルにトリガーを設定
+CREATE TRIGGER set_updated_at_trigger
+BEFORE UPDATE ON users
+FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
+
+-- routesテーブルにトリガーを設定
+CREATE TRIGGER set_updated_at_trigger
+BEFORE UPDATE ON routes
+FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
+
+-- tripsテーブルにトリガーを設定
+CREATE TRIGGER update_trips_updated_at
+BEFORE UPDATE ON trips
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
+
+-- route_imagesテーブルにトリガーを設定
+CREATE TRIGGER update_route_images_updated_at
+BEFORE UPDATE ON route_images
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
+
+-- trip_imagesテーブルにトリガーを設定
+CREATE TRIGGER update_trip_images_updated_at
+BEFORE UPDATE ON trip_images
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
+
+-- route_commentsテーブルにトリガーを設定
+CREATE TRIGGER update_route_comments_updated_at
+BEFORE UPDATE ON route_comments
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();

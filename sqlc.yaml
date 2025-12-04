@@ -13,6 +13,7 @@ sql:
         package: "sqlc"
         out: "internal/infrastructure/database/sqlc"
         sql_package: "pgx/v5"
+        emit_pointers_for_null_types: true
         emit_json_tags: true
         overrides:
           - db_type: "geometry"
@@ -21,5 +22,15 @@ sql:
           - db_type: "geometry"
             go_type:
               type: "OrbGeometry"
+              pointer: true
+            nullable: true
+          - db_type: timestamptz
+            go_type:
+              import: time
+              type: Time
+          - db_type: timestamptz
+            go_type:
+              import: time
+              type: Time
               pointer: true
             nullable: true

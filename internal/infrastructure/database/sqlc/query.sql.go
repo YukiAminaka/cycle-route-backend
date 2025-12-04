@@ -7,45 +7,72 @@ package sqlc
 
 import (
 	"context"
-
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const createUser = `-- name: CreateUser :one
-INSERT INTO users (
-    name, email, geom, first_name, last_name, has_set_location
+INSERT INTO users (                
+    ulid,              
+    name,              
+    highlighted_photo_id,
+    locale,            
+    description,       
+    locality,          
+    administrative_area,
+    country_code,       
+    postal_code,        
+    geom,              
+    first_name,         
+    last_name,          
+    email,             
+    has_set_location     
 ) VALUES (
-    $1, $2, ST_SetSRID(ST_MakePoint($3, $4), 4326), $5, $6, $7
-) RETURNING id, name, highlighted_photo_id, locale, created_at, description, locality, administrative_area, country_code, postal_code, geom, first_name, last_name, email, has_set_location
+    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14
+) RETURNING id, ulid, name, highlighted_photo_id, locale, created_at, updated_at, description, locality, administrative_area, country_code, postal_code, geom, first_name, last_name, email, has_set_location
 `
 
 type CreateUserParams struct {
-	Name           string      `json:"name"`
-	Email          pgtype.Text `json:"email"`
-	StMakepoint    interface{} `json:"st_makepoint"`
-	StMakepoint_2  interface{} `json:"st_makepoint_2"`
-	FirstName      pgtype.Text `json:"first_name"`
-	LastName       pgtype.Text `json:"last_name"`
-	HasSetLocation pgtype.Bool `json:"has_set_location"`
+	Ulid               string       `json:"ulid"`
+	Name               string       `json:"name"`
+	HighlightedPhotoID *int64       `json:"highlighted_photo_id"`
+	Locale             *string      `json:"locale"`
+	Description        *string      `json:"description"`
+	Locality           *string      `json:"locality"`
+	AdministrativeArea *string      `json:"administrative_area"`
+	CountryCode        *string      `json:"country_code"`
+	PostalCode         *string      `json:"postal_code"`
+	Geom               *OrbGeometry `json:"geom"`
+	FirstName          *string      `json:"first_name"`
+	LastName           *string      `json:"last_name"`
+	Email              *string      `json:"email"`
+	HasSetLocation     bool         `json:"has_set_location"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
 	row := q.db.QueryRow(ctx, createUser,
+		arg.Ulid,
 		arg.Name,
-		arg.Email,
-		arg.StMakepoint,
-		arg.StMakepoint_2,
+		arg.HighlightedPhotoID,
+		arg.Locale,
+		arg.Description,
+		arg.Locality,
+		arg.AdministrativeArea,
+		arg.CountryCode,
+		arg.PostalCode,
+		arg.Geom,
 		arg.FirstName,
 		arg.LastName,
+		arg.Email,
 		arg.HasSetLocation,
 	)
 	var i User
 	err := row.Scan(
 		&i.ID,
+		&i.Ulid,
 		&i.Name,
 		&i.HighlightedPhotoID,
 		&i.Locale,
 		&i.CreatedAt,
+		&i.UpdatedAt,
 		&i.Description,
 		&i.Locality,
 		&i.AdministrativeArea,
@@ -61,7 +88,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 }
 
 const getUserByID = `-- name: GetUserByID :one
-SELECT id, name, highlighted_photo_id, locale, created_at, description, locality, administrative_area, country_code, postal_code, geom, first_name, last_name, email, has_set_location FROM users WHERE id = $1
+SELECT id, ulid, name, highlighted_photo_id, locale, created_at, updated_at, description, locality, administrative_area, country_code, postal_code, geom, first_name, last_name, email, has_set_location FROM users WHERE id = $1
 `
 
 func (q *Queries) GetUserByID(ctx context.Context, id int64) (User, error) {
@@ -69,10 +96,88 @@ func (q *Queries) GetUserByID(ctx context.Context, id int64) (User, error) {
 	var i User
 	err := row.Scan(
 		&i.ID,
+		&i.Ulid,
 		&i.Name,
 		&i.HighlightedPhotoID,
 		&i.Locale,
 		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Description,
+		&i.Locality,
+		&i.AdministrativeArea,
+		&i.CountryCode,
+		&i.PostalCode,
+		&i.Geom,
+		&i.FirstName,
+		&i.LastName,
+		&i.Email,
+		&i.HasSetLocation,
+	)
+	return i, err
+}
+
+const updateUser = `-- name: UpdateUser :one
+UPDATE users SET
+    name = $2,
+    email = $3,
+    first_name = $4,
+    last_name = $5,
+    description = $6,
+    locality = $7,
+    administrative_area = $8,
+    country_code = $9,
+    postal_code = $10,
+    geom = $11,
+    has_set_location = $12,
+    highlighted_photo_id = $13,
+    locale = $14
+WHERE id = $1
+RETURNING id, ulid, name, highlighted_photo_id, locale, created_at, updated_at, description, locality, administrative_area, country_code, postal_code, geom, first_name, last_name, email, has_set_location
+`
+
+type UpdateUserParams struct {
+	ID                 int64        `json:"id"`
+	Name               string       `json:"name"`
+	Email              *string      `json:"email"`
+	FirstName          *string      `json:"first_name"`
+	LastName           *string      `json:"last_name"`
+	Description        *string      `json:"description"`
+	Locality           *string      `json:"locality"`
+	AdministrativeArea *string      `json:"administrative_area"`
+	CountryCode        *string      `json:"country_code"`
+	PostalCode         *string      `json:"postal_code"`
+	Geom               *OrbGeometry `json:"geom"`
+	HasSetLocation     bool         `json:"has_set_location"`
+	HighlightedPhotoID *int64       `json:"highlighted_photo_id"`
+	Locale             *string      `json:"locale"`
+}
+
+func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error) {
+	row := q.db.QueryRow(ctx, updateUser,
+		arg.ID,
+		arg.Name,
+		arg.Email,
+		arg.FirstName,
+		arg.LastName,
+		arg.Description,
+		arg.Locality,
+		arg.AdministrativeArea,
+		arg.CountryCode,
+		arg.PostalCode,
+		arg.Geom,
+		arg.HasSetLocation,
+		arg.HighlightedPhotoID,
+		arg.Locale,
+	)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Ulid,
+		&i.Name,
+		&i.HighlightedPhotoID,
+		&i.Locale,
+		&i.CreatedAt,
+		&i.UpdatedAt,
 		&i.Description,
 		&i.Locality,
 		&i.AdministrativeArea,

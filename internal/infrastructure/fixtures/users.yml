@@ -1,0 +1,89 @@
+- id: "1"
+  ulid: "01HCNYK0PKYZWB0ZT1KR0EPWGP"
+  name: "testuser"
+  highlighted_photo_id: null
+  locale: "ja"
+  created_at: "2024-01-15 10:00:00"
+  updated_at: "2024-01-15 10:00:00"
+  description: "東京を中心にサイクリングを楽しんでいます。週末ライダーです。"
+  locality: "渋谷区"
+  administrative_area: "東京都"
+  country_code: "JP"
+  postal_code: "150-0002"
+  geom: "SRID=4326;POINT(139.7024 35.6598)"
+  first_name: "太郎"
+  last_name: "山田"
+  email: "test@example.com"
+  has_set_location: true
+
+- id: "2"
+  ulid: "01HCNZM1QRYZWB0ZT1KR0EPXHA"
+  name: "cyclingfan"
+  highlighted_photo_id: null
+  locale: "ja"
+  created_at: "2024-02-20 14:30:00"
+  updated_at: "2024-02-20 14:30:00"
+  description: "ロングライドが好きです。日本全国を走破するのが目標！"
+  locality: "中央区"
+  administrative_area: "大阪府"
+  country_code: "JP"
+  postal_code: "542-0076"
+  geom: "SRID=4326;POINT(135.5023 34.6937)"
+  first_name: "花子"
+  last_name: "佐藤"
+  email: "cycling.fan@example.com"
+  has_set_location: true
+
+- id: "3"
+  ulid: "01HCP0N2RSYZWB0ZT1KR0EPYIB"
+  name: "ridermax"
+  highlighted_photo_id: null
+  locale: "en"
+  created_at: "2024-03-10 09:15:00"
+  updated_at: "2024-03-10 09:15:00"
+  description: "Mountain biking enthusiast from Kyoto. Love exploring new trails!"
+  locality: "Sakyo Ward"
+  administrative_area: "Kyoto"
+  country_code: "JP"
+  postal_code: "606-8501"
+  geom: "SRID=4326;POINT(135.7681 35.0116)"
+  first_name: "Max"
+  last_name: "Smith"
+  email: "rider.max@example.com"
+  has_set_location: true
+
+- id: "4"
+  ulid: "01HCP1P3STYZWB0ZT1KR0EPZJC"
+  name: "newbie_cyclist"
+  highlighted_photo_id: null
+  locale: "ja"
+  created_at: "2024-11-01 16:45:00"
+  updated_at: "2024-11-01 16:45:00"
+  description: null
+  locality: null
+  administrative_area: null
+  country_code: "JP"
+  postal_code: null
+  geom: null
+  first_name: "健太"
+  last_name: "鈴木"
+  email: "newbie@example.com"
+  has_set_location: false
+
+- id: "5"
+  ulid: "01HCP2Q4TUYZWB0ZT1KR0EQ0KD"
+  name: "pro_racer"
+  highlighted_photo_id: null
+  locale: "ja"
+  created_at: "2023-05-12 08:00:00"
+  updated_at: "2024-12-01 12:30:00"
+  description: "競技志向のサイクリスト。レースとトレーニングに日々励んでいます。"
+  locality: "緑区"
+  administrative_area: "神奈川県"
+  country_code: "JP"
+  postal_code: "226-0013"
+  geom: "SRID=4326;POINT(139.5114 35.5111)"
+  first_name: "優"
+  last_name: "高橋"
+  email: "pro.racer@example.com"
+  has_set_location: true

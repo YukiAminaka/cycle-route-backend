@@ -56,7 +56,7 @@ func (mr *MockIUserRepositoryMockRecorder) CreateUser(ctx, user any) *gomock.Cal
 }
 
 // GetUserByID mocks base method.
-func (m *MockIUserRepository) GetUserByID(ctx context.Context, id int64) (*User, error) {
+func (m *MockIUserRepository) GetUserByID(ctx context.Context, id string) (*User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUserByID", ctx, id)
 	ret0, _ := ret[0].(*User)

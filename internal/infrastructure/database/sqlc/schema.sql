@@ -218,22 +218,22 @@ EXECUTE FUNCTION set_updated_at();
 CREATE TRIGGER update_trips_updated_at
 BEFORE UPDATE ON trips
 FOR EACH ROW
-EXECUTE FUNCTION update_updated_at_column();
+EXECUTE FUNCTION set_updated_at();
 
 -- route_imagesテーブルにトリガーを設定
 CREATE TRIGGER update_route_images_updated_at
 BEFORE UPDATE ON route_images
 FOR EACH ROW
-EXECUTE FUNCTION update_updated_at_column();
+EXECUTE FUNCTION set_updated_at();
 
 -- trip_imagesテーブルにトリガーを設定
 CREATE TRIGGER update_trip_images_updated_at
 BEFORE UPDATE ON trip_images
 FOR EACH ROW
-EXECUTE FUNCTION update_updated_at_column();
+EXECUTE FUNCTION set_updated_at();
 
 -- route_commentsテーブルにトリガーを設定
 CREATE TRIGGER update_route_comments_updated_at
 BEFORE UPDATE ON route_comments
 FOR EACH ROW
-EXECUTE FUNCTION update_updated_at_column();
+EXECUTE FUNCTION set_updated_at();

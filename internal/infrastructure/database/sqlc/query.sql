@@ -37,4 +37,4 @@ WHERE id = $1
 RETURNING *; 
 
 -- name: GetUserByID :one
-SELECT * FROM users WHERE id = $1;
+SELECT * FROM users WHERE ulid = $1;

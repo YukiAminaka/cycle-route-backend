@@ -1,4 +1,4 @@
-package sqlc
+package dbgen
 
 import (
 	"database/sql/driver"

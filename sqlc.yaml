@@ -5,13 +5,13 @@ cloud:
   hostname: ""
 servers: []
 sql:
-  - schema: "sqlc/schema.sql"
-    queries: "sqlc/query.sql"
+  - schema: "internal/infrastructure/database/sqlc/schema.sql"
+    queries: "internal/infrastructure/database/sqlc/query.sql"
     engine: "postgresql"
     gen:
       go:
-        package: "sqlc"
-        out: "internal/infrastructure/database/sqlc"
+        package: "dbgen"
+        out: "internal/infrastructure/database/dbgen"
         sql_package: "pgx/v5"
         emit_pointers_for_null_types: true
         emit_json_tags: true

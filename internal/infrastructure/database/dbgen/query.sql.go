@@ -3,7 +3,7 @@
 //   sqlc v1.30.0
 // source: query.sql
 
-package sqlc
+package dbgen
 
 import (
 	"context"
@@ -88,11 +88,11 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 }
 
 const getUserByID = `-- name: GetUserByID :one
-SELECT id, ulid, name, highlighted_photo_id, locale, created_at, updated_at, description, locality, administrative_area, country_code, postal_code, geom, first_name, last_name, email, has_set_location FROM users WHERE id = $1
+SELECT id, ulid, name, highlighted_photo_id, locale, created_at, updated_at, description, locality, administrative_area, country_code, postal_code, geom, first_name, last_name, email, has_set_location FROM users WHERE ulid = $1
 `
 
-func (q *Queries) GetUserByID(ctx context.Context, id int64) (User, error) {
-	row := q.db.QueryRow(ctx, getUserByID, id)
+func (q *Queries) GetUserByID(ctx context.Context, ulid string) (User, error) {
+	row := q.db.QueryRow(ctx, getUserByID, ulid)
 	var i User
 	err := row.Scan(
 		&i.ID,

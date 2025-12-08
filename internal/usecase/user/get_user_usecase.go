@@ -9,7 +9,7 @@ import (
 
 // IUserUsecase はユーザーユースケースのインターフェース
 type IGetUserByIDUsecase interface {
-	GetUserByID(ctx context.Context, id int64) (*GetUserByIDUseCaseDto, error)
+	GetUserByID(ctx context.Context, id string) (*GetUserByIDUseCaseDto, error)
 }
 
 type getUserByIDUsecase struct {
@@ -41,7 +41,7 @@ type GetUserByIDUseCaseDto struct {
 	hasSetLocation     bool
 }
 
-func (u *getUserByIDUsecase) GetUserByID(ctx context.Context, id int64) (*GetUserByIDUseCaseDto, error) {
+func (u *getUserByIDUsecase) GetUserByID(ctx context.Context, id string) (*GetUserByIDUseCaseDto, error) {
 	user, err := u.userRepo.GetUserByID(ctx, id)
 	if err != nil {
 		return nil, err

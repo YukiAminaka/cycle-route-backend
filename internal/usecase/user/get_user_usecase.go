@@ -25,20 +25,20 @@ func NewGetUserByIDUsecase(userRepo userDomain.IUserRepository) IGetUserByIDUsec
 
 // GetUserByIDUseCaseDto は GetUserByID ユースケースの出力DTO
 type GetUserByIDUseCaseDto struct {
-	id                 string
-	name               string
-	highlightedPhotoID *int64
-	locale             *string
-	description        *string
-	locality           *string
-	administrativeArea *string
-	countryCode        *string
-	postalCode         *string
-	geom               *orb.Point
-	firstName          *string
-	lastName           *string
-	email              *string
-	hasSetLocation     bool
+	ID                 string
+	Name               string
+	HighlightedPhotoID *int64
+	Locale             *string
+	Description        *string
+	Locality           *string
+	AdministrativeArea *string
+	CountryCode        *string
+	PostalCode         *string
+	Geom               *orb.Point
+	FirstName          *string
+	LastName           *string
+	Email              *string
+	HasSetLocation     bool
 }
 
 func (u *getUserByIDUsecase) GetUserByID(ctx context.Context, id string) (*GetUserByIDUseCaseDto, error) {
@@ -47,16 +47,16 @@ func (u *getUserByIDUsecase) GetUserByID(ctx context.Context, id string) (*GetUs
 		return nil, err
 	}
 	return &GetUserByIDUseCaseDto{
-		id:                 user.ID().String(),
-		name:               user.Name(),
-		highlightedPhotoID: user.HighlightedPhotoID(),
-		locale:             user.Locale(),
-		description:        user.Description(),
-		locality:           user.Locality(),
-		administrativeArea: user.AdministrativeArea(),
-		countryCode:        user.CountryCode(),
-		postalCode:         user.PostalCode(),
-		geom: func() *orb.Point {
+		ID:                 user.ID().String(),
+		Name:               user.Name(),
+		HighlightedPhotoID: user.HighlightedPhotoID(),
+		Locale:             user.Locale(),
+		Description:        user.Description(),
+		Locality:           user.Locality(),
+		AdministrativeArea: user.AdministrativeArea(),
+		CountryCode:        user.CountryCode(),
+		PostalCode:         user.PostalCode(),
+		Geom: func() *orb.Point {
 			if user.Geom() != nil {
 				if point, ok := user.Geom().Geometry.(orb.Point); ok {
 					return &point
@@ -64,10 +64,10 @@ func (u *getUserByIDUsecase) GetUserByID(ctx context.Context, id string) (*GetUs
 			}
 			return nil
 		}(),
-		firstName:      user.FirstName(),
-		lastName:       user.LastName(),
-		email:          user.Email(),
-		hasSetLocation: user.HasSetLocation(),
+		FirstName:      user.FirstName(),
+		LastName:       user.LastName(),
+		Email:          user.Email(),
+		HasSetLocation: user.HasSetLocation(),
 	}, nil
 }
 

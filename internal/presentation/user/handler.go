@@ -1,10 +1,11 @@
 package user
 
 import (
-	"github.com/YukiAminaka/cycle-route-backend/internal/presentation/settings"
+	"github.com/YukiAminaka/cycle-route-backend/internal/presentation/response"
 	"github.com/YukiAminaka/cycle-route-backend/internal/presentation/validator"
 	userUsecase "github.com/YukiAminaka/cycle-route-backend/internal/usecase/user"
 	"github.com/gin-gonic/gin"
+	"github.com/paulmach/orb/geojson"
 )
 
 // Handler はユーザー関連のHTTPハンドラー
@@ -30,18 +31,27 @@ func NewHandler(
 // @Accept json
 // @Produce json
 // @Param id path string true "User ID"
-// @Success 200 {object} GetUserResponse
-// @Failure 400 {object} presenter.Response
-// @Failure 404 {object} presenter.Response
-// @Failure 500 {object} presenter.Response
-// @Router /v1/users/{id} [get]
+// @Success 200 {object} userResponse
+// @Failure 400 {object} response.ErrorResponse
+// @Failure 404 {object} response.ErrorResponse
+// @Failure 500 {object} response.ErrorResponse
+// @Router api/v1/users/{id} [get]
 func (h *Handler) GetUserByID(c *gin.Context) {
 	id := c.Param("id")
 
 	dto, err := h.getUserUsecase.GetUserByID(c.Request.Context(), id)
 	if err != nil {
-		settings.ReturnError(c, err)
+		response.ReturnError(c, err)
 		return
+	}
+
+	// GEOJSON 形式に変換
+	var rawJSON string
+	if dto.Geom != nil {
+		fc := geojson.NewFeatureCollection()
+		fc.Append(geojson.NewFeature(dto.Geom))
+		b, _ := fc.MarshalJSON()
+		rawJSON = string(b)
 	}
 
 	res := userResponse{
@@ -55,7 +65,7 @@ func (h *Handler) GetUserByID(c *gin.Context) {
 			AdministrativeArea: dto.AdministrativeArea,
 			CountryCode:        dto.CountryCode,
 			PostalCode:         dto.PostalCode,
-			Geom:               dto.Geom,
+			Geom:               &rawJSON,
 			FirstName:          dto.FirstName,
 			LastName:           dto.LastName,
 			Email:              dto.Email,
@@ -63,7 +73,7 @@ func (h *Handler) GetUserByID(c *gin.Context) {
 		},
 	}
 
-	settings.ReturnStatusOK(c, res)
+	response.ReturnStatusOK(c, res)
 }
 
 // CreateUser godoc
@@ -72,21 +82,21 @@ func (h *Handler) GetUserByID(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param request body CreateUserRequest true "Create User Request"
-// @Success 201 {object} presenter.Response
-// @Failure 400 {object} presenter.Response
-// @Failure 500 {object} presenter.Response
-// @Router /v1/users [post]
+// @Success 201 {object} userResponse
+// @Failure 400 {object} response.ErrorResponse
+// @Failure 500 {object} response.ErrorResponse
+// @Router api/v1/users [post]
 func (h *Handler) CreateUser(c *gin.Context) {
 	var req CreateUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		settings.ReturnBadRequest(c, err)
+		response.ReturnBadRequest(c, err)
 		return
 	}
 
 	// バリデーション
 	validate := validator.GetValidator()
 	if err := validate.Struct(req); err != nil {
-		settings.ReturnStatusBadRequest(c, err)
+		response.ReturnStatusBadRequest(c, err)
 		return
 	}
 
@@ -99,10 +109,20 @@ func (h *Handler) CreateUser(c *gin.Context) {
 
 	dto, err := h.createUserUsecase.CreateUser(c, input)
 	if err != nil {
-		settings.ReturnError(c, err)
+		response.ReturnError(c, err)
 		return
 	}
-	response := userResponse{
+
+	// GEOJSON 形式に変換
+	var rawJSON string
+	if dto.Geom != nil {
+		fc := geojson.NewFeatureCollection()
+		fc.Append(geojson.NewFeature(dto.Geom))
+		b, _ := fc.MarshalJSON()
+		rawJSON = string(b)
+	}
+
+	res := userResponse{
 		userResponseModel{
 			ID:                 dto.ID,
 			Name:               dto.Name,
@@ -113,12 +133,12 @@ func (h *Handler) CreateUser(c *gin.Context) {
 			AdministrativeArea: dto.AdministrativeArea,
 			CountryCode:        dto.CountryCode,
 			PostalCode:         dto.PostalCode,
-			Geom:               dto.Geom,
+			Geom:               &rawJSON,
 			FirstName:          dto.FirstName,
 			LastName:           dto.LastName,
 			Email:              dto.Email,
 			HasSetLocation:     dto.HasSetLocation,
 		},
 	}
-	settings.ReturnStatusCreated(c, response)
+	response.ReturnStatusCreated(c, res)
 }

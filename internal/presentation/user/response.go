@@ -1,7 +1,5 @@
 package user
 
-import "github.com/paulmach/orb"
-
 // userResponse はユーザー取得のレスポンス
 type userResponse struct {
 	User userResponseModel `json:"user"`
@@ -20,7 +18,7 @@ type userResponseModel struct {
 	AdministrativeArea *string    `json:"administrative_area,omitempty"`
 	CountryCode        *string    `json:"country_code,omitempty"`
 	PostalCode         *string    `json:"postal_code,omitempty"`
-	Geom               *orb.Point `json:"geom,omitempty"`
+	Geom               *string 	  `json:"geom,omitempty"`
 	FirstName          *string    `json:"first_name,omitempty"`
 	LastName           *string    `json:"last_name,omitempty"`
 	Email              *string    `json:"email,omitempty"`

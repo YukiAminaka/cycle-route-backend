@@ -116,6 +116,14 @@ sqlc generate
 go run cmd/api/main.go
 ```
 
+## API ドキュメント
+
+ブラウザで以下の URL にアクセスすると、Swagger UI が表示され、API のドキュメントを確認できます。
+
+```
+http://localhost:8080/api/v1/swagger/index.html
+```
+
 ## 開発ワークフロー
 
 ### Atlas を使ったマイグレーション管理

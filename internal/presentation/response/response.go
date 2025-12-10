@@ -1,20 +1,15 @@
-package settings
+package response
 
 import (
 	"net/http"
 
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
-
-func NewGinEngine() *gin.Engine {
-	router := gin.Default()
-	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"*"}
-
-	router.Use(cors.New(config))
-	return router
+// ErrorResponse はエラーレスポンスの構造体
+type ErrorResponse struct {
+	Code int    `json:"code" example:"400"`
+	Msg  string `json:"msg" example:"Bad Request"`
 }
 
 func ReturnStatusOK[T any](ctx *gin.Context, body T) {

@@ -24,8 +24,8 @@ type DBConfig struct {
 }
 
 type Server struct {
-	Address string `env:"ADDRESS" default:"0.0.0.0"`
-	Port    string `env:"PORT" default:"8080"`
+	Address string `env:"ADDRESS" envDefault:"0.0.0.0"`
+	Port    string `env:"PORT" envDefault:"8080"`
 }
 
 // 読み込み

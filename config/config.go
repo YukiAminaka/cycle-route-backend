@@ -1,26 +1,52 @@
 package config
 
 import (
+	"fmt"
+	"log"
 	"os"
+	"sync"
+
+	"github.com/caarlos0/env/v11"
+	"github.com/joho/godotenv"
 )
 
-// Config はアプリケーションの設定
 type Config struct {
-	DatabaseURL string
-	ServerPort  string
+	DB     DBConfig
+	Server Server
 }
 
-// LoadConfig は環境変数から設定を読み込む
-func LoadConfig() *Config {
-	return &Config{
-		DatabaseURL: getEnv("DATABASE_URL", ""),
-		ServerPort:  getEnv("SERVER_PORT", "8080"),
-	}
+type DBConfig struct {
+	Name string `env:"DB_NAME"`
+	User string `env:"DB_USER"`
+	Password string `env:"DB_PASSWORD"`
+    Host string `env:"DB_HOST"`
+    Port string `env:"DB_PORT"`
 }
 
-func getEnv(key, defaultValue string) string {
-	if value := os.Getenv(key); value != "" {
-		return value
-	}
-	return defaultValue
+type Server struct {
+	Address string `env:"ADDRESS" default:"0.0.0.0"`
+	Port    string `env:"PORT" default:"8080"`
+}
+
+// 読み込み
+var (
+	cfg Config
+	once sync.Once
+)
+
+
+func GetConfig() *Config {
+	// goroutine実行中でも一度だけ実行される
+	once.Do(func() {
+		// envファイルの読み込み
+		err := godotenv.Load(fmt.Sprintf("env/%s.env", os.Getenv("GO_ENV")))
+		if err != nil {
+			log.Fatal("Error loading .env file")
+		}
+
+		if err := env.Parse(&cfg); err != nil {
+			panic(err)
+		}
+	})
+	return &cfg
 }

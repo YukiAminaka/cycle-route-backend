@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -17,14 +18,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Run(ctx context.Context, conf *config.Config, q *dbgen.Queries) {
+func Run(ctx context.Context, conf *config.Config, q *dbgen.Queries) error{
 	router := gin.Default()
 	config := cors.DefaultConfig()
 	config.AllowOrigins = []string{"*"}
 
 	router.Use(cors.New(config))
 
-	route.InitRoute(router)
+	route.InitRoute(router, q)
 	
 	address := conf.Server.Address + ":" + conf.Server.Port
 	log.Printf("Starting server on %s...\n", address)
@@ -55,6 +56,7 @@ func Run(ctx context.Context, conf *config.Config, q *dbgen.Queries) {
 	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
 	defer cancel()
 	if err := srv.Shutdown(ctx); err != nil {
-		os.Exit(1)
+		return fmt.Errorf("shutdown: %w", err)
 	}
+	return nil
 }

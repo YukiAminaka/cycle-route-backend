@@ -2,10 +2,12 @@ package main
 
 import (
 	"context"
+	"os"
 
 	"github.com/YukiAminaka/cycle-route-backend/config"
 	_ "github.com/YukiAminaka/cycle-route-backend/docs"
 	"github.com/YukiAminaka/cycle-route-backend/internal/infrastructure/database"
+	"github.com/YukiAminaka/cycle-route-backend/internal/infrastructure/database/dbgen"
 	"github.com/YukiAminaka/cycle-route-backend/internal/server"
 )
 
@@ -19,6 +21,11 @@ func main() {
 	defer cancel()
 
 	conf := config.GetConfig()
-	q := database.NewDB(conf.DB)
-	server.Run(ctx, conf, q)
+	pool := database.NewDB(conf.DB)
+	defer pool.Close()
+	
+	q := dbgen.New(pool)
+	if err := server.Run(ctx, conf, q); err != nil {
+		os.Exit(1)
+	}
 }

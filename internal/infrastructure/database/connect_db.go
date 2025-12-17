@@ -18,7 +18,7 @@ const (
 )
 
 // NewDB creates a new database connection pool with proper configuration
-func NewDB(cfg config.DBConfig) *dbgen.Queries {
+func NewDB(cfg config.DBConfig)  *pgxpool.Pool{
 	ctx, cancel := context.WithTimeout(context.Background(), connectionTimeout)
 	defer cancel()
 
@@ -35,11 +35,11 @@ func NewDB(cfg config.DBConfig) *dbgen.Queries {
 	}
 
 	// コネクションプールの設定
-	poolConfig.MaxConns = 25
-	poolConfig.MinConns = 5
-	poolConfig.MaxConnLifetime = time.Hour
-	poolConfig.MaxConnIdleTime = 30 * time.Minute
-	poolConfig.HealthCheckPeriod = time.Minute
+	poolConfig.MaxConns = 25 // 最大接続数
+	poolConfig.MinConns = 5 // 最小接続数
+	poolConfig.MaxConnLifetime = time.Hour // コネクションの最大寿命
+	poolConfig.MaxConnIdleTime = 30 * time.Minute // コネクションの最大アイドル時間
+	poolConfig.HealthCheckPeriod = time.Minute // ヘルスチェックの間隔
 
 	// リトライロジック付きで接続プールを作成
 	var pool *pgxpool.Pool
@@ -49,8 +49,7 @@ func NewDB(cfg config.DBConfig) *dbgen.Queries {
 			// 疎通確認
 			if err = pool.Ping(ctx); err == nil {
 				log.Println("Successfully connected to database")
-				queries := dbgen.New(pool)
-				return queries
+				return pool
 			}
 			pool.Close()
 		}

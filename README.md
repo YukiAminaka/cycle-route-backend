@@ -113,7 +113,7 @@ sqlc generate
 ### 5. アプリケーションの起動
 
 ```bash
-go run cmd/api/main.go
+GO_ENV=dev go run cmd/api/main.go
 ```
 
 ## API ドキュメント

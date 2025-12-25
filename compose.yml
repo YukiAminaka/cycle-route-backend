@@ -1,4 +1,4 @@
-name: "SERVICE_NAME"
+name: "cycle-route-backend"
 
 services:
   postgres:
@@ -11,5 +11,19 @@ services:
       - "5432:5432"
     volumes:
       - postgis_data:/var/lib/postgresql
+    networks:
+      - intranet
+  app:
+    build: .
+    volumes:
+      - .:/app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    networks:
+      - intranet
+networks:
+  intranet:
 volumes:
   postgis_data:

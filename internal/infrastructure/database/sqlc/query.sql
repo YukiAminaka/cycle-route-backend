@@ -1,6 +1,7 @@
 -- name: CreateUser :one
 INSERT INTO users (                
-    ulid,              
+    id,
+    kratos_id,              
     name,              
     highlighted_photo_id,
     locale,            
@@ -15,7 +16,7 @@ INSERT INTO users (
     email,             
     has_set_location     
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14
+    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15
 ) RETURNING *;
 
 -- name: UpdateUser :one
@@ -37,4 +38,4 @@ WHERE id = $1
 RETURNING *; 
 
 -- name: GetUserByID :one
-SELECT * FROM users WHERE ulid = $1;
+SELECT * FROM users WHERE id = $1;

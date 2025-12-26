@@ -34,3 +34,7 @@ sql:
               type: Time
               pointer: true
             nullable: true
+          - db_type: "uuid"
+            go_type:
+              import: "github.com/google/uuid"
+              type: "UUID"

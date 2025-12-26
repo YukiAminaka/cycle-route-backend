@@ -1,12 +1,11 @@
 package user
 
 import (
-	"crypto/rand"
 	"errors"
 	"fmt"
 	"strings"
 
-	"github.com/oklog/ulid/v2"
+	"github.com/google/uuid"
 	"github.com/paulmach/orb"
 )
 
@@ -22,7 +21,11 @@ type UserID string
 
 // NewUserID は新しいUserIDを生成します
 func NewUserID() UserID {
-	return UserID(ulid.MustNew(ulid.Now(), rand.Reader).String())
+	uuid, err := uuid.NewV7()
+	if err != nil {
+		panic(err)
+	}
+	return UserID(uuid.String())
 }
 
 // String はUserIDの文字列表現を返します
@@ -38,6 +41,7 @@ type Geometry struct {
 // ユーザーエンティティ
 type User struct {
 	id                 UserID
+	kratosID           string
 	name               string
 	highlightedPhotoID *int64
 	locale             *string
@@ -55,12 +59,17 @@ type User struct {
 
 // 新しいユーザーを作成
 func NewUser(
+	kratosID string,
 	name string,
 	email *string,
 	firstName *string,
 	lastName *string,
 ) (*User, error) {
 	// バリデーション
+	if strings.TrimSpace(kratosID) == "" {
+		return nil, ErrInvalidName
+	}
+
 	if strings.TrimSpace(name) == "" {
 		return nil, ErrInvalidName
 	}
@@ -71,6 +80,7 @@ func NewUser(
 
 	return &User{
 		id:             NewUserID(),
+		kratosID:       kratosID,
 		name:           name,
 		email:          email,
 		firstName:      firstName,
@@ -82,6 +92,7 @@ func NewUser(
 // 永続化層から取得したデータをドメインに変換（リポジトリからの取得時に使用）
 func ReconstructUser(
 	id UserID,
+	kratosID string,
 	name string,
 	highlightedPhotoID *int64,
 	locale *string,
@@ -103,6 +114,7 @@ func ReconstructUser(
 
 	return &User{
 		id:                 id,
+		kratosID:           kratosID,
 		name:               name,
 		highlightedPhotoID: highlightedPhotoID,
 		locale:             locale,
@@ -123,6 +135,10 @@ func ReconstructUser(
 
 func (u *User) ID() UserID {
 	return u.id
+}
+
+func (u *User) KratosID() string {
+	return u.kratosID
 }
 
 func (u *User) Name() string {

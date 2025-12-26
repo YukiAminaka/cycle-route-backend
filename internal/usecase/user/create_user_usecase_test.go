@@ -35,6 +35,7 @@ func Test_createUserUsecase_CreateUser(t *testing.T) {
 		{
 			name: "正常系: ユーザー作成に成功する",
 			input: CreateUserUseCaseInputDto{
+				KratosID: "2eb50f70-3a23-4067-99f6-9fd645686880",
 				Name:      "Test User",
 				FirstName: ptr("Test"),
 				LastName:  ptr("User"),
@@ -48,7 +49,8 @@ func Test_createUserUsecase_CreateUser(t *testing.T) {
 						// 渡されたuserをそのまま返す（実際のリポジトリの挙動を模倣）
 						// ReconstructUserを使用してデフォルト値を含む完全なユーザーを返す
 						return userDomain.ReconstructUser(
-							userDomain.UserID("01HCNYK0PKYZWB0ZT1KR0EPWGP"),
+							userDomain.UserID("019b5a8d-16a7-700a-be92-9ae11e7e5b9a"),
+							"2eb50f70-3a23-4067-99f6-9fd645686880",
 							"Test User",
 							nil,                     // highlightedPhotoID (schema.sql: DEFAULT 0、nilで表現)
 							ptr("ja"),               // locale (schema.sql: DEFAULT 'ja')
@@ -66,7 +68,7 @@ func Test_createUserUsecase_CreateUser(t *testing.T) {
 					})
 			},
 			want: &CreateUserUseCaseOutputDto{
-				ID:                 "01HCNYK0PKYZWB0ZT1KR0EPWGP",
+				ID:                 "019b5a8d-16a7-700a-be92-9ae11e7e5b9a",
 				Name:               "Test User",
 				FirstName:          ptr("Test"),
 				LastName:           ptr("User"),

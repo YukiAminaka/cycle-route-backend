@@ -20,7 +20,8 @@ func ptrGeom(g orb.Geometry) *userDomain.Geometry {
 
 func TestUserRepository_GetUserByID(t *testing.T) {
 	user, err := userDomain.ReconstructUser(
-		"01HCNYK0PKYZWB0ZT1KR0EPWGP",
+		"70d6037a-b67b-4aa8-b5a3-da393b514f24",
+		"019b5a3b-9854-787d-8877-e1732595d5b8",
 		"testuser",
 		nil, // highlightedPhotoID
 		ptr("ja"),
@@ -66,7 +67,7 @@ func TestUserRepository_GetUserByID(t *testing.T) {
 }
 
 func TestUserRepository_CreateUser(t *testing.T) {
-	user, err := userDomain.NewUser("newuser",ptr("newuser@example.com"),ptr("Test"),ptr("User"))
+	user, err := userDomain.NewUser("019b5a40-2c63-7c96-a2d2-a8f1ed21ecbd", "newuser",ptr("newuser@example.com"),ptr("Test"),ptr("User"))
 	if err != nil {
 		t.Error(err)
 	}

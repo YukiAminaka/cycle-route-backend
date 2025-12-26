@@ -24,6 +24,7 @@ func NewCreateUserUsecase(userRepo userDomain.IUserRepository) ICreateUserUsecas
 }
 
 type CreateUserUseCaseInputDto struct {
+	KratosID string
 	Name      string
 	Email     *string
 	FirstName *string
@@ -49,6 +50,7 @@ type CreateUserUseCaseOutputDto struct {
 
 func (u *createUserUsecase) CreateUser(ctx context.Context, dto CreateUserUseCaseInputDto) (*CreateUserUseCaseOutputDto, error) {
 	newUser, err := userDomain.NewUser(
+		dto.KratosID,
 		dto.Name,
 		dto.Email,
 		dto.FirstName,

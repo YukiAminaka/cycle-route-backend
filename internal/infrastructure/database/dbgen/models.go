@@ -6,12 +6,13 @@ package dbgen
 
 import (
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type CoursePoint struct {
-	ID            int64        `json:"id"`
-	Ulid          string       `json:"ulid"`
-	RouteID       *int64       `json:"route_id"`
+	ID            uuid.UUID    `json:"id"`
+	RouteID       uuid.UUID    `json:"route_id"`
 	StepOrder     int32        `json:"step_order"`
 	SegDistM      *float64     `json:"seg_dist_m"`
 	CumDistM      *float64     `json:"cum_dist_m"`
@@ -26,9 +27,8 @@ type CoursePoint struct {
 }
 
 type Route struct {
-	ID                 int64       `json:"id"`
-	Ulid               string      `json:"ulid"`
-	UserID             int64       `json:"user_id"`
+	ID                 uuid.UUID   `json:"id"`
+	UserID             uuid.UUID   `json:"user_id"`
 	Name               string      `json:"name"`
 	Description        string      `json:"description"`
 	HighlightedPhotoID *int64      `json:"highlighted_photo_id"`
@@ -48,8 +48,7 @@ type Route struct {
 }
 
 type RouteComment struct {
-	ID        int64      `json:"id"`
-	Ulid      string     `json:"ulid"`
+	ID        uuid.UUID  `json:"id"`
 	UserID    int64      `json:"user_id"`
 	RouteID   int64      `json:"route_id"`
 	ParentID  *int64     `json:"parent_id"`
@@ -60,9 +59,8 @@ type RouteComment struct {
 }
 
 type RouteImage struct {
-	ID         int64     `json:"id"`
-	Ulid       string    `json:"ulid"`
-	RouteID    int64     `json:"route_id"`
+	ID         uuid.UUID `json:"id"`
+	RouteID    uuid.UUID `json:"route_id"`
 	S3Key      string    `json:"s3_key"`
 	Width      *int32    `json:"width"`
 	Height     *int32    `json:"height"`
@@ -74,27 +72,24 @@ type RouteImage struct {
 }
 
 type RouteLike struct {
-	ID        int64     `json:"id"`
-	Ulid      string    `json:"ulid"`
-	UserID    int64     `json:"user_id"`
-	RouteID   int64     `json:"route_id"`
+	ID        uuid.UUID `json:"id"`
+	UserID    uuid.UUID `json:"user_id"`
+	RouteID   uuid.UUID `json:"route_id"`
 	CreatedAt time.Time `json:"created_at"`
 }
 
 type RouteSafe struct {
-	ID        int64      `json:"id"`
-	Ulid      string     `json:"ulid"`
-	UserID    int64      `json:"user_id"`
-	RouteID   int64      `json:"route_id"`
+	ID        uuid.UUID  `json:"id"`
+	UserID    uuid.UUID  `json:"user_id"`
+	RouteID   uuid.UUID  `json:"route_id"`
 	Pinned    bool       `json:"pinned"`
 	CreatedAt time.Time  `json:"created_at"`
 	DeletedAt *time.Time `json:"deleted_at"`
 }
 
 type Trip struct {
-	ID                 int64        `json:"id"`
-	Ulid               string       `json:"ulid"`
-	UserID             int64        `json:"user_id"`
+	ID                 uuid.UUID    `json:"id"`
+	UserID             uuid.UUID    `json:"user_id"`
 	Name               string       `json:"name"`
 	Description        string       `json:"description"`
 	Visibility         int16        `json:"visibility"`
@@ -136,9 +131,8 @@ type Trip struct {
 }
 
 type TripImage struct {
-	ID         int64     `json:"id"`
-	Ulid       string    `json:"ulid"`
-	TripID     int64     `json:"trip_id"`
+	ID         uuid.UUID `json:"id"`
+	TripID     uuid.UUID `json:"trip_id"`
 	S3Key      string    `json:"s3_key"`
 	Width      *int32    `json:"width"`
 	Height     *int32    `json:"height"`
@@ -150,8 +144,8 @@ type TripImage struct {
 }
 
 type User struct {
-	ID                 int64        `json:"id"`
-	Ulid               string       `json:"ulid"`
+	ID                 uuid.UUID    `json:"id"`
+	KratosID           uuid.UUID    `json:"kratos_id"`
 	Name               string       `json:"name"`
 	HighlightedPhotoID *int64       `json:"highlighted_photo_id"`
 	Locale             *string      `json:"locale"`

@@ -90,7 +90,7 @@ cycle-route-backend/
 
 `.env`ファイルを作成し、データベース接続情報を設定します。
 
-### 2. データベースの起動
+### 2. アプリケーションの起動
 
 ```bash
 docker compose up -d
@@ -110,10 +110,10 @@ docker compose exec -T postgres psql -U postgres -d postgres_db < sqlc/schema.sq
 sqlc generate
 ```
 
-### 5. アプリケーションの起動
+## テストの実行
 
 ```bash
-GO_ENV=dev go run cmd/api/main.go
+go test ./...
 ```
 
 ## API ドキュメント

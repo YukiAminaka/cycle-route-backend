@@ -1,5 +1,5 @@
-- id: "1"
-  ulid: "01HCNYK0PKYZWB0ZT1KR0EPWGP"
+- id: "70d6037a-b67b-4aa8-b5a3-da393b514f24"
+  kratos_id: "019b5a3b-9854-787d-8877-e1732595d5b8"
   name: "testuser"
   highlighted_photo_id: null
   locale: "ja"
@@ -16,8 +16,8 @@
   email: "test@example.com"
   has_set_location: true
 
-- id: "2"
-  ulid: "01HCNZM1QRYZWB0ZT1KR0EPXHA"
+- id: "019b5a46-1e77-7b9d-ac62-b438a0fc89cb"
+  kratos_id: "00ed801b-d158-4f92-84ab-46a2e001578b"
   name: "cyclingfan"
   highlighted_photo_id: null
   locale: "ja"
@@ -34,8 +34,8 @@
   email: "cycling.fan@example.com"
   has_set_location: true
 
-- id: "3"
-  ulid: "01HCP0N2RSYZWB0ZT1KR0EPYIB"
+- id: "019b5a46-48de-7bd4-84d4-a705f87f5797"
+  kratos_id: "b1d3c2ab-ccaa-4faa-b928-647497611cd0"
   name: "ridermax"
   highlighted_photo_id: null
   locale: "en"
@@ -52,8 +52,8 @@
   email: "rider.max@example.com"
   has_set_location: true
 
-- id: "4"
-  ulid: "01HCP1P3STYZWB0ZT1KR0EPZJC"
+- id: "019b5a46-71c6-702e-a8a0-c0cf5a2fe757"
+  kratos_id: "fbd5e1d9-5036-4c61-9af3-c1b43d3a7a84"
   name: "newbie_cyclist"
   highlighted_photo_id: null
   locale: "ja"
@@ -70,8 +70,8 @@
   email: "newbie@example.com"
   has_set_location: false
 
-- id: "5"
-  ulid: "01HCP2Q4TUYZWB0ZT1KR0EQ0KD"
+- id: "019b5a46-a03e-7ea3-af09-86f74ff39aa2"
+  kratos_id: "73fdc43d-acf5-4d28-bfd7-ab5e8b049936"
   name: "pro_racer"
   highlighted_photo_id: null
   locale: "ja"

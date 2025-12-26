@@ -14,6 +14,7 @@ func ptr(s string) *string {
 
 func TestNewUser(t *testing.T) {
 	type args struct {
+		kratosID string
 		name      string
 		email     *string
 		firstName *string
@@ -28,12 +29,14 @@ func TestNewUser(t *testing.T) {
 		{
 			name: "正常系",
 			args: args{
+				kratosID: "2eb50f70-3a23-4067-99f6-9fd645686880",
 				name:      "John Doe",
 				email:     ptr("test@example.com"),  // ポインタ型
 				firstName: ptr("John"),             
 				lastName:  ptr("Doe"),               
 			},
 			want: &User{
+				kratosID:      "2eb50f70-3a23-4067-99f6-9fd645686880",
 				name:           "John Doe",
 				highlightedPhotoID: nil,
 				locale:         nil,
@@ -52,6 +55,7 @@ func TestNewUser(t *testing.T) {
 		}, 
 		{name: "異常系",
 			args: args{
+				kratosID: "",
 				name:      "", 
 				email:     nil, 
 				firstName: nil, 
@@ -63,7 +67,7 @@ func TestNewUser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := NewUser(tt.args.name, tt.args.email, tt.args.firstName, tt.args.lastName)
+			got, err := NewUser(tt.args.kratosID, tt.args.name, tt.args.email, tt.args.firstName, tt.args.lastName)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NewUser() error = %v, wantErr %v", err, tt.wantErr)
 				return

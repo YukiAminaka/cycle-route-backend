@@ -8,8 +8,8 @@ import (
 
 // ルートのコースポイント
 type CoursePoint struct {
-	id            int64
-	routeID       int64
+	id            string
+	routeID       string
 	stepOrder     int32
 	segDistM      *float64       // セグメント距離(メートル)
 	cumDistM      *float64       // 累積距離(メートル)
@@ -24,8 +24,8 @@ type CoursePoint struct {
 }
 
 func NewCoursePoint(
-	id int64,
-	routeID int64,
+	id string,
+	routeID string,
 	stepOrder int32,
 	segDistM *float64,
 	cumDistM *float64,
@@ -54,11 +54,11 @@ func NewCoursePoint(
 		}, nil
 }
 
-func (cp *CoursePoint) ID() int64 {
+func (cp *CoursePoint) ID() string {
 	return cp.id
 }
 
-func (cp *CoursePoint) RouteID() int64 {
+func (cp *CoursePoint) RouteID() string {
 	return cp.routeID
 }
 
@@ -107,7 +107,7 @@ func (cp *CoursePoint) BearingAfter() *int32 {
 }
 
 type Route struct {
-	id                 int64
+	id                 string
 	author             string
 	name               string
 	description        string
@@ -126,7 +126,7 @@ type Route struct {
 }
 
 func NewRoute(
-	id int64,
+	id string,
 	author string,
 	name string,
 	description string,

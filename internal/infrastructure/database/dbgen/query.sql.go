@@ -7,11 +7,14 @@ package dbgen
 
 import (
 	"context"
+
+	"github.com/google/uuid"
 )
 
 const createUser = `-- name: CreateUser :one
 INSERT INTO users (                
-    ulid,              
+    id,
+    kratos_id,              
     name,              
     highlighted_photo_id,
     locale,            
@@ -26,12 +29,13 @@ INSERT INTO users (
     email,             
     has_set_location     
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14
-) RETURNING id, ulid, name, highlighted_photo_id, locale, created_at, updated_at, description, locality, administrative_area, country_code, postal_code, geom, first_name, last_name, email, has_set_location
+    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15
+) RETURNING id, kratos_id, name, highlighted_photo_id, locale, created_at, updated_at, description, locality, administrative_area, country_code, postal_code, geom, first_name, last_name, email, has_set_location
 `
 
 type CreateUserParams struct {
-	Ulid               string       `json:"ulid"`
+	ID                 uuid.UUID    `json:"id"`
+	KratosID           uuid.UUID    `json:"kratos_id"`
 	Name               string       `json:"name"`
 	HighlightedPhotoID *int64       `json:"highlighted_photo_id"`
 	Locale             *string      `json:"locale"`
@@ -49,7 +53,8 @@ type CreateUserParams struct {
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
 	row := q.db.QueryRow(ctx, createUser,
-		arg.Ulid,
+		arg.ID,
+		arg.KratosID,
 		arg.Name,
 		arg.HighlightedPhotoID,
 		arg.Locale,
@@ -67,7 +72,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 	var i User
 	err := row.Scan(
 		&i.ID,
-		&i.Ulid,
+		&i.KratosID,
 		&i.Name,
 		&i.HighlightedPhotoID,
 		&i.Locale,
@@ -88,15 +93,15 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 }
 
 const getUserByID = `-- name: GetUserByID :one
-SELECT id, ulid, name, highlighted_photo_id, locale, created_at, updated_at, description, locality, administrative_area, country_code, postal_code, geom, first_name, last_name, email, has_set_location FROM users WHERE ulid = $1
+SELECT id, kratos_id, name, highlighted_photo_id, locale, created_at, updated_at, description, locality, administrative_area, country_code, postal_code, geom, first_name, last_name, email, has_set_location FROM users WHERE id = $1
 `
 
-func (q *Queries) GetUserByID(ctx context.Context, ulid string) (User, error) {
-	row := q.db.QueryRow(ctx, getUserByID, ulid)
+func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
+	row := q.db.QueryRow(ctx, getUserByID, id)
 	var i User
 	err := row.Scan(
 		&i.ID,
-		&i.Ulid,
+		&i.KratosID,
 		&i.Name,
 		&i.HighlightedPhotoID,
 		&i.Locale,
@@ -132,11 +137,11 @@ UPDATE users SET
     highlighted_photo_id = $13,
     locale = $14
 WHERE id = $1
-RETURNING id, ulid, name, highlighted_photo_id, locale, created_at, updated_at, description, locality, administrative_area, country_code, postal_code, geom, first_name, last_name, email, has_set_location
+RETURNING id, kratos_id, name, highlighted_photo_id, locale, created_at, updated_at, description, locality, administrative_area, country_code, postal_code, geom, first_name, last_name, email, has_set_location
 `
 
 type UpdateUserParams struct {
-	ID                 int64        `json:"id"`
+	ID                 uuid.UUID    `json:"id"`
 	Name               string       `json:"name"`
 	Email              *string      `json:"email"`
 	FirstName          *string      `json:"first_name"`
@@ -172,7 +177,7 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 	var i User
 	err := row.Scan(
 		&i.ID,
-		&i.Ulid,
+		&i.KratosID,
 		&i.Name,
 		&i.HighlightedPhotoID,
 		&i.Locale,

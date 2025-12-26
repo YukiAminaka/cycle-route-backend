@@ -7,6 +7,7 @@ import (
 
 	"github.com/YukiAminaka/cycle-route-backend/internal/domain/user"
 	"github.com/YukiAminaka/cycle-route-backend/internal/infrastructure/database/dbgen"
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -20,14 +21,20 @@ func NewUserRepository(queries *dbgen.Queries) user.IUserRepository {
 }
 
 func (r *userRepositoryImpl) GetUserByID(ctx context.Context, id string) (*user.User, error) {
-	u, err := r.queries.GetUserByID(ctx, id)
+	// UUIDに変換
+	uuid, err := uuid.Parse(id)
+	if err != nil {
+		return nil, fmt.Errorf("invalid user id: %w", err)
+	}
+
+	u, err := r.queries.GetUserByID(ctx, uuid)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, fmt.Errorf("user not found")
 		}
 		return nil, err
 	}
-	
+
 	// ドメインモデルのUserに変換して返す
 	var geom *user.Geometry
 	if u.Geom != nil {
@@ -35,7 +42,8 @@ func (r *userRepositoryImpl) GetUserByID(ctx context.Context, id string) (*user.
 	}
 
 	ud, err := user.ReconstructUser(
-		user.UserID(u.Ulid),
+		user.UserID(u.ID.String()),
+		u.KratosID.String(),
 		u.Name,
 		u.HighlightedPhotoID,
 		u.Locale,
@@ -57,8 +65,21 @@ func (r *userRepositoryImpl) GetUserByID(ctx context.Context, id string) (*user.
 }
 
 func (r *userRepositoryImpl) CreateUser(ctx context.Context, userDomain *user.User) (*user.User, error) {
+	// UserIDをuuid.UUIDに変換
+	id, err := uuid.Parse(userDomain.ID().String())
+	if err != nil {
+		return nil, fmt.Errorf("invalid user id: %w", err)
+	}
+
+	// KratosIDをuuid.UUIDに変換
+	kratosID, err := uuid.Parse(userDomain.KratosID())
+	if err != nil {
+		return nil, fmt.Errorf("invalid kratos id: %w", err)
+	}
+
 	u, err := r.queries.CreateUser(ctx, dbgen.CreateUserParams{
-		Ulid:               string(userDomain.ID()),
+		ID:               	id,
+		KratosID:         	kratosID,
 		Name:               userDomain.Name(),
 		HighlightedPhotoID: userDomain.HighlightedPhotoID(),
 		Locale:             userDomain.Locale(),
@@ -76,7 +97,7 @@ func (r *userRepositoryImpl) CreateUser(ctx context.Context, userDomain *user.Us
 		FirstName:      userDomain.FirstName(),
 		LastName:       userDomain.LastName(),
 		Email:          userDomain.Email(),
-		HasSetLocation: userDomain.HasSetLocation(),	
+		HasSetLocation: userDomain.HasSetLocation(),
 	})
 	if err != nil {
 		return nil, err
@@ -88,7 +109,8 @@ func (r *userRepositoryImpl) CreateUser(ctx context.Context, userDomain *user.Us
 	}
 
 	ud, err := user.ReconstructUser(
-		user.UserID(u.Ulid),
+		user.UserID(u.ID.String()),
+		u.KratosID.String(),
 		u.Name,
 		u.HighlightedPhotoID,
 		u.Locale,

@@ -3,9 +3,9 @@ CREATE EXTENSION IF NOT EXISTS btree_gist; -- 便利（排他制約や複合イ�
 CREATE EXTENSION IF NOT EXISTS pg_trgm;    -- 名前/説明/検索用
 
 
-CREATE TABLE users (
-    id BIGSERIAL PRIMARY KEY,                    -- ユーザーID
-    ulid  CHAR(26) NOT NULL UNIQUE,
+CREATE TABLE users (                   
+    id UUID PRIMARY KEY,                         -- ユーザーID（ULID形式）
+    kratos_id UUID UNIQUE NOT NULL,              -- Ory KratosのユーザーID
     name TEXT NOT NULL,                          -- ユーザー名
     highlighted_photo_id BIGINT DEFAULT 0,       -- ハイライト写真ID
     locale VARCHAR(10) DEFAULT 'ja',             -- 言語設定
@@ -24,15 +24,14 @@ CREATE TABLE users (
 );
 
 CREATE TABLE routes (
-  id                  BIGSERIAL PRIMARY KEY,                 -- 例: 42125024
-  ulid  CHAR(26) NOT NULL UNIQUE,
-  user_id             BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  id  UUID PRIMARY KEY,                                   -- ルートID（ULID形式）
+  user_id             UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   name                TEXT NOT NULL,
   description         TEXT NOT NULL DEFAULT '',
   highlighted_photo_id        BIGINT      DEFAULT 0,
   has_course_points   BOOLEAN NOT NULL DEFAULT FALSE,
   distance            DOUBLE PRECISION NOT NULL CHECK (distance >= 0),   -- 距離(m)
-  duration            INTEGER NOT NULL CHECK (duration IS NULL OR duration >= 0), -- 所要時間(s)
+  duration            INTEGER NOT NULL CHECK (duration >= 0), -- 修正: IS NULL 条件を削除
   elevation_gain      DOUBLE PRECISION NOT NULL DEFAULT 0 CHECK (elevation_gain >= 0),
   elevation_loss      DOUBLE PRECISION NOT NULL DEFAULT 0 CHECK (elevation_loss >= 0),
   path_geom           geometry(LineString, 4326) NOT NULL CHECK (NOT ST_IsEmpty(path_geom)) CHECK (ST_NPoints(path_geom) >= 2),  -- 経路パス 空ジオメトリや、点が1個だけの線を保存禁止
@@ -47,9 +46,8 @@ CREATE TABLE routes (
 
 -- トリップの写真
 CREATE TABLE route_images (
-  id           BIGSERIAL PRIMARY KEY,
-  ulid  CHAR(26) NOT NULL UNIQUE,
-  route_id      BIGINT NOT NULL REFERENCES routes(id) ON DELETE CASCADE,
+  id           UUID PRIMARY KEY,
+  route_id      UUID NOT NULL REFERENCES routes(id) ON DELETE CASCADE,
   s3_key       TEXT NOT NULL,            -- S3等の保存先パス
   width        INTEGER,                             -- 画像の幅
   height       INTEGER,                             -- 画像の高さ
@@ -63,9 +61,8 @@ CREATE TABLE route_images (
 
 -- キューシート
 CREATE TABLE  course_point(
-  id            BIGSERIAL PRIMARY KEY,
-  ulid  CHAR(26) NOT NULL UNIQUE,
-  route_id      BIGINT REFERENCES routes(id) ON DELETE CASCADE,
+  id            UUID PRIMARY KEY,
+  route_id      UUID  NOT NULL REFERENCES routes(id) ON DELETE CASCADE,
   step_order    INT NOT NULL,          -- 0..n（ルート全体の通し順）
   seg_dist_m    DOUBLE PRECISION,      -- 直前のポイントからこのポイントまでの区間距離(m)
   cum_dist_m    DOUBLE PRECISION,      -- 直前のポイントからこのポイントまでの区間距離(m)
@@ -81,9 +78,8 @@ CREATE TABLE  course_point(
 
 -- 活動
 CREATE TABLE trips (
-  id                     BIGSERIAL PRIMARY KEY,                   -- 例: 342859653
-  ulid  CHAR(26) NOT NULL UNIQUE,
-  user_id                BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  id                     UUID PRIMARY KEY,  
+  user_id                UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   -- 表示/識別
   name                   TEXT NOT NULL DEFAULT '',
   description            TEXT NOT NULL DEFAULT '',
@@ -141,9 +137,8 @@ CREATE TABLE trips (
 
 -- トリップの写真
 CREATE TABLE trip_images (
-  id           BIGSERIAL PRIMARY KEY,
-  ulid  CHAR(26) NOT NULL UNIQUE,
-  trip_id      BIGINT NOT NULL REFERENCES trips(id) ON DELETE CASCADE,
+  id           UUID PRIMARY KEY,
+  trip_id      UUID NOT NULL REFERENCES trips(id) ON DELETE CASCADE,
   s3_key       TEXT NOT NULL,            -- S3等の保存先パス
   width        INTEGER,                             -- 画像の幅
   height       INTEGER,                             -- 画像の高さ
@@ -157,21 +152,19 @@ CREATE TABLE trip_images (
 
 
 CREATE TABLE route_likes (
-  id           BIGSERIAL PRIMARY KEY,
-  ulid  CHAR(26) NOT NULL UNIQUE,
-  user_id      BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  route_id    BIGINT NOT NULL,
+  id           UUID PRIMARY KEY,
+  user_id      UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  route_id    UUID NOT NULL REFERENCES routes(id) ON DELETE CASCADE,
   created_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
   UNIQUE (user_id, route_id)
 );
 
 
 CREATE TABLE route_comments (
-  id           BIGSERIAL PRIMARY KEY,
-  ulid  CHAR(26) NOT NULL UNIQUE,
-  user_id      BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  route_id    BIGINT NOT NULL,
-  parent_id    BIGINT,                            -- 返信ツリー（同テーブル参照）
+  id           UUID PRIMARY KEY,
+  user_id      UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  route_id    UUID NOT NULL REFERENCES routes(id) ON DELETE CASCADE,
+  parent_id    UUID,                            -- 返信ツリー（同テーブル参照）
   content      TEXT NOT NULL,
   created_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -181,10 +174,9 @@ CREATE TABLE route_comments (
 
 -- ルートのブックマーク（保存）
 CREATE TABLE route_saves (
-  id         BIGSERIAL PRIMARY KEY,
-  ulid       CHAR(26) NOT NULL UNIQUE,
-  user_id    BIGINT NOT NULL REFERENCES users(id)   ON DELETE CASCADE,
-  route_id   BIGINT NOT NULL REFERENCES routes(id)  ON DELETE CASCADE,
+  id         UUID PRIMARY KEY,
+  user_id    UUID NOT NULL REFERENCES users(id)   ON DELETE CASCADE,
+  route_id   UUID NOT NULL REFERENCES routes(id)  ON DELETE CASCADE,
   pinned     BOOLEAN NOT NULL DEFAULT FALSE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   deleted_at TIMESTAMPTZ,               -- ソフト削除（履歴/復活用）
@@ -203,37 +195,37 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- usersテーブルにトリガーを設定
-CREATE TRIGGER set_updated_at_trigger
+CREATE TRIGGER users_set_updated_at
 BEFORE UPDATE ON users
 FOR EACH ROW
 EXECUTE FUNCTION set_updated_at();
 
 -- routesテーブルにトリガーを設定
-CREATE TRIGGER set_updated_at_trigger
+CREATE TRIGGER routes_set_updated_at
 BEFORE UPDATE ON routes
 FOR EACH ROW
 EXECUTE FUNCTION set_updated_at();
 
 -- tripsテーブルにトリガーを設定
-CREATE TRIGGER update_trips_updated_at
+CREATE TRIGGER trips_set_updated_at
 BEFORE UPDATE ON trips
 FOR EACH ROW
 EXECUTE FUNCTION set_updated_at();
 
 -- route_imagesテーブルにトリガーを設定
-CREATE TRIGGER update_route_images_updated_at
+CREATE TRIGGER route_images_set_updated_at
 BEFORE UPDATE ON route_images
 FOR EACH ROW
 EXECUTE FUNCTION set_updated_at();
 
 -- trip_imagesテーブルにトリガーを設定
-CREATE TRIGGER update_trip_images_updated_at
+CREATE TRIGGER trip_images_set_updated_at
 BEFORE UPDATE ON trip_images
 FOR EACH ROW
 EXECUTE FUNCTION set_updated_at();
 
 -- route_commentsテーブルにトリガーを設定
-CREATE TRIGGER update_route_comments_updated_at
+CREATE TRIGGER route_comments_set_updated_at
 BEFORE UPDATE ON route_comments
 FOR EACH ROW
 EXECUTE FUNCTION set_updated_at();

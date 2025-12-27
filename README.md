@@ -94,6 +94,8 @@ cycle-route-backend/
 
 ```bash
 docker compose up -d
+# or
+GO_ENV=dev go run cmd/api/main.go
 ```
 
 ### 3. スキーマの適用
@@ -122,6 +124,20 @@ go test ./...
 
 ```
 http://localhost:8080/api/v1/swagger/index.html
+```
+
+### API ドキュメントの生成
+
+- 整形
+
+```
+swag fmt
+```
+
+- 生成（エントリポイント指定）
+
+```
+swag init -g ./cmd/api/main.go
 ```
 
 ## 開発ワークフロー
@@ -159,7 +175,7 @@ atlas migrate apply --env dev
 sqlc generate
 ```
 
-**`atlas.hcl`を使うことで**、長いコマンドが `--env dev` だけで済みます！
+**`atlas.hcl`を使うことで**、長いコマンドが `--env dev` だけで済む
 
 #### 便利な Atlas コマンド
 

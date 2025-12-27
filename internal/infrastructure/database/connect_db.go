@@ -12,13 +12,13 @@ import (
 )
 
 const (
-	maxRetries       = 5
-	retryDelay       = 5 * time.Second
+	maxRetries        = 5
+	retryDelay        = 5 * time.Second
 	connectionTimeout = 10 * time.Second
 )
 
 // NewDB creates a new database connection pool with proper configuration
-func NewDB(cfg config.DBConfig)  *pgxpool.Pool{
+func NewDB(cfg config.DBConfig) *pgxpool.Pool {
 	ctx, cancel := context.WithTimeout(context.Background(), connectionTimeout)
 	defer cancel()
 
@@ -35,11 +35,11 @@ func NewDB(cfg config.DBConfig)  *pgxpool.Pool{
 	}
 
 	// コネクションプールの設定
-	poolConfig.MaxConns = 25 // 最大接続数
-	poolConfig.MinConns = 5 // 最小接続数
-	poolConfig.MaxConnLifetime = time.Hour // コネクションの最大寿命
+	poolConfig.MaxConns = 25                      // 最大接続数
+	poolConfig.MinConns = 5                       // 最小接続数
+	poolConfig.MaxConnLifetime = time.Hour        // コネクションの最大寿命
 	poolConfig.MaxConnIdleTime = 30 * time.Minute // コネクションの最大アイドル時間
-	poolConfig.HealthCheckPeriod = time.Minute // ヘルスチェックの間隔
+	poolConfig.HealthCheckPeriod = time.Minute    // ヘルスチェックの間隔
 
 	// リトライロジック付きで接続プールを作成
 	var pool *pgxpool.Pool
@@ -64,9 +64,6 @@ func NewDB(cfg config.DBConfig)  *pgxpool.Pool{
 	log.Fatalf("Failed to connect to database after %d attempts: %v", maxRetries, err)
 	return nil
 }
-
-
-
 
 // CloseDB closes the database connection pool
 func CloseDB(queries *dbgen.Queries) {

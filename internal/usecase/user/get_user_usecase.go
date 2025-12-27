@@ -70,4 +70,3 @@ func (u *getUserByIDUsecase) GetUserByID(ctx context.Context, id string) (*GetUs
 		HasSetLocation: user.HasSetLocation(),
 	}, nil
 }
-

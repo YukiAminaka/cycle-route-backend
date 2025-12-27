@@ -12,7 +12,7 @@ import (
 // OrbGeometry は任意の PostGIS geometry (Point, LineString, Polygon etc.) を格納できる汎用的な型です。
 type OrbGeometry struct {
 	orb.Geometry
-} 
+}
 
 // Scan は DB からの値を orb.Geometry に変換します (sql.Scanner)
 func (g *OrbGeometry) Scan(value interface{}) error {
@@ -55,26 +55,25 @@ func (g OrbGeometry) Value() (driver.Value, error) {
 	return ewkb.Value(g.Geometry, 4326).Value() // 第2引数はSRID (例: 4326なら指定可能)
 }
 
-
 type OrbPoint struct {
 	orb.Point
-} 
+}
 
 // sql.Scannerの実装 (DB -> Go)
 func (p *OrbPoint) Scan(value interface{}) error {
-    // PostGISなどは通常、EWKBまたはWKB (byte slice) で返します
-    _, ok := value.([]byte)
-    if !ok {
-        return fmt.Errorf("OrbPoint scan error: expected []byte, got %T", value)
-    }
+	// PostGISなどは通常、EWKBまたはWKB (byte slice) で返します
+	_, ok := value.([]byte)
+	if !ok {
+		return fmt.Errorf("OrbPoint scan error: expected []byte, got %T", value)
+	}
 
-    // EWKBまたはWKBとしてスキャン
-    // ※ PostGISの場合はEWKBが多いため、ewkbスキャナを使うのが安全です
-    s := ewkb.Scanner(&p.Point)
-    return s.Scan(value)
+	// EWKBまたはWKBとしてスキャン
+	// ※ PostGISの場合はEWKBが多いため、ewkbスキャナを使うのが安全です
+	s := ewkb.Scanner(&p.Point)
+	return s.Scan(value)
 }
 
 // driver.Valuerの実装 (Go -> DB)
 func (p OrbPoint) Value() (driver.Value, error) {
-    return ewkb.Value(p.Point,4326).Value()
+	return ewkb.Value(p.Point, 4326).Value()
 }

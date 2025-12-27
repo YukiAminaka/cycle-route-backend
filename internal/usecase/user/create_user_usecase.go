@@ -24,7 +24,7 @@ func NewCreateUserUsecase(userRepo userDomain.IUserRepository) ICreateUserUsecas
 }
 
 type CreateUserUseCaseInputDto struct {
-	KratosID string
+	KratosID  string
 	Name      string
 	Email     *string
 	FirstName *string

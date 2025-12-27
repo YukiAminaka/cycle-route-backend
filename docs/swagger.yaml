@@ -15,19 +15,22 @@ definitions:
         type: string
       first_name:
         type: string
+      kratos_id:
+        type: string
       last_name:
         type: string
       name:
         type: string
     required:
+    - kratos_id
     - name
     type: object
-  user.userResponse:
+  user.UserResponse:
     properties:
       user:
-        $ref: '#/definitions/user.userResponseModel'
+        $ref: '#/definitions/user.UserResponseModel'
     type: object
-  user.userResponseModel:
+  user.UserResponseModel:
     properties:
       administrative_area:
         type: string
@@ -65,7 +68,7 @@ info:
   title: Cycle-Route API
   version: "1.0"
 paths:
-  /v1/users:
+  /users:
     post:
       consumes:
       - application/json
@@ -82,7 +85,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/user.userResponse'
+            $ref: '#/definitions/user.UserResponse'
         "400":
           description: Bad Request
           schema:
@@ -94,7 +97,7 @@ paths:
       summary: ユーザーを作成する
       tags:
       - users
-  /v1/users/{id}:
+  /users/{id}:
     get:
       consumes:
       - application/json
@@ -110,7 +113,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/user.userResponse'
+            $ref: '#/definitions/user.UserResponse'
         "400":
           description: Bad Request
           schema:

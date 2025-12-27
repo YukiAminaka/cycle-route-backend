@@ -78,8 +78,8 @@ func (r *userRepositoryImpl) CreateUser(ctx context.Context, userDomain *user.Us
 	}
 
 	u, err := r.queries.CreateUser(ctx, dbgen.CreateUserParams{
-		ID:               	id,
-		KratosID:         	kratosID,
+		ID:                 id,
+		KratosID:           kratosID,
 		Name:               userDomain.Name(),
 		HighlightedPhotoID: userDomain.HighlightedPhotoID(),
 		Locale:             userDomain.Locale(),

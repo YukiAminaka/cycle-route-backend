@@ -16,11 +16,11 @@ type Config struct {
 }
 
 type DBConfig struct {
-	Name string `env:"DB_NAME"`
-	User string `env:"DB_USER"`
+	Name     string `env:"DB_NAME"`
+	User     string `env:"DB_USER"`
 	Password string `env:"DB_PASSWORD"`
-    Host string `env:"DB_HOST"`
-    Port string `env:"DB_PORT"`
+	Host     string `env:"DB_HOST"`
+	Port     string `env:"DB_PORT"`
 }
 
 type Server struct {
@@ -30,10 +30,9 @@ type Server struct {
 
 // 読み込み
 var (
-	cfg Config
+	cfg  Config
 	once sync.Once
 )
-
 
 func GetConfig() *Config {
 	// goroutine実行中でも一度だけ実行される

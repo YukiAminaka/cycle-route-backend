@@ -60,7 +60,7 @@ func CreateContainer() (*dockertest.Resource, *dockertest.Pool) {
 	}
 
 	// コンテナを起動
-	resource, err := pool.RunWithOptions(runOptions,func(config *docker.HostConfig) {
+	resource, err := pool.RunWithOptions(runOptions, func(config *docker.HostConfig) {
 		// 処理が終了したらコンテナを自動削除する設定
 		config.AutoRemove = true
 		config.RestartPolicy = docker.RestartPolicy{Name: "no"}

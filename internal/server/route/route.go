@@ -10,8 +10,6 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-
-
 func InitRoute(api *gin.Engine, q *dbgen.Queries) {
 	apiGroup := api.Group("/api")
 	v1 := apiGroup.Group("/v1")

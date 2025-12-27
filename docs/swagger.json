@@ -9,7 +9,7 @@
     "host": "localhost:8080",
     "basePath": "/api/v1",
     "paths": {
-        "/v1/users": {
+        "/users": {
             "post": {
                 "consumes": [
                     "application/json"
@@ -36,7 +36,7 @@
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/user.userResponse"
+                            "$ref": "#/definitions/user.UserResponse"
                         }
                     },
                     "400": {
@@ -54,7 +54,7 @@
                 }
             }
         },
-        "/v1/users/{id}": {
+        "/users/{id}": {
             "get": {
                 "consumes": [
                     "application/json"
@@ -79,7 +79,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/user.userResponse"
+                            "$ref": "#/definitions/user.UserResponse"
                         }
                     },
                     "400": {
@@ -121,6 +121,7 @@
         "user.CreateUserRequest": {
             "type": "object",
             "required": [
+                "kratos_id",
                 "name"
             ],
             "properties": {
@@ -128,6 +129,9 @@
                     "type": "string"
                 },
                 "first_name": {
+                    "type": "string"
+                },
+                "kratos_id": {
                     "type": "string"
                 },
                 "last_name": {
@@ -138,15 +142,15 @@
                 }
             }
         },
-        "user.userResponse": {
+        "user.UserResponse": {
             "type": "object",
             "properties": {
                 "user": {
-                    "$ref": "#/definitions/user.userResponseModel"
+                    "$ref": "#/definitions/user.UserResponseModel"
                 }
             }
         },
-        "user.userResponseModel": {
+        "user.UserResponseModel": {
             "type": "object",
             "properties": {
                 "administrative_area": {

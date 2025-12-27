@@ -37,21 +37,21 @@ func NewCoursePoint(
 	location *user.Geometry,
 	bearingBefore *int32,
 	bearingAfter *int32) (*CoursePoint, error) {
-		return &CoursePoint{
-			id:            id,
-			routeID:       routeID,
-			stepOrder:     stepOrder,
-			segDistM:      segDistM,
-			cumDistM:      cumDistM,
-			duration:      duration,
-			instruction:   instruction,
-			roadName:      roadName,
-			maneuverType:  maneuverType,
-			modifier:      modifier,
-			location:      location,
-			bearingBefore: bearingBefore,
-			bearingAfter:  bearingAfter,
-		}, nil
+	return &CoursePoint{
+		id:            id,
+		routeID:       routeID,
+		stepOrder:     stepOrder,
+		segDistM:      segDistM,
+		cumDistM:      cumDistM,
+		duration:      duration,
+		instruction:   instruction,
+		roadName:      roadName,
+		maneuverType:  maneuverType,
+		modifier:      modifier,
+		location:      location,
+		bearingBefore: bearingBefore,
+		bearingAfter:  bearingAfter,
+	}, nil
 }
 
 func (cp *CoursePoint) ID() string {
@@ -142,22 +142,22 @@ func NewRoute(
 	lastPoint user.Geometry,
 	createdAt time.Time,
 	visibility int16) (*Route, error) {
-		return &Route{
-			id:                 id,
-			author: 		   author,
-			name:               name,
-			description:        description,
-			highlightedPhotoID: highlightedPhotoID,
-			hasCoursePoints:    hasCoursePoints,
-			distance:           distance,
-			duration:           duration,
-			elevationGain:      elevationGain,
-			elevationLoss:      elevationLoss,
-			pathGeom:           pathGeom,
-			bbox:               bbox,
-			firstPoint:        firstPoint,
-			lastPoint:         lastPoint,
-			createdAt:          createdAt,
-			visibility:         visibility,
-		}, nil
+	return &Route{
+		id:                 id,
+		author:             author,
+		name:               name,
+		description:        description,
+		highlightedPhotoID: highlightedPhotoID,
+		hasCoursePoints:    hasCoursePoints,
+		distance:           distance,
+		duration:           duration,
+		elevationGain:      elevationGain,
+		elevationLoss:      elevationLoss,
+		pathGeom:           pathGeom,
+		bbox:               bbox,
+		firstPoint:         firstPoint,
+		lastPoint:          lastPoint,
+		createdAt:          createdAt,
+		visibility:         visibility,
+	}, nil
 }

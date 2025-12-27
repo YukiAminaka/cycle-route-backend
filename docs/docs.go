@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/v1/users": {
+        "/users": {
             "post": {
                 "consumes": [
                     "application/json"
@@ -42,7 +42,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/user.userResponse"
+                            "$ref": "#/definitions/user.UserResponse"
                         }
                     },
                     "400": {
@@ -60,7 +60,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/users/{id}": {
+        "/users/{id}": {
             "get": {
                 "consumes": [
                     "application/json"
@@ -85,7 +85,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/user.userResponse"
+                            "$ref": "#/definitions/user.UserResponse"
                         }
                     },
                     "400": {
@@ -127,6 +127,7 @@ const docTemplate = `{
         "user.CreateUserRequest": {
             "type": "object",
             "required": [
+                "kratos_id",
                 "name"
             ],
             "properties": {
@@ -134,6 +135,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "first_name": {
+                    "type": "string"
+                },
+                "kratos_id": {
                     "type": "string"
                 },
                 "last_name": {
@@ -144,15 +148,15 @@ const docTemplate = `{
                 }
             }
         },
-        "user.userResponse": {
+        "user.UserResponse": {
             "type": "object",
             "properties": {
                 "user": {
-                    "$ref": "#/definitions/user.userResponseModel"
+                    "$ref": "#/definitions/user.UserResponseModel"
                 }
             }
         },
-        "user.userResponseModel": {
+        "user.UserResponseModel": {
             "type": "object",
             "properties": {
                 "administrative_area": {

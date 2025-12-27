@@ -1,16 +1,12 @@
 // Atlas configuration for cycle-route-backend
 
-variable "db_url" {
-  type    = string
-  default = getenv("DATABASE_URL")
-}
 
 env "dev" {
   // データベース接続URL
-  url = var.db_url
+  url = "postgres://postgres:password@localhost:5432/postgres_db?sslmode=disable&search_path=public"
 
   // スキーマの定義元（理想の状態）
-  src = "file://sqlc/schema.sql"
+  src = "file://internal/infrastructure/database/sqlc/schema.sql"
 
   // マイグレーションファイルの保存先
   migration {
@@ -18,7 +14,7 @@ env "dev" {
   }
 
   // 開発用データベース（diff計算用の一時DB）
-  dev = "docker://postgres/15/dev?search_path=public"
+  dev = "docker://postgis/postgis/18-3.6/dev"
 
   // スキーマ名
   schemas = ["public"]

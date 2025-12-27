@@ -26,22 +26,22 @@ func NewHandler(
 }
 
 // GetUserByID godoc
-// @Summary ユーザーを取得する
-// @Tags users
-// @Accept json
-// @Produce json
-// @Param id path string true "User ID"
-// @Success 200 {object} userResponse
-// @Failure 400 {object} response.ErrorResponse
-// @Failure 404 {object} response.ErrorResponse
-// @Failure 500 {object} response.ErrorResponse
-// @Router api/v1/users/{id} [get]
+//	@Summary	ユーザーを取得する
+//	@Tags		users
+//	@Accept		json
+//	@Produce	json
+//	@Param		id	path		string	true	"User ID"
+//	@Success	200	{object}	UserResponse
+//	@Failure	400	{object}	response.ErrorResponse
+//	@Failure	404	{object}	response.ErrorResponse
+//	@Failure	500	{object}	response.ErrorResponse
+//	@Router		/users/{id} [get]
 func (h *Handler) GetUserByID(c *gin.Context) {
 	id := c.Param("id")
 
 	dto, err := h.getUserUsecase.GetUserByID(c.Request.Context(), id)
 	if err != nil {
-		response.ReturnError(c, err)
+		response.ReturnStatusInternalServerError(c, err)
 		return
 	}
 
@@ -54,8 +54,8 @@ func (h *Handler) GetUserByID(c *gin.Context) {
 		rawJSON = string(b)
 	}
 
-	res := userResponse{
-		User: userResponseModel{
+	res := UserResponse{
+		User: UserResponseModel{
 			ID:                 dto.ID,
 			Name:               dto.Name,
 			HighlightedPhotoID: dto.HighlightedPhotoID,
@@ -77,15 +77,15 @@ func (h *Handler) GetUserByID(c *gin.Context) {
 }
 
 // CreateUser godoc
-// @Summary ユーザーを作成する
-// @Tags users
-// @Accept json
-// @Produce json
-// @Param request body CreateUserRequest true "Create User Request"
-// @Success 201 {object} userResponse
-// @Failure 400 {object} response.ErrorResponse
-// @Failure 500 {object} response.ErrorResponse
-// @Router api/v1/users [post]
+//	@Summary	ユーザーを作成する
+//	@Tags		users
+//	@Accept		json
+//	@Produce	json
+//	@Param		request	body		CreateUserRequest	true	"Create User Request"
+//	@Success	201		{object}	UserResponse
+//	@Failure	400		{object}	response.ErrorResponse
+//	@Failure	500		{object}	response.ErrorResponse
+//	@Router		/users [post]
 func (h *Handler) CreateUser(c *gin.Context) {
 	var req CreateUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -101,6 +101,7 @@ func (h *Handler) CreateUser(c *gin.Context) {
 	}
 
 	input := userUsecase.CreateUserUseCaseInputDto{
+		KratosID:  req.KratosID,
 		Name:      req.Name,
 		Email:     req.Email,
 		FirstName: req.FirstName,
@@ -109,7 +110,7 @@ func (h *Handler) CreateUser(c *gin.Context) {
 
 	dto, err := h.createUserUsecase.CreateUser(c, input)
 	if err != nil {
-		response.ReturnError(c, err)
+		response.ReturnStatusInternalServerError(c, err)
 		return
 	}
 
@@ -122,8 +123,8 @@ func (h *Handler) CreateUser(c *gin.Context) {
 		rawJSON = string(b)
 	}
 
-	res := userResponse{
-		userResponseModel{
+	res := UserResponse{
+		User: UserResponseModel{
 			ID:                 dto.ID,
 			Name:               dto.Name,
 			HighlightedPhotoID: dto.HighlightedPhotoID,

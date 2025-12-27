@@ -18,7 +18,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Run(ctx context.Context, conf *config.Config, q *dbgen.Queries) error{
+func Run(ctx context.Context, conf *config.Config, q *dbgen.Queries) error {
 	router := gin.Default()
 	config := cors.DefaultConfig()
 	config.AllowOrigins = []string{"*"}
@@ -26,7 +26,7 @@ func Run(ctx context.Context, conf *config.Config, q *dbgen.Queries) error{
 	router.Use(cors.New(config))
 
 	route.InitRoute(router, q)
-	
+
 	address := conf.Server.Address + ":" + conf.Server.Port
 	log.Printf("Starting server on %s...\n", address)
 	srv := &http.Server{
@@ -43,12 +43,12 @@ func Run(ctx context.Context, conf *config.Config, q *dbgen.Queries) error{
 			panic(err)
 		}
 	}()
-	
+
 	//割り込み信号を待って、5秒のタイムアウトでサーバーを正常にシャットダウンします。
 	quit := make(chan os.Signal, 1)
 	// kill (パラメータなし) はデフォルトで syscall.SIGTERM を送信します
 	// kill -2 は syscall.SIGINT です
-	// kill -9 は syscall.SIGKILL ですが、catch できないため追加する必要はありません
+	// kill -9 は syscall.SIGKILL ですが、捕捉できないため、追加する必要はありません
 	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
 	<-quit
 	log.Println("Shutting down server...")

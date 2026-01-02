@@ -29,7 +29,6 @@ CREATE TABLE routes (
   name                TEXT NOT NULL,
   description         TEXT NOT NULL DEFAULT '',
   highlighted_photo_id        BIGINT      DEFAULT 0,
-  has_course_points   BOOLEAN NOT NULL DEFAULT FALSE,
   distance            DOUBLE PRECISION NOT NULL CHECK (distance >= 0),   -- 距離(m)
   duration            INTEGER NOT NULL CHECK (duration >= 0), -- 修正: IS NULL 条件を削除
   elevation_gain      DOUBLE PRECISION NOT NULL DEFAULT 0 CHECK (elevation_gain >= 0),
@@ -59,21 +58,29 @@ CREATE TABLE route_images (
   UNIQUE (s3_key)
 );
 
+CREATE TABLE waypoints (
+  id            UUID PRIMARY KEY,
+  route_id      UUID  NOT NULL REFERENCES routes(id) ON DELETE CASCADE,
+  location      geometry(Point, 4326), -- ポイント位置
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+);
+
 -- キューシート
 CREATE TABLE  course_point(
   id            UUID PRIMARY KEY,
   route_id      UUID  NOT NULL REFERENCES routes(id) ON DELETE CASCADE,
   step_order    INT NOT NULL,          -- 0..n（ルート全体の通し順）
   seg_dist_m    DOUBLE PRECISION,      -- 直前のポイントからこのポイントまでの区間距離(m)
-  cum_dist_m    DOUBLE PRECISION,      -- 直前のポイントからこのポイントまでの区間距離(m)
-  duration      DOUBLE PRECISION,      -- 直前からこのポイyントまでの所要時間(s)
-  instruction   TEXT,
-  road_name     TEXT,
-  maneuver_type TEXT,                  -- 'turn','depart','arrive'等
-  modifier      TEXT,                  -- 'left','right','slight_left'等
-  location      geometry(Point, 4326), 
-  bearing_before INT,
-  bearing_after  INT
+  cum_dist_m    DOUBLE PRECISION,      -- ルート開始からこのポイントまでの累積距離(m)
+  duration      DOUBLE PRECISION,      -- 直前からこのポイントまでの所要時間(s)
+  instruction   TEXT,                  -- ユーザーに見せる案内文
+  road_name     TEXT,                  -- 道路名
+  maneuver_type TEXT,                  -- 操作の種類 'turn','depart','arrive'等
+  modifier      TEXT,                  -- 操作の向きや強さ 'left','right','slight_left'等
+  location      geometry(Point, 4326), -- ポイント位置
+  bearing_before INT,                  -- 操作直前の進行方位（0–360）
+  bearing_after  INT,                   -- 操作直後の進行方位（0–360）
+  UNIQUE(route_id, step_order)
 );
 
 -- 活動

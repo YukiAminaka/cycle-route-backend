@@ -11,6 +11,119 @@ import (
 	"github.com/google/uuid"
 )
 
+const createCoursePoint = `-- name: CreateCoursePoint :exec
+INSERT INTO course_points (
+    id,
+    route_id,
+    step_order,
+    seg_dist_m,
+    cum_dist_m,
+    duration,
+    instruction,
+    road_name,
+    maneuver_type,
+    modifier,
+    location,
+    bearing_before,
+    bearing_after
+) VALUES (
+    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13
+)
+`
+
+type CreateCoursePointParams struct {
+	ID            uuid.UUID    `json:"id"`
+	RouteID       uuid.UUID    `json:"route_id"`
+	StepOrder     int32        `json:"step_order"`
+	SegDistM      *float64     `json:"seg_dist_m"`
+	CumDistM      *float64     `json:"cum_dist_m"`
+	Duration      *float64     `json:"duration"`
+	Instruction   *string      `json:"instruction"`
+	RoadName      *string      `json:"road_name"`
+	ManeuverType  *string      `json:"maneuver_type"`
+	Modifier      *string      `json:"modifier"`
+	Location      *OrbGeometry `json:"location"`
+	BearingBefore *int32       `json:"bearing_before"`
+	BearingAfter  *int32       `json:"bearing_after"`
+}
+
+func (q *Queries) CreateCoursePoint(ctx context.Context, arg CreateCoursePointParams) error {
+	_, err := q.db.Exec(ctx, createCoursePoint,
+		arg.ID,
+		arg.RouteID,
+		arg.StepOrder,
+		arg.SegDistM,
+		arg.CumDistM,
+		arg.Duration,
+		arg.Instruction,
+		arg.RoadName,
+		arg.ManeuverType,
+		arg.Modifier,
+		arg.Location,
+		arg.BearingBefore,
+		arg.BearingAfter,
+	)
+	return err
+}
+
+const createRoute = `-- name: CreateRoute :exec
+INSERT INTO routes (
+    id,
+    user_id,
+    name,
+    description,
+    highlighted_photo_id,
+    distance,
+    duration,
+    elevation_gain,
+    elevation_loss,
+    path_geom,
+    bbox,
+    first_point,
+    last_point,
+    visibility
+) VALUES (
+    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14
+)
+`
+
+type CreateRouteParams struct {
+	ID                 uuid.UUID   `json:"id"`
+	UserID             uuid.UUID   `json:"user_id"`
+	Name               string      `json:"name"`
+	Description        string      `json:"description"`
+	HighlightedPhotoID *int64      `json:"highlighted_photo_id"`
+	Distance           float64     `json:"distance"`
+	Duration           int32       `json:"duration"`
+	ElevationGain      float64     `json:"elevation_gain"`
+	ElevationLoss      float64     `json:"elevation_loss"`
+	PathGeom           OrbGeometry `json:"path_geom"`
+	Bbox               OrbGeometry `json:"bbox"`
+	FirstPoint         OrbGeometry `json:"first_point"`
+	LastPoint          OrbGeometry `json:"last_point"`
+	Visibility         int16       `json:"visibility"`
+}
+
+func (q *Queries) CreateRoute(ctx context.Context, arg CreateRouteParams) error {
+	_, err := q.db.Exec(ctx, createRoute,
+		arg.ID,
+		arg.UserID,
+		arg.Name,
+		arg.Description,
+		arg.HighlightedPhotoID,
+		arg.Distance,
+		arg.Duration,
+		arg.ElevationGain,
+		arg.ElevationLoss,
+		arg.PathGeom,
+		arg.Bbox,
+		arg.FirstPoint,
+		arg.LastPoint,
+		arg.Visibility,
+	)
+	return err
+}
+
 const createUser = `-- name: CreateUser :one
 INSERT INTO users (                
     id,
@@ -92,6 +205,163 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 	return i, err
 }
 
+const createWaypoint = `-- name: CreateWaypoint :exec
+INSERT INTO waypoints (
+    id,
+    route_id,
+    location
+) VALUES (
+    $1, $2, $3
+)
+`
+
+type CreateWaypointParams struct {
+	ID       uuid.UUID    `json:"id"`
+	RouteID  uuid.UUID    `json:"route_id"`
+	Location *OrbGeometry `json:"location"`
+}
+
+func (q *Queries) CreateWaypoint(ctx context.Context, arg CreateWaypointParams) error {
+	_, err := q.db.Exec(ctx, createWaypoint, arg.ID, arg.RouteID, arg.Location)
+	return err
+}
+
+const deleteCoursePoint = `-- name: DeleteCoursePoint :exec
+DELETE FROM course_points WHERE id = $1
+`
+
+func (q *Queries) DeleteCoursePoint(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.Exec(ctx, deleteCoursePoint, id)
+	return err
+}
+
+const deleteRoute = `-- name: DeleteRoute :exec
+DELETE FROM routes WHERE id = $1
+`
+
+func (q *Queries) DeleteRoute(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.Exec(ctx, deleteRoute, id)
+	return err
+}
+
+const deleteWaypoint = `-- name: DeleteWaypoint :exec
+DELETE FROM waypoints WHERE id = $1
+`
+
+func (q *Queries) DeleteWaypoint(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.Exec(ctx, deleteWaypoint, id)
+	return err
+}
+
+const getCoursePointsByRouteID = `-- name: GetCoursePointsByRouteID :many
+SELECT id, route_id, step_order, seg_dist_m, cum_dist_m, duration, instruction, road_name, maneuver_type, modifier, location, bearing_before, bearing_after FROM course_points WHERE route_id = $1 ORDER BY step_order ASC
+`
+
+func (q *Queries) GetCoursePointsByRouteID(ctx context.Context, routeID uuid.UUID) ([]CoursePoint, error) {
+	rows, err := q.db.Query(ctx, getCoursePointsByRouteID, routeID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []CoursePoint
+	for rows.Next() {
+		var i CoursePoint
+		if err := rows.Scan(
+			&i.ID,
+			&i.RouteID,
+			&i.StepOrder,
+			&i.SegDistM,
+			&i.CumDistM,
+			&i.Duration,
+			&i.Instruction,
+			&i.RoadName,
+			&i.ManeuverType,
+			&i.Modifier,
+			&i.Location,
+			&i.BearingBefore,
+			&i.BearingAfter,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getRouteByID = `-- name: GetRouteByID :one
+SELECT id, user_id, name, description, highlighted_photo_id, distance, duration, elevation_gain, elevation_loss, path_geom, bbox, first_point, last_point, created_at, updated_at, deleted_at, visibility FROM routes WHERE id = $1
+`
+
+func (q *Queries) GetRouteByID(ctx context.Context, id uuid.UUID) (Route, error) {
+	row := q.db.QueryRow(ctx, getRouteByID, id)
+	var i Route
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Name,
+		&i.Description,
+		&i.HighlightedPhotoID,
+		&i.Distance,
+		&i.Duration,
+		&i.ElevationGain,
+		&i.ElevationLoss,
+		&i.PathGeom,
+		&i.Bbox,
+		&i.FirstPoint,
+		&i.LastPoint,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+		&i.Visibility,
+	)
+	return i, err
+}
+
+const getRoutesByUserID = `-- name: GetRoutesByUserID :many
+SELECT id, user_id, name, description, highlighted_photo_id, distance, duration, elevation_gain, elevation_loss, path_geom, bbox, first_point, last_point, created_at, updated_at, deleted_at, visibility FROM routes WHERE user_id = $1
+`
+
+func (q *Queries) GetRoutesByUserID(ctx context.Context, userID uuid.UUID) ([]Route, error) {
+	rows, err := q.db.Query(ctx, getRoutesByUserID, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Route
+	for rows.Next() {
+		var i Route
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.Name,
+			&i.Description,
+			&i.HighlightedPhotoID,
+			&i.Distance,
+			&i.Duration,
+			&i.ElevationGain,
+			&i.ElevationLoss,
+			&i.PathGeom,
+			&i.Bbox,
+			&i.FirstPoint,
+			&i.LastPoint,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.DeletedAt,
+			&i.Visibility,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getUserByID = `-- name: GetUserByID :one
 SELECT id, kratos_id, name, highlighted_photo_id, locale, created_at, updated_at, description, locality, administrative_area, country_code, postal_code, geom, first_name, last_name, email, has_set_location FROM users WHERE id = $1
 `
@@ -119,6 +389,116 @@ func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 		&i.HasSetLocation,
 	)
 	return i, err
+}
+
+const getUserByKratosID = `-- name: GetUserByKratosID :one
+SELECT id, kratos_id, name, highlighted_photo_id, locale, created_at, updated_at, description, locality, administrative_area, country_code, postal_code, geom, first_name, last_name, email, has_set_location FROM users WHERE kratos_id = $1
+`
+
+func (q *Queries) GetUserByKratosID(ctx context.Context, kratosID uuid.UUID) (User, error) {
+	row := q.db.QueryRow(ctx, getUserByKratosID, kratosID)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.KratosID,
+		&i.Name,
+		&i.HighlightedPhotoID,
+		&i.Locale,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Description,
+		&i.Locality,
+		&i.AdministrativeArea,
+		&i.CountryCode,
+		&i.PostalCode,
+		&i.Geom,
+		&i.FirstName,
+		&i.LastName,
+		&i.Email,
+		&i.HasSetLocation,
+	)
+	return i, err
+}
+
+const getWaypointsByRouteID = `-- name: GetWaypointsByRouteID :many
+SELECT id, route_id, location, created_at FROM waypoints WHERE route_id = $1 ORDER BY id ASC
+`
+
+func (q *Queries) GetWaypointsByRouteID(ctx context.Context, routeID uuid.UUID) ([]Waypoint, error) {
+	rows, err := q.db.Query(ctx, getWaypointsByRouteID, routeID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Waypoint
+	for rows.Next() {
+		var i Waypoint
+		if err := rows.Scan(
+			&i.ID,
+			&i.RouteID,
+			&i.Location,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const updateRoute = `-- name: UpdateRoute :exec
+UPDATE routes SET
+    name = $2,
+    description = $3,
+    highlighted_photo_id = $4,
+    distance = $5,
+    duration = $6,
+    elevation_gain = $7,
+    elevation_loss = $8,
+    path_geom = $9,
+    bbox = $10,
+    first_point = $11,
+    last_point = $12,
+    visibility = $13
+WHERE id = $1
+`
+
+type UpdateRouteParams struct {
+	ID                 uuid.UUID   `json:"id"`
+	Name               string      `json:"name"`
+	Description        string      `json:"description"`
+	HighlightedPhotoID *int64      `json:"highlighted_photo_id"`
+	Distance           float64     `json:"distance"`
+	Duration           int32       `json:"duration"`
+	ElevationGain      float64     `json:"elevation_gain"`
+	ElevationLoss      float64     `json:"elevation_loss"`
+	PathGeom           OrbGeometry `json:"path_geom"`
+	Bbox               OrbGeometry `json:"bbox"`
+	FirstPoint         OrbGeometry `json:"first_point"`
+	LastPoint          OrbGeometry `json:"last_point"`
+	Visibility         int16       `json:"visibility"`
+}
+
+func (q *Queries) UpdateRoute(ctx context.Context, arg UpdateRouteParams) error {
+	_, err := q.db.Exec(ctx, updateRoute,
+		arg.ID,
+		arg.Name,
+		arg.Description,
+		arg.HighlightedPhotoID,
+		arg.Distance,
+		arg.Duration,
+		arg.ElevationGain,
+		arg.ElevationLoss,
+		arg.PathGeom,
+		arg.Bbox,
+		arg.FirstPoint,
+		arg.LastPoint,
+		arg.Visibility,
+	)
+	return err
 }
 
 const updateUser = `-- name: UpdateUser :one

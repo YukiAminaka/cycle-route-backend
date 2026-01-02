@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type CoursePoint struct {
@@ -32,7 +33,6 @@ type Route struct {
 	Name               string      `json:"name"`
 	Description        string      `json:"description"`
 	HighlightedPhotoID *int64      `json:"highlighted_photo_id"`
-	HasCoursePoints    bool        `json:"has_course_points"`
 	Distance           float64     `json:"distance"`
 	Duration           int32       `json:"duration"`
 	ElevationGain      float64     `json:"elevation_gain"`
@@ -48,14 +48,14 @@ type Route struct {
 }
 
 type RouteComment struct {
-	ID        uuid.UUID  `json:"id"`
-	UserID    int64      `json:"user_id"`
-	RouteID   int64      `json:"route_id"`
-	ParentID  *int64     `json:"parent_id"`
-	Content   string     `json:"content"`
-	CreatedAt time.Time  `json:"created_at"`
-	UpdatedAt time.Time  `json:"updated_at"`
-	DeletedAt *time.Time `json:"deleted_at"`
+	ID        uuid.UUID   `json:"id"`
+	UserID    uuid.UUID   `json:"user_id"`
+	RouteID   uuid.UUID   `json:"route_id"`
+	ParentID  pgtype.UUID `json:"parent_id"`
+	Content   string      `json:"content"`
+	CreatedAt time.Time   `json:"created_at"`
+	UpdatedAt time.Time   `json:"updated_at"`
+	DeletedAt *time.Time  `json:"deleted_at"`
 }
 
 type RouteImage struct {
@@ -161,4 +161,11 @@ type User struct {
 	LastName           *string      `json:"last_name"`
 	Email              *string      `json:"email"`
 	HasSetLocation     bool         `json:"has_set_location"`
+}
+
+type Waypoint struct {
+	ID        uuid.UUID    `json:"id"`
+	RouteID   uuid.UUID    `json:"route_id"`
+	Location  *OrbGeometry `json:"location"`
+	CreatedAt time.Time    `json:"created_at"`
 }

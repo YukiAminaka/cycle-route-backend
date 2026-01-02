@@ -37,8 +37,8 @@ CREATE TABLE routes (
   bbox                geometry(Polygon,4326) NOT NULL GENERATED ALWAYS AS (ST_Envelope(path_geom)) STORED,    -- マップの表示領域 path_geomから自動生成
   first_point         geometry(Point,4326) NOT NULL GENERATED ALWAYS AS (ST_StartPoint(path_geom)) STORED,  -- スタート位置 path_geomの始点から自動生成
   last_point          geometry(Point,4326) NOT NULL GENERATED ALWAYS AS (ST_EndPoint(path_geom))   STORED, -- 終了位置　path_geomの終点から自動生成
-  created_at          TIMESTAMPTZ NOT NULL,
-  updated_at          TIMESTAMPTZ NOT NULL,
+  created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
   deleted_at          TIMESTAMPTZ,         --　削除日時
   visibility          SMALLINT NOT NULL DEFAULT 1 CHECK (visibility IN (0,1,2)) -- 公開範囲0:private,1:unlisted,2:public
 );
@@ -62,11 +62,11 @@ CREATE TABLE waypoints (
   id            UUID PRIMARY KEY,
   route_id      UUID  NOT NULL REFERENCES routes(id) ON DELETE CASCADE,
   location      geometry(Point, 4326), -- ポイント位置
-  created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 -- キューシート
-CREATE TABLE  course_point(
+CREATE TABLE  course_points(
   id            UUID PRIMARY KEY,
   route_id      UUID  NOT NULL REFERENCES routes(id) ON DELETE CASCADE,
   step_order    INT NOT NULL,          -- 0..n（ルート全体の通し順）

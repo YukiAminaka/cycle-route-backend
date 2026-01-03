@@ -11,6 +11,17 @@ import (
 	"github.com/google/uuid"
 )
 
+const countRoutesByUserID = `-- name: CountRoutesByUserID :one
+SELECT COUNT(*) FROM routes WHERE user_id = $1
+`
+
+func (q *Queries) CountRoutesByUserID(ctx context.Context, userID uuid.UUID) (int64, error) {
+	row := q.db.QueryRow(ctx, countRoutesByUserID, userID)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const createCoursePoint = `-- name: CreateCoursePoint :exec
 INSERT INTO course_points (
     id,
@@ -235,6 +246,15 @@ func (q *Queries) DeleteCoursePoint(ctx context.Context, id uuid.UUID) error {
 	return err
 }
 
+const deleteCoursePointsByRouteID = `-- name: DeleteCoursePointsByRouteID :exec
+DELETE FROM course_points WHERE route_id = $1
+`
+
+func (q *Queries) DeleteCoursePointsByRouteID(ctx context.Context, routeID uuid.UUID) error {
+	_, err := q.db.Exec(ctx, deleteCoursePointsByRouteID, routeID)
+	return err
+}
+
 const deleteRoute = `-- name: DeleteRoute :exec
 DELETE FROM routes WHERE id = $1
 `
@@ -250,6 +270,15 @@ DELETE FROM waypoints WHERE id = $1
 
 func (q *Queries) DeleteWaypoint(ctx context.Context, id uuid.UUID) error {
 	_, err := q.db.Exec(ctx, deleteWaypoint, id)
+	return err
+}
+
+const deleteWaypointsByRouteID = `-- name: DeleteWaypointsByRouteID :exec
+DELETE FROM waypoints WHERE route_id = $1
+`
+
+func (q *Queries) DeleteWaypointsByRouteID(ctx context.Context, routeID uuid.UUID) error {
+	_, err := q.db.Exec(ctx, deleteWaypointsByRouteID, routeID)
 	return err
 }
 

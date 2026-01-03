@@ -58,7 +58,7 @@ type User struct {
 }
 
 // 新しいユーザーを作成
-func NewUser(
+func newUser(
 	kratosID string,
 	name string,
 	email *string,
@@ -89,6 +89,16 @@ func NewUser(
 	}, nil
 }
 
+func NewUser(
+	kratosID string,
+	name string,
+	email *string,
+	firstName *string,
+	lastName *string,
+) (*User, error) {
+	return newUser(kratosID, name, email, firstName, lastName)
+}
+
 // 永続化層から取得したデータをドメインに変換（リポジトリからの取得時に使用）
 func ReconstructUser(
 	id UserID,
@@ -107,28 +117,13 @@ func ReconstructUser(
 	email *string,
 	hasSetLocation bool,
 ) (*User, error) {
-	// 再構築時の最小限のバリデーション
-	if strings.TrimSpace(name) == "" {
-		return nil, ErrInvalidName
-	}
-
-	return &User{
-		id:                 id,
-		kratosID:           kratosID,
-		name:               name,
-		highlightedPhotoID: highlightedPhotoID,
-		locale:             locale,
-		description:        description,
-		locality:           locality,
-		administrativeArea: administrativeArea,
-		countryCode:        countryCode,
-		postalCode:         postalCode,
-		geom:               geom,
-		firstName:          firstName,
-		lastName:           lastName,
-		email:              email,
-		hasSetLocation:     hasSetLocation,
-	}, nil
+	return newUser(
+		kratosID,
+		name,
+		email,
+		firstName,
+		lastName,
+	)
 }
 
 // ゲッターメソッド

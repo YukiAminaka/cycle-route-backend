@@ -85,6 +85,9 @@ SELECT * FROM routes WHERE id = $1;
 -- name: GetRoutesByUserID :many
 SELECT * FROM routes WHERE user_id = $1;
 
+-- name: CountRoutesByUserID :one
+SELECT COUNT(*) FROM routes WHERE user_id = $1;
+
 -- name: DeleteRoute :exec
 DELETE FROM routes WHERE id = $1;
 
@@ -113,6 +116,9 @@ SELECT * FROM course_points WHERE route_id = $1 ORDER BY step_order ASC;
 -- name: DeleteCoursePoint :exec
 DELETE FROM course_points WHERE id = $1;
 
+-- name: DeleteCoursePointsByRouteID :exec
+DELETE FROM course_points WHERE route_id = $1;
+
 -- name: CreateWaypoint :exec
 INSERT INTO waypoints (
     id,
@@ -128,4 +134,5 @@ SELECT * FROM waypoints WHERE route_id = $1 ORDER BY id ASC;
 -- name: DeleteWaypoint :exec
 DELETE FROM waypoints WHERE id = $1;
 
-
+-- name: DeleteWaypointsByRouteID :exec
+DELETE FROM waypoints WHERE route_id = $1;

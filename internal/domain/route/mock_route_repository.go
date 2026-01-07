@@ -40,8 +40,23 @@ func (m *MockIRouteRepository) EXPECT() *MockIRouteRepositoryMockRecorder {
 	return m.recorder
 }
 
+// CountRoutesByUserID mocks base method.
+func (m *MockIRouteRepository) CountRoutesByUserID(ctx context.Context, userID string) (int64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CountRoutesByUserID", ctx, userID)
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CountRoutesByUserID indicates an expected call of CountRoutesByUserID.
+func (mr *MockIRouteRepositoryMockRecorder) CountRoutesByUserID(ctx, userID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CountRoutesByUserID", reflect.TypeOf((*MockIRouteRepository)(nil).CountRoutesByUserID), ctx, userID)
+}
+
 // DeleteRoute mocks base method.
-func (m *MockIRouteRepository) DeleteRoute(ctx context.Context, id RouteID) error {
+func (m *MockIRouteRepository) DeleteRoute(ctx context.Context, id string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteRoute", ctx, id)
 	ret0, _ := ret[0].(error)
@@ -55,7 +70,7 @@ func (mr *MockIRouteRepositoryMockRecorder) DeleteRoute(ctx, id any) *gomock.Cal
 }
 
 // GetRouteByID mocks base method.
-func (m *MockIRouteRepository) GetRouteByID(ctx context.Context, id RouteID) (*Route, error) {
+func (m *MockIRouteRepository) GetRouteByID(ctx context.Context, id string) (*Route, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetRouteByID", ctx, id)
 	ret0, _ := ret[0].(*Route)
@@ -67,6 +82,21 @@ func (m *MockIRouteRepository) GetRouteByID(ctx context.Context, id RouteID) (*R
 func (mr *MockIRouteRepositoryMockRecorder) GetRouteByID(ctx, id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRouteByID", reflect.TypeOf((*MockIRouteRepository)(nil).GetRouteByID), ctx, id)
+}
+
+// GetRoutesByUserID mocks base method.
+func (m *MockIRouteRepository) GetRoutesByUserID(ctx context.Context, userID string) ([]*Route, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRoutesByUserID", ctx, userID)
+	ret0, _ := ret[0].([]*Route)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetRoutesByUserID indicates an expected call of GetRoutesByUserID.
+func (mr *MockIRouteRepositoryMockRecorder) GetRoutesByUserID(ctx, userID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRoutesByUserID", reflect.TypeOf((*MockIRouteRepository)(nil).GetRoutesByUserID), ctx, userID)
 }
 
 // SaveRoute mocks base method.

@@ -88,8 +88,8 @@ SELECT * FROM routes WHERE user_id = $1;
 -- name: CountRoutesByUserID :one
 SELECT COUNT(*) FROM routes WHERE user_id = $1;
 
--- name: DeleteRoute :exec
-DELETE FROM routes WHERE id = $1;
+-- name: DeleteRoute :one
+DELETE FROM routes WHERE id = $1 RETURNING id;
 
 -- name: CreateCoursePoint :exec
 INSERT INTO course_points (

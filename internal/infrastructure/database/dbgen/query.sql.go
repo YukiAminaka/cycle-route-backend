@@ -255,13 +255,14 @@ func (q *Queries) DeleteCoursePointsByRouteID(ctx context.Context, routeID uuid.
 	return err
 }
 
-const deleteRoute = `-- name: DeleteRoute :exec
-DELETE FROM routes WHERE id = $1
+const deleteRoute = `-- name: DeleteRoute :one
+DELETE FROM routes WHERE id = $1 RETURNING id
 `
 
-func (q *Queries) DeleteRoute(ctx context.Context, id uuid.UUID) error {
-	_, err := q.db.Exec(ctx, deleteRoute, id)
-	return err
+func (q *Queries) DeleteRoute(ctx context.Context, id uuid.UUID) (uuid.UUID, error) {
+	row := q.db.QueryRow(ctx, deleteRoute, id)
+	err := row.Scan(&id)
+	return id, err
 }
 
 const deleteWaypoint = `-- name: DeleteWaypoint :exec

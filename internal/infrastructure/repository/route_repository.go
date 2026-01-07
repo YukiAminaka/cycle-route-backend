@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	"github.com/YukiAminaka/cycle-route-backend/internal/domain/route"
-	userdomain "github.com/YukiAminaka/cycle-route-backend/internal/domain/user"
 	"github.com/YukiAminaka/cycle-route-backend/internal/infrastructure/database/dbgen"
 
 	"github.com/google/uuid"
@@ -22,8 +21,8 @@ func NewRouteRepository(queries *dbgen.Queries) route.IRouteRepository {
 	return &routeRepositoryImpl{queries: queries}
 }
 
-func (r *routeRepositoryImpl) GetRouteByID(ctx context.Context, id route.RouteID) (*route.Route, error) {
-	uid, err := uuid.Parse(id.String())
+func (r *routeRepositoryImpl) GetRouteByID(ctx context.Context, id string) (*route.Route, error) {
+	uid, err := uuid.Parse(id)
 	if err != nil {
 		return nil, fmt.Errorf("invalid route id: %w", err)
 	}
@@ -62,6 +61,7 @@ func (r *routeRepositoryImpl) GetRouteByID(ctx context.Context, id route.RouteID
 		return nil, fmt.Errorf("failed to get course points: %w", err)
 	}
 
+	// CoursePoint構造体へのポインタのスライスを作成
 	coursePoints := make([]*route.CoursePoint, 0, len(coursePointsData))
 	for _, cp := range coursePointsData {
 		var location *route.Geometry
@@ -92,6 +92,7 @@ func (r *routeRepositoryImpl) GetRouteByID(ctx context.Context, id route.RouteID
 		return nil, fmt.Errorf("failed to get waypoints: %w", err)
 	}
 
+	// Waypoint構造体へのポインタのスライスを作成
 	waypoints := make([]*route.Waypoint, 0, len(waypointsData))
 	for _, wp := range waypointsData {
 		var location route.Geometry
@@ -109,8 +110,8 @@ func (r *routeRepositoryImpl) GetRouteByID(ctx context.Context, id route.RouteID
 	return routeModel, nil
 }
 
-func (r *routeRepositoryImpl) GetRoutesByUserID(ctx context.Context, userID userdomain.UserID) ([]*route.Route, error) {
-	uid, err := uuid.Parse(userID.String())
+func (r *routeRepositoryImpl) GetRoutesByUserID(ctx context.Context, userID string) ([]*route.Route, error) {
+	uid, err := uuid.Parse(userID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid user id: %w", err)
 	}
@@ -144,8 +145,8 @@ func (r *routeRepositoryImpl) GetRoutesByUserID(ctx context.Context, userID user
 	return result, nil
 }
 
-func (r *routeRepositoryImpl) CountRoutesByUserID(ctx context.Context, userID userdomain.UserID) (int64, error) {
-	uid, err := uuid.Parse(userID.String())
+func (r *routeRepositoryImpl) CountRoutesByUserID(ctx context.Context, userID string) (int64, error) {
+	uid, err := uuid.Parse(userID)
 	if err != nil {
 		return 0, fmt.Errorf("invalid user id: %w", err)
 	}
@@ -240,15 +241,18 @@ func (r *routeRepositoryImpl) SaveRoute(ctx context.Context, rt *route.Route) er
 	return nil
 }
 
-func (r *routeRepositoryImpl) DeleteRoute(ctx context.Context, id route.RouteID) error {
-	uid, err := uuid.Parse(id.String())
+func (r *routeRepositoryImpl) DeleteRoute(ctx context.Context, id string) error {
+	uid, err := uuid.Parse(id)
 	if err != nil {
 		return fmt.Errorf("invalid route id: %w", err)
 	}
 
 	// ルートを削除（カスケード削除でコースポイントとウェイポイントも削除される）
-	err = r.queries.DeleteRoute(ctx, uid)
+	_, err = r.queries.DeleteRoute(ctx, uid)
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return fmt.Errorf("route not found")
+		}
 		return fmt.Errorf("failed to delete route: %w", err)
 	}
 

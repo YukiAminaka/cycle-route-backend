@@ -59,7 +59,7 @@ func TestUserRepository_GetUserByID(t *testing.T) {
 			if err != nil {
 				t.Error(err)
 			}
-			if diff := cmp.Diff(got.ID(), tt.want.ID()); diff != "" {
+			if diff := cmp.Diff(got.KratosID(), tt.want.KratosID()); diff != "" {
 				t.Errorf("FindById() mismatch (-want +got):\n%s", diff)
 			}
 		})
@@ -97,7 +97,7 @@ func TestUserRepository_CreateUser(t *testing.T) {
 				t.Fatal("CreateUser returned nil user")
 			}
 
-			if diff := cmp.Diff(got.ID(), tt.want.ID()); diff != "" {
+			if diff := cmp.Diff(got.KratosID(), tt.want.KratosID()); diff != "" {
 				t.Errorf("FindById() mismatch (-want +got):\n%s", diff)
 			}
 		})

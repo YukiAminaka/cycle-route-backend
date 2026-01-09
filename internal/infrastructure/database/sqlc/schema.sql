@@ -34,9 +34,9 @@ CREATE TABLE routes (
   elevation_gain      DOUBLE PRECISION NOT NULL DEFAULT 0 CHECK (elevation_gain >= 0),
   elevation_loss      DOUBLE PRECISION NOT NULL DEFAULT 0 CHECK (elevation_loss >= 0),
   path_geom           geometry(LineString, 4326) NOT NULL CHECK (NOT ST_IsEmpty(path_geom)) CHECK (ST_NPoints(path_geom) >= 2),  -- 経路パス 空ジオメトリや、点が1個だけの線を保存禁止
-  bbox                geometry(Polygon,4326) NOT NULL GENERATED ALWAYS AS (ST_Envelope(path_geom)) STORED,    -- マップの表示領域 path_geomから自動生成
-  first_point         geometry(Point,4326) NOT NULL GENERATED ALWAYS AS (ST_StartPoint(path_geom)) STORED,  -- スタート位置 path_geomの始点から自動生成
-  last_point          geometry(Point,4326) NOT NULL GENERATED ALWAYS AS (ST_EndPoint(path_geom))   STORED, -- 終了位置　path_geomの終点から自動生成
+  bbox                geometry(Polygon,4326) NOT NULL,    -- ある地点の指定距離内にあるルートを検索するために使う
+  first_point         geometry(Point,4326) NOT NULL,  -- 出発地点（ユーザーが設定）
+  last_point          geometry(Point,4326) NOT NULL, -- 目的地（ユーザーが設定）
   created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
   deleted_at          TIMESTAMPTZ,         --　削除日時

@@ -59,6 +59,7 @@ type User struct {
 
 // 新しいユーザーを作成
 func newUser(
+	id UserID,
 	kratosID string,
 	name string,
 	email *string,
@@ -79,7 +80,7 @@ func newUser(
 	}
 
 	return &User{
-		id:             NewUserID(),
+		id:             id,
 		kratosID:       kratosID,
 		name:           name,
 		email:          email,
@@ -96,7 +97,7 @@ func NewUser(
 	firstName *string,
 	lastName *string,
 ) (*User, error) {
-	return newUser(kratosID, name, email, firstName, lastName)
+	return newUser(NewUserID(),kratosID, name, email, firstName, lastName)
 }
 
 // 永続化層から取得したデータをドメインに変換（リポジトリからの取得時に使用）
@@ -118,6 +119,7 @@ func ReconstructUser(
 	hasSetLocation bool,
 ) (*User, error) {
 	return newUser(
+		id,
 		kratosID,
 		name,
 		email,

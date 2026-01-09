@@ -1,40 +1,40 @@
 -- name: CreateUser :one
-INSERT INTO users (                
+INSERT INTO users (
     id,
-    kratos_id,              
-    name,              
+    kratos_id,
+    name,
     highlighted_photo_id,
-    locale,            
-    description,       
-    locality,          
+    locale,
+    description,
+    locality,
     administrative_area,
-    country_code,       
-    postal_code,        
-    geom,              
-    first_name,         
-    last_name,          
-    email,             
-    has_set_location     
+    country_code,
+    postal_code,
+    geom,
+    first_name,
+    last_name,
+    email,
+    has_set_location
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15
+    sqlc.arg(id), sqlc.arg(kratos_id), sqlc.arg(name), sqlc.arg(highlighted_photo_id), sqlc.arg(locale), sqlc.arg(description), sqlc.arg(locality), sqlc.arg(administrative_area), sqlc.arg(country_code), sqlc.arg(postal_code), ST_GeomFromEWKB(sqlc.arg(geom)), sqlc.arg(first_name), sqlc.arg(last_name), sqlc.arg(email), sqlc.arg(has_set_location)
 ) RETURNING *;
 
 -- name: UpdateUser :one
 UPDATE users SET
-    name = $2,
-    email = $3,
-    first_name = $4,
-    last_name = $5,
-    description = $6,
-    locality = $7,
-    administrative_area = $8,
-    country_code = $9,
-    postal_code = $10,
-    geom = $11,
-    has_set_location = $12,
-    highlighted_photo_id = $13,
-    locale = $14
-WHERE id = $1
+    name = sqlc.arg(name),
+    email = sqlc.arg(email),
+    first_name = sqlc.arg(first_name),
+    last_name = sqlc.arg(last_name),
+    description = sqlc.arg(description),
+    locality = sqlc.arg(locality),
+    administrative_area = sqlc.arg(administrative_area),
+    country_code = sqlc.arg(country_code),
+    postal_code = sqlc.arg(postal_code),
+    geom = ST_GeomFromEWKB(sqlc.arg(geom)),
+    has_set_location = sqlc.arg(has_set_location),
+    highlighted_photo_id = sqlc.arg(highlighted_photo_id),
+    locale = sqlc.arg(locale)
+WHERE id = sqlc.arg(id)
 RETURNING *; 
 
 -- name: GetUserByID :one
@@ -60,24 +60,24 @@ INSERT INTO routes (
     last_point,
     visibility
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14
+    sqlc.arg(id), sqlc.arg(user_id), sqlc.arg(name), sqlc.arg(description), sqlc.arg(highlighted_photo_id), sqlc.arg(distance), sqlc.arg(duration), sqlc.arg(elevation_gain), sqlc.arg(elevation_loss), ST_GeomFromEWKB(sqlc.arg(path_geom)), ST_GeomFromEWKB(sqlc.arg(bbox)), ST_GeomFromEWKB(sqlc.arg(first_point)), ST_GeomFromEWKB(sqlc.arg(last_point)), sqlc.arg(visibility)
 );
 
 -- name: UpdateRoute :exec
 UPDATE routes SET
-    name = $2,
-    description = $3,
-    highlighted_photo_id = $4,
-    distance = $5,
-    duration = $6,
-    elevation_gain = $7,
-    elevation_loss = $8,
-    path_geom = $9,
-    bbox = $10,
-    first_point = $11,
-    last_point = $12,
-    visibility = $13
-WHERE id = $1;
+    name = sqlc.arg(name),
+    description = sqlc.arg(description),
+    highlighted_photo_id = sqlc.arg(highlighted_photo_id),
+    distance = sqlc.arg(distance),
+    duration = sqlc.arg(duration),
+    elevation_gain = sqlc.arg(elevation_gain),
+    elevation_loss = sqlc.arg(elevation_loss),
+    path_geom = ST_GeomFromEWKB(sqlc.arg(path_geom)),
+    bbox = ST_GeomFromEWKB(sqlc.arg(bbox)),
+    first_point = ST_GeomFromEWKB(sqlc.arg(first_point)),
+    last_point = ST_GeomFromEWKB(sqlc.arg(last_point)),
+    visibility = sqlc.arg(visibility)
+WHERE id = sqlc.arg(id);
 
 -- name: GetRouteByID :one
 SELECT * FROM routes WHERE id = $1;
@@ -107,7 +107,7 @@ INSERT INTO course_points (
     bearing_before,
     bearing_after
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13
+    sqlc.arg(id), sqlc.arg(route_id), sqlc.arg(step_order), sqlc.arg(seg_dist_m), sqlc.arg(cum_dist_m), sqlc.arg(duration), sqlc.arg(instruction), sqlc.arg(road_name), sqlc.arg(maneuver_type), sqlc.arg(modifier), ST_GeomFromEWKB(sqlc.arg(location)), sqlc.arg(bearing_before), sqlc.arg(bearing_after)
 );
 
 -- name: GetCoursePointsByRouteID :many
@@ -125,7 +125,7 @@ INSERT INTO waypoints (
     route_id,
     location
 ) VALUES (
-    $1, $2, $3
+    sqlc.arg(id), sqlc.arg(route_id), ST_GeomFromEWKB(sqlc.arg(location))
 );
 
 -- name: GetWaypointsByRouteID :many

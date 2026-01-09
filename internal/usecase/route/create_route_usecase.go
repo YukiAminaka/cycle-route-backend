@@ -51,7 +51,6 @@ type CreateRouteUseCaseInputDto struct {
 	ElevationGain      float64
 	ElevationLoss      float64
 	PathGeom           orb.LineString
-	Bbox               orb.Polygon
 	FirstPoint         orb.Point
 	LastPoint          orb.Point
 	Visibility         int16
@@ -88,7 +87,6 @@ func (u *createRouteUsecase) CreateRoute(ctx context.Context, dto CreateRouteUse
 		dto.ElevationGain,
 		dto.ElevationLoss,
 		routeDomain.Geometry{Geometry: dto.PathGeom},
-		routeDomain.Geometry{Geometry: dto.Bbox},
 		routeDomain.Geometry{Geometry: dto.FirstPoint},
 		routeDomain.Geometry{Geometry: dto.LastPoint},
 		dto.Visibility,

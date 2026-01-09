@@ -121,7 +121,7 @@ func (r *routeRepositoryImpl) GetRoutesByUserID(ctx context.Context, userID stri
 	}
 	result := make([]*route.Route, 0, len(rows))
 	for _, rd := range rows {
-		routeModel,err := route.ReconstructRoute(
+		routeModel, err := route.ReconstructRoute(
 			rd.ID.String(),
 			rd.UserID.String(),
 			rd.Name,
@@ -168,6 +168,9 @@ func (r *routeRepositoryImpl) SaveRoute(ctx context.Context, rt *route.Route) er
 		return fmt.Errorf("invalid user id: %w", err)
 	}
 
+	// path_geomからbboxを自動計算
+	bbox := CalculateBbox(rt.PathGeom().Geometry)
+
 	// ルート本体を保存
 	err = r.queries.CreateRoute(ctx, dbgen.CreateRouteParams{
 		ID:                 routeID,
@@ -180,7 +183,7 @@ func (r *routeRepositoryImpl) SaveRoute(ctx context.Context, rt *route.Route) er
 		ElevationGain:      rt.ElevationGain(),
 		ElevationLoss:      rt.ElevationLoss(),
 		PathGeom:           dbgen.OrbGeometry{Geometry: rt.PathGeom().Geometry},
-		Bbox:               dbgen.OrbGeometry{Geometry: rt.Bbox().Geometry},
+		Bbox:               bbox,
 		FirstPoint:         dbgen.OrbGeometry{Geometry: rt.FirstPoint().Geometry},
 		LastPoint:          dbgen.OrbGeometry{Geometry: rt.LastPoint().Geometry},
 		Visibility:         rt.Visibility(),
@@ -266,6 +269,9 @@ func (r *routeRepositoryImpl) UpdateRoute(ctx context.Context, rt *route.Route) 
 		return fmt.Errorf("invalid route id: %w", err)
 	}
 
+	// path_geomからbboxを自動計算
+	bbox := CalculateBbox(rt.PathGeom().Geometry)
+
 	// ルート本体を更新
 	err = r.queries.UpdateRoute(ctx, dbgen.UpdateRouteParams{
 		ID:                 routeID,
@@ -277,7 +283,7 @@ func (r *routeRepositoryImpl) UpdateRoute(ctx context.Context, rt *route.Route) 
 		ElevationGain:      rt.ElevationGain(),
 		ElevationLoss:      rt.ElevationLoss(),
 		PathGeom:           dbgen.OrbGeometry{Geometry: rt.PathGeom().Geometry},
-		Bbox:               dbgen.OrbGeometry{Geometry: rt.Bbox().Geometry},
+		Bbox:               bbox,
 		FirstPoint:         dbgen.OrbGeometry{Geometry: rt.FirstPoint().Geometry},
 		LastPoint:          dbgen.OrbGeometry{Geometry: rt.LastPoint().Geometry},
 		Visibility:         rt.Visibility(),

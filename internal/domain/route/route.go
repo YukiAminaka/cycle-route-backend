@@ -176,7 +176,6 @@ func newRoute(
 	elevationGain float64,
 	elevationLoss float64,
 	pathGeom Geometry,
-	bbox Geometry,
 	firstPoint Geometry,
 	lastPoint Geometry,
 	visibility int16) (*Route, error) {
@@ -193,12 +192,6 @@ func newRoute(
 	}
 	if pathGeom.Geometry.GeoJSONType() != "LineString" {
 		return nil, errors.New("pathGeom must be a LineString")
-	}
-	if bbox.Geometry == nil {
-		return nil, errors.New("bbox is required")
-	}
-	if bbox.Geometry.GeoJSONType() != "Polygon" {
-		return nil, errors.New("bbox must be a Polygon")
 	}
 	if firstPoint.Geometry == nil {
 		return nil, errors.New("firstPoint is required")
@@ -222,6 +215,7 @@ func newRoute(
 	// IDの生成
 	id := NewRouteID().String()
 
+	// bboxは空のGeometryで初期化（データベースで自動生成される）
 	return &Route{
 		id:                 id,
 		userID:             userID,
@@ -233,7 +227,7 @@ func newRoute(
 		elevationGain:      elevationGain,
 		elevationLoss:      elevationLoss,
 		pathGeom:           pathGeom,
-		bbox:               bbox,
+		bbox:               Geometry{}, // 空のGeometry（DBで自動生成される）
 		firstPoint:         firstPoint,
 		lastPoint:          lastPoint,
 		visibility:         visibility,
@@ -252,7 +246,6 @@ func NewRoute(
 	elevationGain float64,
 	elevationLoss float64,
 	pathGeom Geometry,
-	bbox Geometry,
 	firstPoint Geometry,
 	lastPoint Geometry,
 	visibility int16) (*Route, error) {
@@ -266,7 +259,6 @@ func NewRoute(
 		elevationGain,
 		elevationLoss,
 		pathGeom,
-		bbox,
 		firstPoint,
 		lastPoint,
 		visibility)

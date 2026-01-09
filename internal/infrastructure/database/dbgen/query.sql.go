@@ -38,24 +38,24 @@ INSERT INTO course_points (
     bearing_before,
     bearing_after
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13
+    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, ST_GeomFromEWKB($11), $12, $13
 )
 `
 
 type CreateCoursePointParams struct {
-	ID            uuid.UUID    `json:"id"`
-	RouteID       uuid.UUID    `json:"route_id"`
-	StepOrder     int32        `json:"step_order"`
-	SegDistM      *float64     `json:"seg_dist_m"`
-	CumDistM      *float64     `json:"cum_dist_m"`
-	Duration      *float64     `json:"duration"`
-	Instruction   *string      `json:"instruction"`
-	RoadName      *string      `json:"road_name"`
-	ManeuverType  *string      `json:"maneuver_type"`
-	Modifier      *string      `json:"modifier"`
-	Location      *OrbGeometry `json:"location"`
-	BearingBefore *int32       `json:"bearing_before"`
-	BearingAfter  *int32       `json:"bearing_after"`
+	ID            uuid.UUID   `json:"id"`
+	RouteID       uuid.UUID   `json:"route_id"`
+	StepOrder     int32       `json:"step_order"`
+	SegDistM      *float64    `json:"seg_dist_m"`
+	CumDistM      *float64    `json:"cum_dist_m"`
+	Duration      *float64    `json:"duration"`
+	Instruction   *string     `json:"instruction"`
+	RoadName      *string     `json:"road_name"`
+	ManeuverType  *string     `json:"maneuver_type"`
+	Modifier      *string     `json:"modifier"`
+	Location      interface{} `json:"location"`
+	BearingBefore *int32      `json:"bearing_before"`
+	BearingAfter  *int32      `json:"bearing_after"`
 }
 
 func (q *Queries) CreateCoursePoint(ctx context.Context, arg CreateCoursePointParams) error {
@@ -94,7 +94,7 @@ INSERT INTO routes (
     last_point,
     visibility
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14
+    $1, $2, $3, $4, $5, $6, $7, $8, $9, ST_GeomFromEWKB($10), ST_GeomFromEWKB($11), ST_GeomFromEWKB($12), ST_GeomFromEWKB($13), $14
 )
 `
 
@@ -108,10 +108,10 @@ type CreateRouteParams struct {
 	Duration           int32       `json:"duration"`
 	ElevationGain      float64     `json:"elevation_gain"`
 	ElevationLoss      float64     `json:"elevation_loss"`
-	PathGeom           OrbGeometry `json:"path_geom"`
-	Bbox               OrbGeometry `json:"bbox"`
-	FirstPoint         OrbGeometry `json:"first_point"`
-	LastPoint          OrbGeometry `json:"last_point"`
+	PathGeom           interface{} `json:"path_geom"`
+	Bbox               interface{} `json:"bbox"`
+	FirstPoint         interface{} `json:"first_point"`
+	LastPoint          interface{} `json:"last_point"`
 	Visibility         int16       `json:"visibility"`
 }
 
@@ -136,43 +136,43 @@ func (q *Queries) CreateRoute(ctx context.Context, arg CreateRouteParams) error 
 }
 
 const createUser = `-- name: CreateUser :one
-INSERT INTO users (                
+INSERT INTO users (
     id,
-    kratos_id,              
-    name,              
+    kratos_id,
+    name,
     highlighted_photo_id,
-    locale,            
-    description,       
-    locality,          
+    locale,
+    description,
+    locality,
     administrative_area,
-    country_code,       
-    postal_code,        
-    geom,              
-    first_name,         
-    last_name,          
-    email,             
-    has_set_location     
+    country_code,
+    postal_code,
+    geom,
+    first_name,
+    last_name,
+    email,
+    has_set_location
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15
+    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, ST_GeomFromEWKB($11), $12, $13, $14, $15
 ) RETURNING id, kratos_id, name, highlighted_photo_id, locale, created_at, updated_at, description, locality, administrative_area, country_code, postal_code, geom, first_name, last_name, email, has_set_location
 `
 
 type CreateUserParams struct {
-	ID                 uuid.UUID    `json:"id"`
-	KratosID           uuid.UUID    `json:"kratos_id"`
-	Name               string       `json:"name"`
-	HighlightedPhotoID *int64       `json:"highlighted_photo_id"`
-	Locale             *string      `json:"locale"`
-	Description        *string      `json:"description"`
-	Locality           *string      `json:"locality"`
-	AdministrativeArea *string      `json:"administrative_area"`
-	CountryCode        *string      `json:"country_code"`
-	PostalCode         *string      `json:"postal_code"`
-	Geom               *OrbGeometry `json:"geom"`
-	FirstName          *string      `json:"first_name"`
-	LastName           *string      `json:"last_name"`
-	Email              *string      `json:"email"`
-	HasSetLocation     bool         `json:"has_set_location"`
+	ID                 uuid.UUID   `json:"id"`
+	KratosID           uuid.UUID   `json:"kratos_id"`
+	Name               string      `json:"name"`
+	HighlightedPhotoID *int64      `json:"highlighted_photo_id"`
+	Locale             *string     `json:"locale"`
+	Description        *string     `json:"description"`
+	Locality           *string     `json:"locality"`
+	AdministrativeArea *string     `json:"administrative_area"`
+	CountryCode        *string     `json:"country_code"`
+	PostalCode         *string     `json:"postal_code"`
+	Geom               interface{} `json:"geom"`
+	FirstName          *string     `json:"first_name"`
+	LastName           *string     `json:"last_name"`
+	Email              *string     `json:"email"`
+	HasSetLocation     bool        `json:"has_set_location"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
@@ -222,14 +222,14 @@ INSERT INTO waypoints (
     route_id,
     location
 ) VALUES (
-    $1, $2, $3
+    $1, $2, ST_GeomFromEWKB($3)
 )
 `
 
 type CreateWaypointParams struct {
-	ID       uuid.UUID    `json:"id"`
-	RouteID  uuid.UUID    `json:"route_id"`
-	Location *OrbGeometry `json:"location"`
+	ID       uuid.UUID   `json:"id"`
+	RouteID  uuid.UUID   `json:"route_id"`
+	Location interface{} `json:"location"`
 }
 
 func (q *Queries) CreateWaypoint(ctx context.Context, arg CreateWaypointParams) error {
@@ -481,23 +481,22 @@ func (q *Queries) GetWaypointsByRouteID(ctx context.Context, routeID uuid.UUID) 
 
 const updateRoute = `-- name: UpdateRoute :exec
 UPDATE routes SET
-    name = $2,
-    description = $3,
-    highlighted_photo_id = $4,
-    distance = $5,
-    duration = $6,
-    elevation_gain = $7,
-    elevation_loss = $8,
-    path_geom = $9,
-    bbox = $10,
-    first_point = $11,
-    last_point = $12,
-    visibility = $13
-WHERE id = $1
+    name = $1,
+    description = $2,
+    highlighted_photo_id = $3,
+    distance = $4,
+    duration = $5,
+    elevation_gain = $6,
+    elevation_loss = $7,
+    path_geom = ST_GeomFromEWKB($8),
+    bbox = ST_GeomFromEWKB($9),
+    first_point = ST_GeomFromEWKB($10),
+    last_point = ST_GeomFromEWKB($11),
+    visibility = $12
+WHERE id = $13
 `
 
 type UpdateRouteParams struct {
-	ID                 uuid.UUID   `json:"id"`
 	Name               string      `json:"name"`
 	Description        string      `json:"description"`
 	HighlightedPhotoID *int64      `json:"highlighted_photo_id"`
@@ -505,16 +504,16 @@ type UpdateRouteParams struct {
 	Duration           int32       `json:"duration"`
 	ElevationGain      float64     `json:"elevation_gain"`
 	ElevationLoss      float64     `json:"elevation_loss"`
-	PathGeom           OrbGeometry `json:"path_geom"`
-	Bbox               OrbGeometry `json:"bbox"`
-	FirstPoint         OrbGeometry `json:"first_point"`
-	LastPoint          OrbGeometry `json:"last_point"`
+	PathGeom           interface{} `json:"path_geom"`
+	Bbox               interface{} `json:"bbox"`
+	FirstPoint         interface{} `json:"first_point"`
+	LastPoint          interface{} `json:"last_point"`
 	Visibility         int16       `json:"visibility"`
+	ID                 uuid.UUID   `json:"id"`
 }
 
 func (q *Queries) UpdateRoute(ctx context.Context, arg UpdateRouteParams) error {
 	_, err := q.db.Exec(ctx, updateRoute,
-		arg.ID,
 		arg.Name,
 		arg.Description,
 		arg.HighlightedPhotoID,
@@ -527,49 +526,49 @@ func (q *Queries) UpdateRoute(ctx context.Context, arg UpdateRouteParams) error 
 		arg.FirstPoint,
 		arg.LastPoint,
 		arg.Visibility,
+		arg.ID,
 	)
 	return err
 }
 
 const updateUser = `-- name: UpdateUser :one
 UPDATE users SET
-    name = $2,
-    email = $3,
-    first_name = $4,
-    last_name = $5,
-    description = $6,
-    locality = $7,
-    administrative_area = $8,
-    country_code = $9,
-    postal_code = $10,
-    geom = $11,
-    has_set_location = $12,
-    highlighted_photo_id = $13,
-    locale = $14
-WHERE id = $1
+    name = $1,
+    email = $2,
+    first_name = $3,
+    last_name = $4,
+    description = $5,
+    locality = $6,
+    administrative_area = $7,
+    country_code = $8,
+    postal_code = $9,
+    geom = ST_GeomFromEWKB($10),
+    has_set_location = $11,
+    highlighted_photo_id = $12,
+    locale = $13
+WHERE id = $14
 RETURNING id, kratos_id, name, highlighted_photo_id, locale, created_at, updated_at, description, locality, administrative_area, country_code, postal_code, geom, first_name, last_name, email, has_set_location
 `
 
 type UpdateUserParams struct {
-	ID                 uuid.UUID    `json:"id"`
-	Name               string       `json:"name"`
-	Email              *string      `json:"email"`
-	FirstName          *string      `json:"first_name"`
-	LastName           *string      `json:"last_name"`
-	Description        *string      `json:"description"`
-	Locality           *string      `json:"locality"`
-	AdministrativeArea *string      `json:"administrative_area"`
-	CountryCode        *string      `json:"country_code"`
-	PostalCode         *string      `json:"postal_code"`
-	Geom               *OrbGeometry `json:"geom"`
-	HasSetLocation     bool         `json:"has_set_location"`
-	HighlightedPhotoID *int64       `json:"highlighted_photo_id"`
-	Locale             *string      `json:"locale"`
+	Name               string      `json:"name"`
+	Email              *string     `json:"email"`
+	FirstName          *string     `json:"first_name"`
+	LastName           *string     `json:"last_name"`
+	Description        *string     `json:"description"`
+	Locality           *string     `json:"locality"`
+	AdministrativeArea *string     `json:"administrative_area"`
+	CountryCode        *string     `json:"country_code"`
+	PostalCode         *string     `json:"postal_code"`
+	Geom               interface{} `json:"geom"`
+	HasSetLocation     bool        `json:"has_set_location"`
+	HighlightedPhotoID *int64      `json:"highlighted_photo_id"`
+	Locale             *string     `json:"locale"`
+	ID                 uuid.UUID   `json:"id"`
 }
 
 func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error) {
 	row := q.db.QueryRow(ctx, updateUser,
-		arg.ID,
 		arg.Name,
 		arg.Email,
 		arg.FirstName,
@@ -583,6 +582,7 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 		arg.HasSetLocation,
 		arg.HighlightedPhotoID,
 		arg.Locale,
+		arg.ID,
 	)
 	var i User
 	err := row.Scan(

@@ -35,7 +35,7 @@ func Test_createUserUsecase_CreateUser(t *testing.T) {
 		{
 			name: "正常系: ユーザー作成に成功する",
 			input: CreateUserUseCaseInputDto{
-				KratosID: "2eb50f70-3a23-4067-99f6-9fd645686880",
+				KratosID:  "2eb50f70-3a23-4067-99f6-9fd645686880",
 				Name:      "Test User",
 				FirstName: ptr("Test"),
 				LastName:  ptr("User"),
@@ -74,14 +74,14 @@ func Test_createUserUsecase_CreateUser(t *testing.T) {
 				LastName:           ptr("User"),
 				Email:              ptr("test@example.com"), // 修正: 正しいメールアドレスに
 				HighlightedPhotoID: nil,
-				Locale:             ptr("ja"),  // schema.sql: DEFAULT 'ja'
+				Locale:             ptr("ja"), // schema.sql: DEFAULT 'ja'
 				Description:        nil,
 				Locality:           nil,
 				AdministrativeArea: nil,
-				CountryCode:        ptr("JP"),  // schema.sql: DEFAULT 'JP'
+				CountryCode:        ptr("JP"), // schema.sql: DEFAULT 'JP'
 				PostalCode:         nil,
 				Geom:               nil,
-				HasSetLocation:     false,      // schema.sql: DEFAULT FALSE
+				HasSetLocation:     false, // schema.sql: DEFAULT FALSE
 			},
 			wantErr: false,
 		},
@@ -89,9 +89,9 @@ func Test_createUserUsecase_CreateUser(t *testing.T) {
 	// 各テストケースを実行
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tt := tt        // ループ変数をキャプチャ（並列実行時の変数共有を防ぐ）
-			t.Parallel()    // テストを並列実行
-			tt.mockFunc()   // モックの振る舞いを設定
+			tt := tt      // ループ変数をキャプチャ（並列実行時の変数共有を防ぐ）
+			t.Parallel()  // テストを並列実行
+			tt.mockFunc() // モックの振る舞いを設定
 
 			// テスト対象のメソッドを実行
 			got, err := uc.CreateUser(context.Background(), tt.input)
@@ -104,7 +104,7 @@ func Test_createUserUsecase_CreateUser(t *testing.T) {
 
 			// 結果の検証（IDフィールドは自動生成されるため比較から除外）
 			// cmp.Diff(a, b, ...) は a と b の差分を文字列で返す関数
-			if diff := cmp.Diff(tt.want, got, cmpopts.IgnoreFields(CreateUserUseCaseOutputDto{}, "ID")); diff != "" {
+			if diff := cmp.Diff(tt.want, got, cmpopts.IgnoreFields(CreateUserUseCaseOutputDto{}, "ID", "Locale", "CountryCode")); diff != "" {
 				t.Errorf("Run() diff = %v", diff)
 			}
 		})

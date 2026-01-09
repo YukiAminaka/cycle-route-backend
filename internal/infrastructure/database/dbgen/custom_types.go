@@ -50,30 +50,19 @@ func (g OrbGeometry) Value() (driver.Value, error) {
 	if g.Geometry == nil {
 		return nil, nil
 	}
-	// PostGIS に書き込む際は、SRID情報を含めることができる EWKB を推奨。
-	// デフォルトのSRID (0) でよい場合も問題なく動作します。
-	return ewkb.Value(g.Geometry, 4326).Value() // 第2引数はSRID (例: 4326なら指定可能)
-}
 
-type OrbPoint struct {
-	orb.Point
-}
+	// // すべてのGeometry型をEWKB形式で送信
+	// data, err := ewkb.Marshal(g.Geometry, 4326)
+	// if err != nil {
+	// 	return nil, fmt.Errorf("failed to marshal geometry to EWKB: %w", err)
+	// }
 
-// sql.Scannerの実装 (DB -> Go)
-func (p *OrbPoint) Scan(value interface{}) error {
-	// PostGISなどは通常、EWKBまたはWKB (byte slice) で返します
-	_, ok := value.([]byte)
-	if !ok {
-		return fmt.Errorf("OrbPoint scan error: expected []byte, got %T", value)
-	}
+	// // Polygon型の場合はデバッグログを出力
+	// if _, ok := g.Geometry.(orb.Polygon); ok {
+	// 	log.Printf("[DEBUG] Polygon EWKB hex: %x", data)
+	// 	wktString := wkt.MarshalString(g.Geometry)
+	// 	log.Printf("[DEBUG] Polygon WKT: %s", wktString)
+	// }
 
-	// EWKBまたはWKBとしてスキャン
-	// ※ PostGISの場合はEWKBが多いため、ewkbスキャナを使うのが安全です
-	s := ewkb.Scanner(&p.Point)
-	return s.Scan(value)
-}
-
-// driver.Valuerの実装 (Go -> DB)
-func (p OrbPoint) Value() (driver.Value, error) {
-	return ewkb.Value(p.Point, 4326).Value()
+	return ewkb.Value(g.Geometry, 4326), nil
 }

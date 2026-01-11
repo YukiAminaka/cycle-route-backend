@@ -4,21 +4,24 @@ import (
 	"context"
 
 	routeDomain "github.com/YukiAminaka/cycle-route-backend/internal/domain/route"
+	userDomain "github.com/YukiAminaka/cycle-route-backend/internal/domain/user"
 	"github.com/paulmach/orb"
 )
 
 type IGetRouteUsecase interface {
-	GetRouteByID(ctx context.Context, routeID string) (*GetRouteUseCaseOutputDto, error)
-	GetRoutesByUserID(ctx context.Context, userID string) ([]*GetRouteUseCaseOutputDto, error)
+	GetRouteByID(ctx context.Context, routeID string) (*RouteDetaileDto, error)
+	GetRoutesByUserID(ctx context.Context, userID string) ([]*RouteListItemDto, error)
 }
 
 type getRouteUsecase struct {
 	routeRepo routeDomain.IRouteRepository
+	userRepo userDomain.IUserRepository
 }
 
-func NewGetRouteUsecase(routeRepo routeDomain.IRouteRepository) IGetRouteUsecase {
+func NewGetRouteUsecase(routeRepo routeDomain.IRouteRepository, userRepo userDomain.IUserRepository) IGetRouteUsecase {
 	return &getRouteUsecase{
 		routeRepo: routeRepo,
+		userRepo: userRepo,
 	}
 }
 
@@ -42,9 +45,10 @@ type WaypointOutput struct {
 	Location orb.Point
 }
 
-type GetRouteUseCaseOutputDto struct {
+type RouteDetaileDto struct {
 	ID                 string
 	UserID             string
+	UserName		   string
 	Name               string
 	Description        string
 	HighlightedPhotoID *int64
@@ -57,34 +61,65 @@ type GetRouteUseCaseOutputDto struct {
 	FirstPoint         orb.Point
 	LastPoint          orb.Point
 	Visibility         int16
+	CreatedAt 		   string
+	UpdatedAt 		   string
 	CoursePoints       []CoursePointOutput
 	Waypoints          []WaypointOutput
 }
 
-func (u *getRouteUsecase) GetRouteByID(ctx context.Context, routeID string) (*GetRouteUseCaseOutputDto, error) {
+type RouteListItemDto struct {
+	ID                 string
+	UserID             string
+	UserName           string
+	Name               string
+	Description        string
+	HighlightedPhotoID *int64
+	Distance           float64
+	Duration           int32
+	ElevationGain      float64
+	ElevationLoss      float64
+	Visibility         int16
+	CreatedAt          string
+	UpdatedAt          string
+}
+
+
+func (u *getRouteUsecase) GetRouteByID(ctx context.Context, routeID string) (*RouteDetaileDto, error) {
 	route, err := u.routeRepo.GetRouteByID(ctx, routeID)
 	if err != nil {
 		return nil, err
 	}
 
-	return u.convertToOutputDto(route), nil
+	//ルート作成者のユーザー名を取得
+	user, err := u.userRepo.GetUserByID(ctx, route.UserID())
+	if err != nil {
+		return nil, err
+	}
+
+	return u.convertToOutputDto(route, user.Name()), nil
 }
 
-func (u *getRouteUsecase) GetRoutesByUserID(ctx context.Context, userID string) ([]*GetRouteUseCaseOutputDto, error) {
+func (u *getRouteUsecase) GetRoutesByUserID(ctx context.Context, userID string) ([]*RouteListItemDto, error) {
 	routes, err := u.routeRepo.GetRoutesByUserID(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
 
-	outputs := make([]*GetRouteUseCaseOutputDto, len(routes))
+	//ルート作成者のユーザー名を取得
+	user, err := u.userRepo.GetUserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	outputs := make([]*RouteListItemDto, len(routes))
 	for i, route := range routes {
-		outputs[i] = u.convertToOutputDto(route)
+		outputs[i] = u.convertToSummaryOutputDto(route, user.Name())
 	}
 
 	return outputs, nil
 }
 
-func (u *getRouteUsecase) convertToOutputDto(route *routeDomain.Route) *GetRouteUseCaseOutputDto {
+func (u *getRouteUsecase) convertToOutputDto(route *routeDomain.Route, userName string) *RouteDetaileDto {
 	// CoursePointsの変換
 	coursePoints := make([]CoursePointOutput, len(route.CoursePoints()))
 	for i, cp := range route.CoursePoints() {
@@ -120,9 +155,10 @@ func (u *getRouteUsecase) convertToOutputDto(route *routeDomain.Route) *GetRoute
 		}
 	}
 
-	return &GetRouteUseCaseOutputDto{
+	return &RouteDetaileDto{
 		ID:                 route.ID(),
 		UserID:             route.UserID(),
+		UserName:		   	userName,
 		Name:               route.Name(),
 		Description:        route.Description(),
 		HighlightedPhotoID: route.HighlightedPhotoID(),
@@ -135,7 +171,28 @@ func (u *getRouteUsecase) convertToOutputDto(route *routeDomain.Route) *GetRoute
 		FirstPoint:         route.FirstPoint().Geometry.(orb.Point),
 		LastPoint:          route.LastPoint().Geometry.(orb.Point),
 		Visibility:         route.Visibility(),
+		CreatedAt:          route.CreatedAt(),
+		UpdatedAt:          route.UpdatedAt(),
 		CoursePoints:       coursePoints,
 		Waypoints:          waypoints,
+	}
+}
+
+
+func (u *getRouteUsecase) convertToSummaryOutputDto(route *routeDomain.Route, userName string) *RouteListItemDto {
+	return &RouteListItemDto{
+		ID:                 route.ID(),
+		UserID:             route.UserID(),
+		UserName:           userName,
+		Name:               route.Name(),
+		Description:        route.Description(),
+		HighlightedPhotoID: route.HighlightedPhotoID(),
+		Distance:           route.Distance(),
+		Duration:           route.Duration(),
+		ElevationGain:      route.ElevationGain(),
+		ElevationLoss:      route.ElevationLoss(),
+		Visibility:         route.Visibility(),
+		CreatedAt:          route.CreatedAt(),
+		UpdatedAt:          route.UpdatedAt(),
 	}
 }

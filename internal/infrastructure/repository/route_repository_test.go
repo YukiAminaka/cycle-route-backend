@@ -423,6 +423,8 @@ func TestRouteRepository_UpdateRoute(t *testing.T) {
 		firstPoint,
 		lastPoint,
 		2,
+		existingRoute.CreatedAt(), // 既存の作成日時を使用
+		existingRoute.UpdatedAt(), // 既存の更新日時を使用
 	)
 	if err != nil {
 		t.Fatalf("failed to reconstruct route: %v", err)

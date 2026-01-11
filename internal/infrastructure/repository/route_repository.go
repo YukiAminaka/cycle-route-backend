@@ -50,6 +50,8 @@ func (r *routeRepositoryImpl) GetRouteByID(ctx context.Context, id string) (*rou
 		route.Geometry{Geometry: rd.FirstPoint.Geometry},
 		route.Geometry{Geometry: rd.LastPoint.Geometry},
 		rd.Visibility,
+		rd.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		rd.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
 	)
 	if err != nil {
 		return nil, err
@@ -136,6 +138,8 @@ func (r *routeRepositoryImpl) GetRoutesByUserID(ctx context.Context, userID stri
 			route.Geometry{Geometry: rd.FirstPoint.Geometry},
 			route.Geometry{Geometry: rd.LastPoint.Geometry},
 			rd.Visibility,
+			rd.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+			rd.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
 		)
 		if err != nil {
 			return nil, err

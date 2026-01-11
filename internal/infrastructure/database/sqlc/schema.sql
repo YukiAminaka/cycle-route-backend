@@ -4,7 +4,7 @@ CREATE EXTENSION IF NOT EXISTS pg_trgm;    -- 名前/説明/検索用
 
 
 CREATE TABLE users (                   
-    id UUID PRIMARY KEY,                         -- ユーザーID（ULID形式）
+    id UUID PRIMARY KEY,                         -- ユーザーID（UUIDv7）
     kratos_id UUID UNIQUE NOT NULL,              -- Ory KratosのユーザーID
     name TEXT NOT NULL,                          -- ユーザー名
     highlighted_photo_id BIGINT DEFAULT 0,       -- ハイライト写真ID
@@ -24,13 +24,13 @@ CREATE TABLE users (
 );
 
 CREATE TABLE routes (
-  id  UUID PRIMARY KEY,                                   -- ルートID（ULID形式）
+  id  UUID PRIMARY KEY,                                   -- ルートID（UUIDv7）
   user_id             UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   name                TEXT NOT NULL,
   description         TEXT NOT NULL DEFAULT '',
   highlighted_photo_id        BIGINT      DEFAULT 0,
   distance            DOUBLE PRECISION NOT NULL CHECK (distance >= 0),   -- 距離(m)
-  duration            INTEGER NOT NULL CHECK (duration >= 0), -- 修正: IS NULL 条件を削除
+  duration            INTEGER NOT NULL CHECK (duration >= 0), -- 所要時間(s)
   elevation_gain      DOUBLE PRECISION NOT NULL DEFAULT 0 CHECK (elevation_gain >= 0),
   elevation_loss      DOUBLE PRECISION NOT NULL DEFAULT 0 CHECK (elevation_loss >= 0),
   path_geom           geometry(LineString, 4326) NOT NULL CHECK (NOT ST_IsEmpty(path_geom)) CHECK (ST_NPoints(path_geom) >= 2),  -- 経路パス 空ジオメトリや、点が1個だけの線を保存禁止

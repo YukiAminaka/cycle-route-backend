@@ -159,6 +159,8 @@ type Route struct {
 	firstPoint         Geometry
 	lastPoint          Geometry
 	visibility         int16
+	createdAt          string
+	updatedAt          string
 
 	// 集約内のエンティティコレクション
 	coursePoints []*CoursePoint
@@ -215,7 +217,7 @@ func newRoute(
 	// IDの生成
 	id := NewRouteID().String()
 
-	// bboxは空のGeometryで初期化（データベースで自動生成される）
+	// bboxは空のGeometryで初期化（リポジトリ層でpathGeomから計算する）
 	return &Route{
 		id:                 id,
 		userID:             userID,
@@ -227,7 +229,7 @@ func newRoute(
 		elevationGain:      elevationGain,
 		elevationLoss:      elevationLoss,
 		pathGeom:           pathGeom,
-		bbox:               Geometry{}, // 空のGeometry（DBで自動生成される）
+		bbox:               Geometry{}, // 空のGeometry
 		firstPoint:         firstPoint,
 		lastPoint:          lastPoint,
 		visibility:         visibility,
@@ -434,6 +436,15 @@ func (r *Route) Visibility() int16 {
 	return r.visibility
 }
 
+func (r *Route) CreatedAt() string {
+	return r.createdAt
+}
+
+func (r *Route) UpdatedAt() string {
+	return r.updatedAt
+}
+
+
 // コースポイントとウェイポイントをクリア（更新時に使用）
 func (r *Route) ClearCoursePointsAndWaypoints() {
 	r.coursePoints = []*CoursePoint{}
@@ -497,6 +508,8 @@ func ReconstructRoute(
 	firstPoint Geometry,
 	lastPoint Geometry,
 	visibility int16,
+	createdAt string,
+	updatedAt string,
 	) (*Route, error) {
 	return &Route{
 		id:                 id,
@@ -513,6 +526,8 @@ func ReconstructRoute(
 		firstPoint:         firstPoint,
 		lastPoint:          lastPoint,
 		visibility:         visibility,
+		createdAt:          createdAt,
+		updatedAt:          updatedAt,
 		coursePoints:       []*CoursePoint{},
 		waypoints:          []*Waypoint{},
 	}, nil
@@ -526,4 +541,70 @@ func (r *Route) SetCoursePoints(coursePoints []*CoursePoint) {
 // Waypointsを直接設定（リポジトリ層での復元用）
 func (r *Route) SetWaypoints(waypoints []*Waypoint) {
 	r.waypoints = waypoints
+}
+
+// 作成したルートの基本情報を更新する（名前、説明、写真など）
+func (r *Route) UpdateBasicInfo(
+	name string,
+	description string,
+	highlightedPhotoID *int64,
+	visibility int16) error {
+
+	if name == "" {
+		return errors.New("name is required")
+	}
+
+	r.name = name
+	r.description = description
+	r.highlightedPhotoID = highlightedPhotoID
+	r.visibility = visibility
+
+	return nil
+}
+
+// ルートのジオメトリ情報を更新する（ルート編集時に使用）
+func (r *Route) UpdateRouteGeometry(
+	distance float64,
+	duration int32,
+	elevationGain float64,
+	elevationLoss float64,
+	pathGeom Geometry,
+	firstPoint Geometry,
+	lastPoint Geometry) error {
+
+	// バリデーション
+	if pathGeom.Geometry == nil {
+		return errors.New("pathGeom is required")
+	}
+	if pathGeom.Geometry.GeoJSONType() != "LineString" {
+		return errors.New("pathGeom must be a LineString")
+	}
+	if firstPoint.Geometry == nil {
+		return errors.New("firstPoint is required")
+	}
+	if firstPoint.Geometry.GeoJSONType() != "Point" {
+		return errors.New("firstPoint must be a Point")
+	}
+	if lastPoint.Geometry == nil {
+		return errors.New("lastPoint is required")
+	}
+	if lastPoint.Geometry.GeoJSONType() != "Point" {
+		return errors.New("lastPoint must be a Point")
+	}
+	if distance < 0 {
+		return errors.New("distance must be non-negative")
+	}
+	if duration < 0 {
+		return errors.New("duration must be non-negative")
+	}
+
+	r.distance = distance
+	r.duration = duration
+	r.elevationGain = elevationGain
+	r.elevationLoss = elevationLoss
+	r.pathGeom = pathGeom
+	r.firstPoint = firstPoint
+	r.lastPoint = lastPoint
+
+	return nil
 }

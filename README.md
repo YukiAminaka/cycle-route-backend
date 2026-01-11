@@ -202,13 +202,6 @@ atlas migrate apply --env dev --to 20240101000001
 - ファイル名形式: `20240101000001_migration_name.sql`
 - Atlas が自動的にバージョン管理とチェックサムを管理します
 
-#### 従来の方法（開発時のクイック確認用）
-
-```bash
-# スキーマを直接適用（マイグレーション履歴なし）
-docker compose exec -T postgres psql -U postgres -d postgres_db < sqlc/schema.sql
-```
-
 ### 新機能追加の手順
 
 1. **Domain 層**: エンティティとリポジトリインターフェースを定義

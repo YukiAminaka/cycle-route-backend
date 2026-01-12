@@ -9,6 +9,101 @@ definitions:
         example: Bad Request
         type: string
     type: object
+  route.CoursePointResponse:
+    properties:
+      bearing_after:
+        type: integer
+      bearing_before:
+        type: integer
+      cum_dist_m:
+        type: number
+      duration:
+        type: number
+      id:
+        type: string
+      instruction:
+        type: string
+      location:
+        type: string
+      maneuver_type:
+        type: string
+      modifier:
+        type: string
+      road_name:
+        type: string
+      seg_dist_m:
+        type: number
+      step_order:
+        type: integer
+    type: object
+  route.CreateRouteRequest:
+    type: object
+  route.RouteListResponse:
+    properties:
+      routes:
+        items:
+          $ref: '#/definitions/route.RouteResponseModel'
+        type: array
+    type: object
+  route.RouteResponse:
+    properties:
+      route:
+        $ref: '#/definitions/route.RouteResponseModel'
+    type: object
+  route.RouteResponseModel:
+    properties:
+      bbox:
+        type: string
+      course_points:
+        items:
+          $ref: '#/definitions/route.CoursePointResponse'
+        type: array
+      created_at:
+        type: string
+      description:
+        type: string
+      distance:
+        type: number
+      duration:
+        type: integer
+      elevation_gain:
+        type: number
+      elevation_loss:
+        type: number
+      first_point:
+        type: string
+      highlighted_photo_id:
+        type: integer
+      id:
+        type: string
+      last_point:
+        type: string
+      name:
+        type: string
+      path_geom:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
+      user_name:
+        type: string
+      visibility:
+        type: integer
+      waypoints:
+        items:
+          $ref: '#/definitions/route.WaypointResponse'
+        type: array
+    type: object
+  route.UpdateRouteRequest:
+    type: object
+  route.WaypointResponse:
+    properties:
+      id:
+        type: string
+      location:
+        type: string
+    type: object
   user.CreateUserRequest:
     properties:
       email:
@@ -68,6 +163,143 @@ info:
   title: Cycle-Route API
   version: "1.0"
 paths:
+  /routes:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Create Route Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/route.CreateRouteRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/route.RouteResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: ルートを作成する
+      tags:
+      - routes
+  /routes/{route_id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: Route ID
+        in: path
+        name: route_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: ルートを削除する
+      tags:
+      - routes
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Route ID
+        in: path
+        name: route_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/route.RouteResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: ルートを取得する
+      tags:
+      - routes
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Route ID
+        in: path
+        name: route_id
+        required: true
+        type: string
+      - description: Update Route Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/route.UpdateRouteRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: ルートを更新する
+      tags:
+      - routes
   /users:
     post:
       consumes:
@@ -129,4 +361,32 @@ paths:
       summary: ユーザーを取得する
       tags:
       - users
+  /users/{user_id}/routes:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/route.RouteListResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: ユーザーのルート一覧を取得する
+      tags:
+      - routes
 swagger: "2.0"

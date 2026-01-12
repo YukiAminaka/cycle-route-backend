@@ -16,16 +16,20 @@ import (
 	"github.com/YukiAminaka/cycle-route-backend/internal/server/route"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func Run(ctx context.Context, conf *config.Config, q *dbgen.Queries) error {
+func Run(ctx context.Context, conf *config.Config, q *dbgen.Queries, pool *pgxpool.Pool) error {
 	router := gin.Default()
 	config := cors.DefaultConfig()
 	config.AllowOrigins = []string{"*"}
 
 	router.Use(cors.New(config))
+	// Recovery ミドルウェアは panic が発生しても 500 エラーを返してくれる
+	router.Use(gin.Recovery())
+	router.Use(gin.Logger())
 
-	route.InitRoute(router, q)
+	route.InitRoute(router, q, pool)
 
 	address := conf.Server.Address + ":" + conf.Server.Port
 	log.Printf("Starting server on %s...\n", address)

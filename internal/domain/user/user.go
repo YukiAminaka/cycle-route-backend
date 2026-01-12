@@ -118,14 +118,23 @@ func ReconstructUser(
 	email *string,
 	hasSetLocation bool,
 ) (*User, error) {
-	return newUser(
-		id,
-		kratosID,
-		name,
-		email,
-		firstName,
-		lastName,
-	)
+	return &User{
+		id:                 id,
+		kratosID:           kratosID,
+		name:               name,
+		highlightedPhotoID: highlightedPhotoID,
+		locale:             locale,
+		description:        description,
+		locality:           locality,
+		administrativeArea: administrativeArea,
+		countryCode:        countryCode,
+		postalCode:         postalCode,
+		geom:               geom,
+		firstName:          firstName,
+		lastName:           lastName,
+		email:              email,
+		hasSetLocation:     hasSetLocation,
+	}, nil
 }
 
 // ゲッターメソッド

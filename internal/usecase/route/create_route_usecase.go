@@ -4,6 +4,7 @@ import (
 	"context"
 
 	routeDomain "github.com/YukiAminaka/cycle-route-backend/internal/domain/route"
+	"github.com/YukiAminaka/cycle-route-backend/internal/domain/user"
 	"github.com/YukiAminaka/cycle-route-backend/internal/infrastructure/database/dbgen"
 	"github.com/YukiAminaka/cycle-route-backend/internal/infrastructure/repository"
 	"github.com/YukiAminaka/cycle-route-backend/internal/usecase/transaction"
@@ -15,12 +16,14 @@ type ICreateRouteUsecase interface {
 }
 
 type createRouteUsecase struct {
-	txManager transaction.TransactionManager
+	userRepository user.IUserRepository
+	txManager      transaction.TransactionManager
 }
 
-func NewCreateRouteUsecase(txManager transaction.TransactionManager) ICreateRouteUsecase {
+func NewCreateRouteUsecase(userRepository user.IUserRepository, txManager transaction.TransactionManager) ICreateRouteUsecase {
 	return &createRouteUsecase{
-		txManager: txManager,
+		userRepository: userRepository,
+		txManager:      txManager,
 	}
 }
 
@@ -42,7 +45,7 @@ type WaypointInput struct {
 }
 
 type CreateRouteUseCaseInputDto struct {
-	UserID             string
+	KratosID           string
 	Name               string
 	Description        string
 	HighlightedPhotoID *int64
@@ -76,9 +79,15 @@ type CreateRouteUseCaseOutputDto struct {
 }
 
 func (u *createRouteUsecase) CreateRoute(ctx context.Context, dto CreateRouteUseCaseInputDto) (*CreateRouteUseCaseOutputDto, error) {
+	// KratosIDからユーザー情報を取得
+	userEntity, err := u.userRepository.GetUserByKratosID(ctx, dto.KratosID)
+	if err != nil {
+		return nil, err
+	}
+
 	// ドメインモデルの作成
 	route, err := routeDomain.NewRoute(
-		dto.UserID,
+		userEntity.ID().String(),
 		dto.Name,
 		dto.Description,
 		dto.HighlightedPhotoID,

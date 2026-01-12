@@ -1,3 +1,4 @@
+CREATE EXTENSION IF NOT EXISTS postgis;
 -- Create "users" table
 CREATE TABLE "public"."users" (
   "id" uuid NOT NULL,

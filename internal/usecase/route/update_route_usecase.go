@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	routeDomain "github.com/YukiAminaka/cycle-route-backend/internal/domain/route"
+	"github.com/YukiAminaka/cycle-route-backend/internal/domain/user"
 	"github.com/YukiAminaka/cycle-route-backend/internal/infrastructure/database/dbgen"
 	"github.com/YukiAminaka/cycle-route-backend/internal/infrastructure/repository"
 	"github.com/YukiAminaka/cycle-route-backend/internal/usecase/transaction"
@@ -16,14 +17,16 @@ type IUpdateRouteUsecase interface {
 }
 
 type updateRouteUsecase struct {
-	txManager transaction.TransactionManager
-	routeRepo routeDomain.IRouteRepository
+	userRepository user.IUserRepository
+	txManager      transaction.TransactionManager
+	routeRepo      routeDomain.IRouteRepository
 }
 
-func NewUpdateRouteUsecase(txManager transaction.TransactionManager, routeRepo routeDomain.IRouteRepository) IUpdateRouteUsecase {
+func NewUpdateRouteUsecase(userRepository user.IUserRepository, txManager transaction.TransactionManager, routeRepo routeDomain.IRouteRepository) IUpdateRouteUsecase {
 	return &updateRouteUsecase{
-		txManager: txManager,
-		routeRepo: routeRepo,
+		userRepository: userRepository,
+		txManager:      txManager,
+		routeRepo:      routeRepo,
 	}
 }
 
@@ -46,7 +49,7 @@ type UpdatedWaypointInput struct {
 
 type UpdateRouteUseCaseInputDto struct {
 	ID                 string
-	UserID             string
+	KratosID           string
 	Name               string
 	Description        string
 	HighlightedPhotoID *int64
@@ -63,6 +66,12 @@ type UpdateRouteUseCaseInputDto struct {
 }
 
 func (u *updateRouteUsecase) UpdateRoute(ctx context.Context, dto UpdateRouteUseCaseInputDto) error {
+	// KratosIDからユーザー情報を取得
+	userEntity, err := u.userRepository.GetUserByKratosID(ctx, dto.KratosID)
+	if err != nil {
+		return err
+	}
+
 	// 既存のルートを取得
 	route, err := u.routeRepo.GetRouteByID(ctx, dto.ID)
 	if err != nil {
@@ -70,7 +79,7 @@ func (u *updateRouteUsecase) UpdateRoute(ctx context.Context, dto UpdateRouteUse
 	}
 
 	// 権限確認: ルートの所有者とリクエストのユーザーIDが一致するか
-	if route.UserID() != dto.UserID {
+	if route.UserID() != userEntity.ID().String() {
 		return errors.New("unauthorized: user does not own the route")
 	}
 

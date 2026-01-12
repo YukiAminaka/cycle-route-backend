@@ -25,7 +25,7 @@ func main() {
 	defer pool.Close()
 
 	q := dbgen.New(pool)
-	if err := server.Run(ctx, conf, q); err != nil {
+	if err := server.Run(ctx, conf, q, pool); err != nil {
 		os.Exit(1)
 	}
 }

@@ -101,10 +101,16 @@ GO_ENV=dev go run cmd/api/main.go
 ### 3. スキーマの適用
 
 ```bash
-docker compose exec -T postgres psql -U postgres -d postgres_db < sqlc/schema.sql
+atlas migrate apply --env dev
 ```
 
-### 4. SQLC でコード生成
+### 4. シードデータ投入
+
+```
+docker compose exec -T postgres psql -U postgres -d postgres_db < db/seeds/dev_seed.sql
+```
+
+### 5. SQLC でコード生成
 
 スキーマやクエリを変更した後は、SQLC でコードを再生成します。
 
@@ -117,6 +123,88 @@ sqlc generate
 ```bash
 go test ./...
 ```
+
+## 認証が必要な API のテスト
+
+このプロジェクトでは Ory Kratos を使用した認証を実装しています。認証が必要なエンドポイントをテストするには、セッションクッキーが必要です。
+
+### 簡単な方法: Admin API でテストユーザーを作成する
+
+Kratos Admin API を使用してテストユーザーを作成し、セッションクッキーを取得するスクリプトを用意しています。
+
+```bash
+# デフォルト（ランダムなメールアドレス）
+./scripts/create-test-user.sh
+
+# カスタムメールアドレスとパスワード
+./scripts/create-test-user.sh your@email.com YourPassword123!
+
+# 環境変数でKratosのURLを指定
+KRATOS_ADMIN_URL=http://127.0.0.1:4434 ./scripts/create-test-user.sh
+```
+
+このスクリプトは以下の処理を自動で行います：
+
+1. Kratos Admin API を使ってユーザーを作成（既存の場合はスキップ）
+2. 作成したユーザーでログイン
+3. セッショントークンとテストユーザーの情報を表示
+
+### 取得したクッキーの使い方
+
+#### curl で API を呼び出す
+
+```bash
+# セッショントークンを使用
+curl -H 'Cookie: ory_kratos_session=YOUR_SESSION_TOKEN' \
+  http://localhost:8080/api/v1/users/USER_ID
+
+# ルートを作成
+curl -H 'Cookie: ory_kratos_session=YOUR_SESSION_TOKEN' \
+  http://localhost:8080/api/v1/routes \
+  -X POST \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"Test Route",...}'
+```
+
+#### Swagger UI で使用
+
+1. `./scripts/create-test-user.sh` を実行
+2. 表示された **Session Token** をコピー
+3. Swagger UI（http://localhost:8080/api/v1/swagger/index.html）を開く
+4. 右上の「Authorize」ボタン（🔒 アイコン）をクリック
+5. `CookieAuth` の欄にセッショントークンを貼り付け
+6. 「Authorize」をクリックして「Close」
+
+これで認証が必要なエンドポイント（🔒 マーク付き）を Swagger UI から試せます。
+
+### 手動でクッキーを取得する場合
+
+<details>
+<summary>クリックして展開</summary>
+
+```bash
+# ログインフローを開始
+FLOW=$(curl -s 'http://127.0.0.1:4433/self-service/login/api' -c cookies.txt)
+FLOW_ID=$(echo $FLOW | jq -r '.id')
+CSRF_TOKEN=$(echo $FLOW | jq -r '.ui.nodes[] | select(.attributes.name=="csrf_token") | .attributes.value')
+
+# ログイン
+curl -X POST "http://127.0.0.1:4433/self-service/login?flow=$FLOW_ID" \
+  -H 'Content-Type: application/json' \
+  -b cookies.txt \
+  -c cookies.txt \
+  -d '{
+    "method": "password",
+    "csrf_token": "'$CSRF_TOKEN'",
+    "identifier": "test@example.com",
+    "password": "testpassword123"
+  }'
+
+# クッキーを確認
+cat cookies.txt | grep ory_kratos_session
+```
+
+</details>
 
 ## API ドキュメント
 

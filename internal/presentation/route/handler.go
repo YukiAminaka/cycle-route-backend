@@ -35,6 +35,7 @@ func NewHandler(
 //	@Tags		routes
 //	@Accept		json
 //	@Produce	json
+//	@Security	CookieAuth
 //	@Param		request	body		CreateRouteRequest	true	"Create Route Request"
 //	@Success	201		{object}	RouteResponse
 //	@Failure	400		{object}	response.ErrorResponse
@@ -210,6 +211,7 @@ func (h *Handler) GetRouteByID(c *gin.Context) {
 //	@Tags		routes
 //	@Accept		json
 //	@Produce	json
+//	@Security	CookieAuth
 //	@Param		route_id	path		string				true	"Route ID"
 //	@Param		request		body		UpdateRouteRequest	true	"Update Route Request"
 //	@Success	204
@@ -295,6 +297,7 @@ func (h *Handler) UpdateRoute(c *gin.Context) {
 //	@Tags		routes
 //	@Accept		json
 //	@Produce	json
+//	@Security	CookieAuth
 //	@Param		route_id	path		string	true	"Route ID"
 //	@Success	204
 //	@Failure	400		{object}	response.ErrorResponse

@@ -17,6 +17,11 @@ const docTemplate = `{
     "paths": {
         "/routes": {
             "post": {
+                "security": [
+                    {
+                        "CookieAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -115,6 +120,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "CookieAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -174,6 +184,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "CookieAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -271,6 +286,11 @@ const docTemplate = `{
         },
         "/users/{id}": {
             "get": {
+                "security": [
+                    {
+                        "CookieAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -599,6 +619,13 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "CookieAuth": {
+            "type": "apiKey",
+            "name": "ory_kratos_session",
+            "in": "cookie"
         }
     }
 }`

@@ -11,6 +11,11 @@
     "paths": {
         "/routes": {
             "post": {
+                "security": [
+                    {
+                        "CookieAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -109,6 +114,11 @@
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "CookieAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -168,6 +178,11 @@
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "CookieAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -265,6 +280,11 @@
         },
         "/users/{id}": {
             "get": {
+                "security": [
+                    {
+                        "CookieAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -593,6 +613,13 @@
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "CookieAuth": {
+            "type": "apiKey",
+            "name": "ory_kratos_session",
+            "in": "cookie"
         }
     }
 }

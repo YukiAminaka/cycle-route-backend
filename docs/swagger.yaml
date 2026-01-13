@@ -193,6 +193,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - CookieAuth: []
       summary: ルートを作成する
       tags:
       - routes
@@ -227,6 +229,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - CookieAuth: []
       summary: ルートを削除する
       tags:
       - routes
@@ -297,6 +301,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - CookieAuth: []
       summary: ルートを更新する
       tags:
       - routes
@@ -358,6 +364,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - CookieAuth: []
       summary: ユーザーを取得する
       tags:
       - users
@@ -389,4 +397,9 @@ paths:
       summary: ユーザーのルート一覧を取得する
       tags:
       - routes
+securityDefinitions:
+  CookieAuth:
+    in: cookie
+    name: ory_kratos_session
+    type: apiKey
 swagger: "2.0"

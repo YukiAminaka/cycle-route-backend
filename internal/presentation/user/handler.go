@@ -30,6 +30,7 @@ func NewHandler(
 //	@Tags		users
 //	@Accept		json
 //	@Produce	json
+//	@Security	CookieAuth
 //	@Param		id	path		string	true	"User ID"
 //	@Success	200	{object}	UserResponse
 //	@Failure	400	{object}	response.ErrorResponse

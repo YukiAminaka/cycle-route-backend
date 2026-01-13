@@ -16,6 +16,9 @@ import (
 // @description	This is a server for Cycle-Route API.
 // @host			localhost:8080
 // @BasePath		/api/v1
+// @securityDefinitions.apikey CookieAuth
+// @in cookie
+// @name ory_kratos_session
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()

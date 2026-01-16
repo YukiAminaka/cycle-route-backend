@@ -175,3 +175,66 @@ func (r *userRepositoryImpl) CreateUser(ctx context.Context, userDomain *user.Us
 
 	return ud, nil
 }
+
+func (r *userRepositoryImpl) UpdateUser(ctx context.Context, userDomain *user.User) (*user.User, error) {
+	// UserIDをuuid.UUIDに変換
+	id, err := uuid.Parse(userDomain.ID().String())
+	if err != nil {
+		return nil, fmt.Errorf("invalid user id: %w", err)
+	}
+
+	u, err := r.queries.UpdateUser(ctx, dbgen.UpdateUserParams{
+		Name:               userDomain.Name(),
+		Email:          userDomain.Email(),
+		HighlightedPhotoID: userDomain.HighlightedPhotoID(),
+		Locale:             userDomain.Locale(),
+		Description:        userDomain.Description(),
+		Locality:           userDomain.Locality(),
+		AdministrativeArea: userDomain.AdministrativeArea(),
+		CountryCode:        userDomain.CountryCode(),
+		PostalCode:         userDomain.PostalCode(),
+		Geom: func() *dbgen.OrbGeometry {
+			if userDomain.Geom() == nil {
+				return nil
+			}
+			return &dbgen.OrbGeometry{Geometry: userDomain.Geom().Geometry}
+		}(),
+		FirstName:      userDomain.FirstName(),
+		LastName:       userDomain.LastName(),
+		HasSetLocation: userDomain.HasSetLocation(),
+		ID:            id,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	// ドメインモデルのUserに変換して返す
+	var geom *user.Geometry
+	if u.Geom != nil {
+		geom = &user.Geometry{Geometry: u.Geom.Geometry}
+	}
+
+	ud, err := user.ReconstructUser(
+		user.UserID(u.ID.String()),
+		u.KratosID.String(),
+		u.Name,
+		u.HighlightedPhotoID,
+		u.Locale,
+		u.Description,
+		u.Locality,
+		u.AdministrativeArea,
+		u.CountryCode,
+		u.PostalCode,
+		geom,
+		u.FirstName,
+		u.LastName,
+		u.Email,
+		u.HasSetLocation,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return ud, nil
+}

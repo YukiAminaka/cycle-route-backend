@@ -7,14 +7,38 @@ resource "aws_ecs_cluster" "main" {
   }
 }
 
-resource "aws_security_group" "ecs_tasks" {
-  name        = "${var.project_name}-${var.environment}-ecs-tasks-sg"
-  description = "Security group for ECS tasks"
+resource "aws_security_group" "backend_services" {
+  name        = "${var.project_name}-${var.environment}-backend-services-sg"
+  description = "Security group for backend services (API, Kratos) internal communication"
   vpc_id      = var.vpc_id
 
   ingress {
-    from_port       = 0
-    to_port         = 65535
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "tcp"
+    self        = true
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.project_name}-${var.environment}-backend-services-sg"
+  }
+}
+
+resource "aws_security_group" "frontend" {
+  name        = "${var.project_name}-${var.environment}-frontend-sg"
+  description = "Security group for Frontend ECS tasks"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    from_port       = 3000
+    to_port         = 3000
     protocol        = "tcp"
     security_groups = [var.alb_security_group_id]
   }
@@ -27,7 +51,7 @@ resource "aws_security_group" "ecs_tasks" {
   }
 
   tags = {
-    Name = "${var.project_name}-${var.environment}-ecs-tasks-sg"
+    Name = "${var.project_name}-${var.environment}-frontend-sg"
   }
 }
 
@@ -102,7 +126,8 @@ resource "aws_ecs_task_definition" "frontend" {
       }
     }
     environment = [
-      { name = "NEXT_PUBLIC_API_URL", value = "http://${var.alb_dns_name}/api" }
+      { name = "API_URL", value = "http://api.${var.project_name}-${var.environment}.local:8080" },
+      { name = "KRATOS_PUBLIC_URL", value = "http://kratos.${var.project_name}-${var.environment}.local:4433" }
     ]
   }])
 }
@@ -116,7 +141,7 @@ resource "aws_ecs_service" "frontend" {
 
   network_configuration {
     subnets          = var.private_subnet_ids
-    security_groups  = [aws_security_group.ecs_tasks.id]
+    security_groups  = [aws_security_group.frontend.id]
     assign_public_ip = false
   }
 
@@ -173,14 +198,12 @@ resource "aws_ecs_service" "api" {
 
   network_configuration {
     subnets          = var.private_subnet_ids
-    security_groups  = [aws_security_group.ecs_tasks.id]
+    security_groups  = [aws_security_group.backend_services.id]
     assign_public_ip = false
   }
 
-  load_balancer {
-    target_group_arn = var.alb_target_group_arns["api"]
-    container_name   = "api"
-    container_port   = 8080
+  service_registries {
+    registry_arn = aws_service_discovery_service.api.arn
   }
 }
 
@@ -223,7 +246,7 @@ resource "aws_ecs_service" "kratos" {
 
   network_configuration {
     subnets          = var.private_subnet_ids
-    security_groups  = [aws_security_group.ecs_tasks.id]
+    security_groups  = [aws_security_group.backend_services.id]
     assign_public_ip = false
   }
 
@@ -238,10 +261,27 @@ resource "aws_ecs_service" "kratos" {
   }
 }
 
-# Service Discovery for Kratos
+# Service Discovery
 resource "aws_service_discovery_private_dns_namespace" "main" {
   name = "${var.project_name}-${var.environment}.local"
   vpc  = var.vpc_id
+}
+
+resource "aws_service_discovery_service" "api" {
+  name = "api"
+
+  dns_config {
+    namespace_id = aws_service_discovery_private_dns_namespace.main.id
+    
+    dns_records {
+      ttl  = 10
+      type = "A"
+    }
+  }
+
+  health_check_custom_config {
+    failure_threshold = 1
+  }
 }
 
 resource "aws_service_discovery_service" "kratos" {

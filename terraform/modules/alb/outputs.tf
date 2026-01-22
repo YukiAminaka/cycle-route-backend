@@ -9,7 +9,6 @@ output "alb_security_group_id" {
 output "target_group_arns" {
   value = {
     frontend = aws_lb_target_group.frontend.arn
-    api      = aws_lb_target_group.api.arn
     kratos   = aws_lb_target_group.kratos.arn
   }
 }

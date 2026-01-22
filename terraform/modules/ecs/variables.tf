@@ -16,6 +16,7 @@ variable "private_subnet_ids" {
 
 variable "alb_target_group_arns" {
   type = map(string)
+  description = "ALB target group ARNs (frontend, kratos only)"
 }
 
 variable "alb_security_group_id" {

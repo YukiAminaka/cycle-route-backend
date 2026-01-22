@@ -58,21 +58,7 @@ resource "aws_lb_target_group" "frontend" {
   }
 }
 
-resource "aws_lb_target_group" "api" {
-  name        = "${var.project_name}-${var.environment}-api"
-  port        = 8080
-  protocol    = "HTTP"
-  vpc_id      = var.vpc_id
-  target_type = "ip"
 
-  health_check {
-    path                = "/api/v1/health"
-    healthy_threshold   = 2
-    unhealthy_threshold = 10
-    timeout             = 60
-    interval            = 300
-  }
-}
 
 resource "aws_lb_target_group" "kratos" {
   name        = "${var.project_name}-${var.environment}-kratos"
@@ -101,25 +87,11 @@ resource "aws_lb_listener" "http" {
   }
 }
 
-resource "aws_lb_listener_rule" "api" {
-  listener_arn = aws_lb_listener.http.arn
-  priority     = 100
 
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.api.arn
-  }
-
-  condition {
-    path_pattern {
-      values = ["/api/*"]
-    }
-  }
-}
 
 resource "aws_lb_listener_rule" "kratos" {
   listener_arn = aws_lb_listener.http.arn
-  priority     = 200
+  priority     = 100
 
   action {
     type             = "forward"

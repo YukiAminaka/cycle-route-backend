@@ -34,6 +34,7 @@ module "database" {
   environment         = var.environment
   vpc_id              = module.network.vpc_id
   database_subnet_ids = module.network.database_subnet_ids
+  backend_services_sg_id = module.ecs.backend_services_sg_id
   db_password_secret  = module.secrets.db_password_secret_arn
 }
 

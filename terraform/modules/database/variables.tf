@@ -10,6 +10,10 @@ variable "vpc_id" {
   type = string
 }
 
+variable "backend_services_sg_id" {
+  type = string
+}
+
 variable "database_subnet_ids" {
   type = list(string)
 }

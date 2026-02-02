@@ -1,6 +1,7 @@
 package user
 
 import (
+	"github.com/YukiAminaka/cycle-route-backend/internal/pkg/geometry"
 	"github.com/YukiAminaka/cycle-route-backend/internal/presentation/response"
 	"github.com/YukiAminaka/cycle-route-backend/internal/presentation/validator"
 	userUsecase "github.com/YukiAminaka/cycle-route-backend/internal/usecase/user"
@@ -115,14 +116,6 @@ func (h *Handler) CreateUser(c *gin.Context) {
 		return
 	}
 
-	// GEOJSON 形式に変換
-	var rawJSON string
-	if dto.Geom != nil {
-		fc := geojson.NewFeatureCollection()
-		fc.Append(geojson.NewFeature(dto.Geom))
-		b, _ := fc.MarshalJSON()
-		rawJSON = string(b)
-	}
 
 	res := UserResponse{
 		User: UserResponseModel{
@@ -135,7 +128,7 @@ func (h *Handler) CreateUser(c *gin.Context) {
 			AdministrativeArea: dto.AdministrativeArea,
 			CountryCode:        dto.CountryCode,
 			PostalCode:         dto.PostalCode,
-			Geom:               &rawJSON,
+			Geom:               geometry.GeometryToGeoJSON(dto.Geom),
 			FirstName:          dto.FirstName,
 			LastName:           dto.LastName,
 			Email:              dto.Email,

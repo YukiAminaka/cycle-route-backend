@@ -3,6 +3,7 @@ package route
 import (
 	"errors"
 
+	"github.com/YukiAminaka/cycle-route-backend/internal/pkg/geojson"
 	"github.com/YukiAminaka/cycle-route-backend/internal/presentation/response"
 	routeUsecase "github.com/YukiAminaka/cycle-route-backend/internal/usecase/route"
 	"github.com/gin-gonic/gin"
@@ -56,14 +57,39 @@ func (h *Handler) CreateRoute(c *gin.Context) {
 	}
 
 	var req CreateRouteRequest
+	// ShouldBindJSONはginの提供する関数で、内部的にはctx.Request.Bodyのstreamから読み出してJSON化してくれるもの
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.ReturnBadRequest(c, err)
+		return
+	}
+
+	// GeoJSONをorbの型に変換
+	pathGeom, err := geojson.ParseToLineString(req.PathGeom)
+	if err != nil {
+		response.ReturnBadRequest(c, errors.New("invalid path_geom GeoJSON: "+err.Error()))
+		return
+	}
+
+	firstPoint, err := geojson.ParseToPoint(req.FirstPoint)
+	if err != nil {
+		response.ReturnBadRequest(c, errors.New("invalid first_point GeoJSON: "+err.Error()))
+		return
+	}
+
+	lastPoint, err := geojson.ParseToPoint(req.LastPoint)
+	if err != nil {
+		response.ReturnBadRequest(c, errors.New("invalid last_point GeoJSON: "+err.Error()))
 		return
 	}
 
 	// CoursePointsの変換
 	coursePoints := make([]routeUsecase.CoursePointInput, len(req.CoursePoints))
 	for i, cp := range req.CoursePoints {
+		location, err := geojson.ParseToPoint(cp.Location)
+		if err != nil {
+			response.ReturnBadRequest(c, errors.New("invalid course_point location GeoJSON: "+err.Error()))
+			return
+		}
 		coursePoints[i] = routeUsecase.CoursePointInput{
 			SegDistM:      cp.SegDistM,
 			CumDistM:      cp.CumDistM,
@@ -72,7 +98,7 @@ func (h *Handler) CreateRoute(c *gin.Context) {
 			RoadName:      cp.RoadName,
 			ManeuverType:  cp.ManeuverType,
 			Modifier:      cp.Modifier,
-			Location:      cp.Location,
+			Location:      location,
 			BearingBefore: cp.BearingBefore,
 			BearingAfter:  cp.BearingAfter,
 		}
@@ -81,8 +107,13 @@ func (h *Handler) CreateRoute(c *gin.Context) {
 	// Waypointsの変換
 	waypoints := make([]routeUsecase.WaypointInput, len(req.Waypoints))
 	for i, wp := range req.Waypoints {
+		location, err := geojson.ParseToPoint(wp.Location)
+		if err != nil {
+			response.ReturnBadRequest(c, errors.New("invalid waypoint location GeoJSON: "+err.Error()))
+			return
+		}
 		waypoints[i] = routeUsecase.WaypointInput{
-			Location: wp.Location,
+			Location: location,
 		}
 	}
 
@@ -95,9 +126,9 @@ func (h *Handler) CreateRoute(c *gin.Context) {
 		Duration:           req.Duration,
 		ElevationGain:      req.ElevationGain,
 		ElevationLoss:      req.ElevationLoss,
-		PathGeom:           req.PathGeom,
-		FirstPoint:         req.FirstPoint,
-		LastPoint:          req.LastPoint,
+		PathGeom:           pathGeom,
+		FirstPoint:         firstPoint,
+		LastPoint:          lastPoint,
 		Visibility:         req.Visibility,
 		CoursePoints:       coursePoints,
 		Waypoints:          waypoints,
@@ -241,9 +272,33 @@ func (h *Handler) UpdateRoute(c *gin.Context) {
 		return
 	}
 
+	// GeoJSONをorbの型に変換
+	pathGeom, err := geojson.ParseToLineString(req.PathGeom)
+	if err != nil {
+		response.ReturnBadRequest(c, errors.New("invalid path_geom GeoJSON: "+err.Error()))
+		return
+	}
+
+	firstPoint, err := geojson.ParseToPoint(req.FirstPoint)
+	if err != nil {
+		response.ReturnBadRequest(c, errors.New("invalid first_point GeoJSON: "+err.Error()))
+		return
+	}
+
+	lastPoint, err := geojson.ParseToPoint(req.LastPoint)
+	if err != nil {
+		response.ReturnBadRequest(c, errors.New("invalid last_point GeoJSON: "+err.Error()))
+		return
+	}
+
 	// CoursePointsの変換
 	coursePoints := make([]routeUsecase.UpdatedCoursePointInput, len(req.CoursePoints))
 	for i, cp := range req.CoursePoints {
+		location, err := geojson.ParseToPoint(cp.Location)
+		if err != nil {
+			response.ReturnBadRequest(c, errors.New("invalid course_point location GeoJSON: "+err.Error()))
+			return
+		}
 		coursePoints[i] = routeUsecase.UpdatedCoursePointInput{
 			SegDistM:      cp.SegDistM,
 			CumDistM:      cp.CumDistM,
@@ -252,7 +307,7 @@ func (h *Handler) UpdateRoute(c *gin.Context) {
 			RoadName:      cp.RoadName,
 			ManeuverType:  cp.ManeuverType,
 			Modifier:      cp.Modifier,
-			Location:      cp.Location,
+			Location:      location,
 			BearingBefore: cp.BearingBefore,
 			BearingAfter:  cp.BearingAfter,
 		}
@@ -261,8 +316,13 @@ func (h *Handler) UpdateRoute(c *gin.Context) {
 	// Waypointsの変換
 	waypoints := make([]routeUsecase.UpdatedWaypointInput, len(req.Waypoints))
 	for i, wp := range req.Waypoints {
+		location, err := geojson.ParseToPoint(wp.Location)
+		if err != nil {
+			response.ReturnBadRequest(c, errors.New("invalid waypoint location GeoJSON: "+err.Error()))
+			return
+		}
 		waypoints[i] = routeUsecase.UpdatedWaypointInput{
-			Location: wp.Location,
+			Location: location,
 		}
 	}
 
@@ -276,9 +336,9 @@ func (h *Handler) UpdateRoute(c *gin.Context) {
 		Duration:           req.Duration,
 		ElevationGain:      req.ElevationGain,
 		ElevationLoss:      req.ElevationLoss,
-		PathGeom:           req.PathGeom,
-		FirstPoint:         req.FirstPoint,
-		LastPoint:          req.LastPoint,
+		PathGeom:           pathGeom,
+		FirstPoint:         firstPoint,
+		LastPoint:          lastPoint,
 		Visibility:         req.Visibility,
 		CoursePoints:       coursePoints,
 		Waypoints:          waypoints,

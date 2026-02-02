@@ -216,16 +216,57 @@ http://localhost:8080/api/v1/swagger/index.html
 
 ### API ドキュメントの生成
 
-- 整形
+このプロジェクトでは、**Swagger 2.0**（gin-swagger用）と**OpenAPI 3.1**（openapi-typescript用）の2つのバージョンを管理しています。
+
+#### ディレクトリ構成
 
 ```
+docs/
+├── docs.go         # Swagger 2.0 (gin-swagger用)
+├── swagger.json    # Swagger 2.0
+├── swagger.yaml    # Swagger 2.0
+└── openapi3/
+    ├── docs.go     # OpenAPI 3.1 (openapi-typescript用)
+    ├── swagger.json # OpenAPI 3.1
+    └── swagger.yaml # OpenAPI 3.1
+```
+
+#### Makefileコマンド
+
+```bash
+# 両方のバージョンを生成
+make swagger
+
+# Swagger 2.0のみ生成（gin-swagger/Swagger UI用）
+make swagger2
+
+# OpenAPI 3.1のみ生成（openapi-typescript/型生成用）
+make swagger3
+
+# コードの整形
 swag fmt
+
+# 使用可能なコマンドを表示
+make help
 ```
 
-- 生成（エントリポイント指定）
+#### 手動で生成する場合
 
+```bash
+# Swagger 2.0（gin-swagger用）
+swag init -g ./cmd/api/main.go --output docs
+
+# OpenAPI 3.1（openapi-typescript用）
+swag init -g ./cmd/api/main.go --output docs/openapi3 --v3.1
 ```
-swag init -g ./cmd/api/main.go
+
+#### フロントエンドでの型生成
+
+OpenAPI 3.1ドキュメントを使用してTypeScript型を生成できます：
+
+```bash
+# Next.jsプロジェクトで実行
+npx openapi-typescript ../cycle-route-backend/docs/openapi3/swagger.yaml -o types/api.ts
 ```
 
 ## 開発ワークフロー

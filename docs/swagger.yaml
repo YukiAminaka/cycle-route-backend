@@ -1,6 +1,6 @@
 basePath: /api/v1
 definitions:
-  response.ErrorResponse:
+  github_com_YukiAminaka_cycle-route-backend_internal_presentation_response.ErrorResponse:
     properties:
       code:
         example: 400
@@ -9,7 +9,34 @@ definitions:
         example: Bad Request
         type: string
     type: object
-  route.CoursePointResponse:
+  internal_presentation_route.CoursePointRequest:
+    properties:
+      bearing_after:
+        type: integer
+      bearing_before:
+        type: integer
+      cum_dist_m:
+        type: number
+      duration:
+        type: number
+      instruction:
+        type: string
+      location:
+        items:
+          type: number
+        type: array
+      maneuver_type:
+        type: string
+      modifier:
+        type: string
+      road_name:
+        type: string
+      seg_dist_m:
+        type: number
+    required:
+    - location
+    type: object
+  internal_presentation_route.CoursePointResponse:
     properties:
       bearing_after:
         type: integer
@@ -36,27 +63,82 @@ definitions:
       step_order:
         type: integer
     type: object
-  route.CreateRouteRequest:
+  internal_presentation_route.CreateRouteRequest:
+    properties:
+      course_points:
+        items:
+          $ref: '#/definitions/internal_presentation_route.CoursePointRequest'
+        type: array
+      description:
+        maxLength: 1000
+        type: string
+      distance:
+        minimum: 0
+        type: number
+      duration:
+        minimum: 0
+        type: integer
+      elevation_gain:
+        minimum: 0
+        type: number
+      elevation_loss:
+        minimum: 0
+        type: number
+      first_point:
+        items:
+          type: number
+        type: array
+      highlighted_photo_id:
+        type: integer
+      last_point:
+        items:
+          type: number
+        type: array
+      name:
+        maxLength: 255
+        type: string
+      path_geom:
+        items:
+          items:
+            type: number
+          type: array
+        type: array
+      visibility:
+        maximum: 2
+        minimum: 0
+        type: integer
+      waypoints:
+        items:
+          $ref: '#/definitions/internal_presentation_route.WaypointRequest'
+        type: array
+    required:
+    - distance
+    - duration
+    - first_point
+    - last_point
+    - name
+    - path_geom
+    - visibility
     type: object
-  route.RouteListResponse:
+  internal_presentation_route.RouteListResponse:
     properties:
       routes:
         items:
-          $ref: '#/definitions/route.RouteResponseModel'
+          $ref: '#/definitions/internal_presentation_route.RouteResponseModel'
         type: array
     type: object
-  route.RouteResponse:
+  internal_presentation_route.RouteResponse:
     properties:
       route:
-        $ref: '#/definitions/route.RouteResponseModel'
+        $ref: '#/definitions/internal_presentation_route.RouteResponseModel'
     type: object
-  route.RouteResponseModel:
+  internal_presentation_route.RouteResponseModel:
     properties:
       bbox:
         type: string
       course_points:
         items:
-          $ref: '#/definitions/route.CoursePointResponse'
+          $ref: '#/definitions/internal_presentation_route.CoursePointResponse'
         type: array
       created_at:
         type: string
@@ -92,19 +174,83 @@ definitions:
         type: integer
       waypoints:
         items:
-          $ref: '#/definitions/route.WaypointResponse'
+          $ref: '#/definitions/internal_presentation_route.WaypointResponse'
         type: array
     type: object
-  route.UpdateRouteRequest:
+  internal_presentation_route.UpdateRouteRequest:
+    properties:
+      course_points:
+        items:
+          $ref: '#/definitions/internal_presentation_route.CoursePointRequest'
+        type: array
+      description:
+        maxLength: 1000
+        type: string
+      distance:
+        minimum: 0
+        type: number
+      duration:
+        minimum: 0
+        type: integer
+      elevation_gain:
+        minimum: 0
+        type: number
+      elevation_loss:
+        minimum: 0
+        type: number
+      first_point:
+        items:
+          type: number
+        type: array
+      highlighted_photo_id:
+        type: integer
+      last_point:
+        items:
+          type: number
+        type: array
+      name:
+        maxLength: 255
+        type: string
+      path_geom:
+        items:
+          items:
+            type: number
+          type: array
+        type: array
+      visibility:
+        maximum: 2
+        minimum: 0
+        type: integer
+      waypoints:
+        items:
+          $ref: '#/definitions/internal_presentation_route.WaypointRequest'
+        type: array
+    required:
+    - distance
+    - duration
+    - first_point
+    - last_point
+    - name
+    - path_geom
+    - visibility
     type: object
-  route.WaypointResponse:
+  internal_presentation_route.WaypointRequest:
+    properties:
+      location:
+        items:
+          type: number
+        type: array
+    required:
+    - location
+    type: object
+  internal_presentation_route.WaypointResponse:
     properties:
       id:
         type: string
       location:
         type: string
     type: object
-  user.CreateUserRequest:
+  internal_presentation_user.CreateUserRequest:
     properties:
       email:
         type: string
@@ -120,12 +266,12 @@ definitions:
     - kratos_id
     - name
     type: object
-  user.UserResponse:
+  internal_presentation_user.UserResponse:
     properties:
       user:
-        $ref: '#/definitions/user.UserResponseModel'
+        $ref: '#/definitions/internal_presentation_user.UserResponseModel'
     type: object
-  user.UserResponseModel:
+  internal_presentation_user.UserResponseModel:
     properties:
       administrative_area:
         type: string
@@ -173,26 +319,26 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/route.CreateRouteRequest'
+          $ref: '#/definitions/internal_presentation_route.CreateRouteRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/route.RouteResponse'
+            $ref: '#/definitions/internal_presentation_route.RouteResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/github_com_YukiAminaka_cycle-route-backend_internal_presentation_response.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/github_com_YukiAminaka_cycle-route-backend_internal_presentation_response.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/github_com_YukiAminaka_cycle-route-backend_internal_presentation_response.ErrorResponse'
       security:
       - CookieAuth: []
       summary: ルートを作成する
@@ -216,19 +362,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/github_com_YukiAminaka_cycle-route-backend_internal_presentation_response.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/github_com_YukiAminaka_cycle-route-backend_internal_presentation_response.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/github_com_YukiAminaka_cycle-route-backend_internal_presentation_response.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/github_com_YukiAminaka_cycle-route-backend_internal_presentation_response.ErrorResponse'
       security:
       - CookieAuth: []
       summary: ルートを削除する
@@ -249,19 +395,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/route.RouteResponse'
+            $ref: '#/definitions/internal_presentation_route.RouteResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/github_com_YukiAminaka_cycle-route-backend_internal_presentation_response.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/github_com_YukiAminaka_cycle-route-backend_internal_presentation_response.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/github_com_YukiAminaka_cycle-route-backend_internal_presentation_response.ErrorResponse'
       summary: ルートを取得する
       tags:
       - routes
@@ -279,7 +425,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/route.UpdateRouteRequest'
+          $ref: '#/definitions/internal_presentation_route.UpdateRouteRequest'
       produces:
       - application/json
       responses:
@@ -288,19 +434,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/github_com_YukiAminaka_cycle-route-backend_internal_presentation_response.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/github_com_YukiAminaka_cycle-route-backend_internal_presentation_response.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/github_com_YukiAminaka_cycle-route-backend_internal_presentation_response.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/github_com_YukiAminaka_cycle-route-backend_internal_presentation_response.ErrorResponse'
       security:
       - CookieAuth: []
       summary: ルートを更新する
@@ -316,22 +462,22 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/user.CreateUserRequest'
+          $ref: '#/definitions/internal_presentation_user.CreateUserRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/user.UserResponse'
+            $ref: '#/definitions/internal_presentation_user.UserResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/github_com_YukiAminaka_cycle-route-backend_internal_presentation_response.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/github_com_YukiAminaka_cycle-route-backend_internal_presentation_response.ErrorResponse'
       summary: ユーザーを作成する
       tags:
       - users
@@ -351,19 +497,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/user.UserResponse'
+            $ref: '#/definitions/internal_presentation_user.UserResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/github_com_YukiAminaka_cycle-route-backend_internal_presentation_response.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/github_com_YukiAminaka_cycle-route-backend_internal_presentation_response.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/github_com_YukiAminaka_cycle-route-backend_internal_presentation_response.ErrorResponse'
       security:
       - CookieAuth: []
       summary: ユーザーを取得する
@@ -385,15 +531,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/route.RouteListResponse'
+            $ref: '#/definitions/internal_presentation_route.RouteListResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/github_com_YukiAminaka_cycle-route-backend_internal_presentation_response.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/github_com_YukiAminaka_cycle-route-backend_internal_presentation_response.ErrorResponse'
       summary: ユーザーのルート一覧を取得する
       tags:
       - routes

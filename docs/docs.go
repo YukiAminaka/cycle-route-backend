@@ -40,7 +40,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_presentation_route.CreateRouteRequest"
+                            "$ref": "#/definitions/route.CreateRouteRequest"
                         }
                     }
                 ],
@@ -48,25 +48,25 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/internal_presentation_route.RouteResponse"
+                            "$ref": "#/definitions/route.RouteResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_YukiAminaka_cycle-route-backend_internal_presentation_response.ErrorResponse"
+                            "$ref": "#/definitions/response.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_YukiAminaka_cycle-route-backend_internal_presentation_response.ErrorResponse"
+                            "$ref": "#/definitions/response.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_YukiAminaka_cycle-route-backend_internal_presentation_response.ErrorResponse"
+                            "$ref": "#/definitions/response.ErrorResponse"
                         }
                     }
                 }
@@ -97,25 +97,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_presentation_route.RouteResponse"
+                            "$ref": "#/definitions/route.RouteResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_YukiAminaka_cycle-route-backend_internal_presentation_response.ErrorResponse"
+                            "$ref": "#/definitions/response.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_YukiAminaka_cycle-route-backend_internal_presentation_response.ErrorResponse"
+                            "$ref": "#/definitions/response.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_YukiAminaka_cycle-route-backend_internal_presentation_response.ErrorResponse"
+                            "$ref": "#/definitions/response.ErrorResponse"
                         }
                     }
                 }
@@ -150,7 +150,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_presentation_route.UpdateRouteRequest"
+                            "$ref": "#/definitions/route.UpdateRouteRequest"
                         }
                     }
                 ],
@@ -161,25 +161,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_YukiAminaka_cycle-route-backend_internal_presentation_response.ErrorResponse"
+                            "$ref": "#/definitions/response.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_YukiAminaka_cycle-route-backend_internal_presentation_response.ErrorResponse"
+                            "$ref": "#/definitions/response.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_YukiAminaka_cycle-route-backend_internal_presentation_response.ErrorResponse"
+                            "$ref": "#/definitions/response.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_YukiAminaka_cycle-route-backend_internal_presentation_response.ErrorResponse"
+                            "$ref": "#/definitions/response.ErrorResponse"
                         }
                     }
                 }
@@ -216,25 +216,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_YukiAminaka_cycle-route-backend_internal_presentation_response.ErrorResponse"
+                            "$ref": "#/definitions/response.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_YukiAminaka_cycle-route-backend_internal_presentation_response.ErrorResponse"
+                            "$ref": "#/definitions/response.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_YukiAminaka_cycle-route-backend_internal_presentation_response.ErrorResponse"
+                            "$ref": "#/definitions/response.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_YukiAminaka_cycle-route-backend_internal_presentation_response.ErrorResponse"
+                            "$ref": "#/definitions/response.ErrorResponse"
                         }
                     }
                 }
@@ -259,7 +259,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_presentation_user.CreateUserRequest"
+                            "$ref": "#/definitions/user.CreateUserRequest"
                         }
                     }
                 ],
@@ -267,19 +267,19 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/internal_presentation_user.UserResponse"
+                            "$ref": "#/definitions/user.UserResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_YukiAminaka_cycle-route-backend_internal_presentation_response.ErrorResponse"
+                            "$ref": "#/definitions/response.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_YukiAminaka_cycle-route-backend_internal_presentation_response.ErrorResponse"
+                            "$ref": "#/definitions/response.ErrorResponse"
                         }
                     }
                 }
@@ -315,25 +315,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_presentation_user.UserResponse"
+                            "$ref": "#/definitions/user.UserResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_YukiAminaka_cycle-route-backend_internal_presentation_response.ErrorResponse"
+                            "$ref": "#/definitions/response.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_YukiAminaka_cycle-route-backend_internal_presentation_response.ErrorResponse"
+                            "$ref": "#/definitions/response.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_YukiAminaka_cycle-route-backend_internal_presentation_response.ErrorResponse"
+                            "$ref": "#/definitions/response.ErrorResponse"
                         }
                     }
                 }
@@ -364,19 +364,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_presentation_route.RouteListResponse"
+                            "$ref": "#/definitions/route.RouteListResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_YukiAminaka_cycle-route-backend_internal_presentation_response.ErrorResponse"
+                            "$ref": "#/definitions/response.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_YukiAminaka_cycle-route-backend_internal_presentation_response.ErrorResponse"
+                            "$ref": "#/definitions/response.ErrorResponse"
                         }
                     }
                 }
@@ -384,7 +384,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "github_com_YukiAminaka_cycle-route-backend_internal_presentation_response.ErrorResponse": {
+        "response.ErrorResponse": {
             "type": "object",
             "properties": {
                 "code": {
@@ -397,7 +397,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_presentation_route.CoursePointRequest": {
+        "route.CoursePointRequest": {
             "type": "object",
             "required": [
                 "location"
@@ -419,10 +419,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "location": {
-                    "type": "array",
-                    "items": {
-                        "type": "number"
-                    }
+                    "type": "string"
                 },
                 "maneuver_type": {
                     "type": "string"
@@ -438,7 +435,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_presentation_route.CoursePointResponse": {
+        "route.CoursePointResponse": {
             "type": "object",
             "properties": {
                 "bearing_after": {
@@ -479,7 +476,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_presentation_route.CreateRouteRequest": {
+        "route.CreateRouteRequest": {
             "type": "object",
             "required": [
                 "distance",
@@ -494,7 +491,7 @@ const docTemplate = `{
                 "course_points": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/internal_presentation_route.CoursePointRequest"
+                        "$ref": "#/definitions/route.CoursePointRequest"
                     }
                 },
                 "description": {
@@ -518,32 +515,20 @@ const docTemplate = `{
                     "minimum": 0
                 },
                 "first_point": {
-                    "type": "array",
-                    "items": {
-                        "type": "number"
-                    }
+                    "type": "string"
                 },
                 "highlighted_photo_id": {
                     "type": "integer"
                 },
                 "last_point": {
-                    "type": "array",
-                    "items": {
-                        "type": "number"
-                    }
+                    "type": "string"
                 },
                 "name": {
                     "type": "string",
                     "maxLength": 255
                 },
                 "path_geom": {
-                    "type": "array",
-                    "items": {
-                        "type": "array",
-                        "items": {
-                            "type": "number"
-                        }
-                    }
+                    "type": "string"
                 },
                 "visibility": {
                     "type": "integer",
@@ -553,31 +538,31 @@ const docTemplate = `{
                 "waypoints": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/internal_presentation_route.WaypointRequest"
+                        "$ref": "#/definitions/route.WaypointRequest"
                     }
                 }
             }
         },
-        "internal_presentation_route.RouteListResponse": {
+        "route.RouteListResponse": {
             "type": "object",
             "properties": {
                 "routes": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/internal_presentation_route.RouteResponseModel"
+                        "$ref": "#/definitions/route.RouteResponseModel"
                     }
                 }
             }
         },
-        "internal_presentation_route.RouteResponse": {
+        "route.RouteResponse": {
             "type": "object",
             "properties": {
                 "route": {
-                    "$ref": "#/definitions/internal_presentation_route.RouteResponseModel"
+                    "$ref": "#/definitions/route.RouteResponseModel"
                 }
             }
         },
-        "internal_presentation_route.RouteResponseModel": {
+        "route.RouteResponseModel": {
             "type": "object",
             "properties": {
                 "bbox": {
@@ -586,7 +571,7 @@ const docTemplate = `{
                 "course_points": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/internal_presentation_route.CoursePointResponse"
+                        "$ref": "#/definitions/route.CoursePointResponse"
                     }
                 },
                 "created_at": {
@@ -640,12 +625,12 @@ const docTemplate = `{
                 "waypoints": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/internal_presentation_route.WaypointResponse"
+                        "$ref": "#/definitions/route.WaypointResponse"
                     }
                 }
             }
         },
-        "internal_presentation_route.UpdateRouteRequest": {
+        "route.UpdateRouteRequest": {
             "type": "object",
             "required": [
                 "distance",
@@ -660,7 +645,7 @@ const docTemplate = `{
                 "course_points": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/internal_presentation_route.CoursePointRequest"
+                        "$ref": "#/definitions/route.CoursePointRequest"
                     }
                 },
                 "description": {
@@ -684,32 +669,20 @@ const docTemplate = `{
                     "minimum": 0
                 },
                 "first_point": {
-                    "type": "array",
-                    "items": {
-                        "type": "number"
-                    }
+                    "type": "string"
                 },
                 "highlighted_photo_id": {
                     "type": "integer"
                 },
                 "last_point": {
-                    "type": "array",
-                    "items": {
-                        "type": "number"
-                    }
+                    "type": "string"
                 },
                 "name": {
                     "type": "string",
                     "maxLength": 255
                 },
                 "path_geom": {
-                    "type": "array",
-                    "items": {
-                        "type": "array",
-                        "items": {
-                            "type": "number"
-                        }
-                    }
+                    "type": "string"
                 },
                 "visibility": {
                     "type": "integer",
@@ -719,26 +692,23 @@ const docTemplate = `{
                 "waypoints": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/internal_presentation_route.WaypointRequest"
+                        "$ref": "#/definitions/route.WaypointRequest"
                     }
                 }
             }
         },
-        "internal_presentation_route.WaypointRequest": {
+        "route.WaypointRequest": {
             "type": "object",
             "required": [
                 "location"
             ],
             "properties": {
                 "location": {
-                    "type": "array",
-                    "items": {
-                        "type": "number"
-                    }
+                    "type": "string"
                 }
             }
         },
-        "internal_presentation_route.WaypointResponse": {
+        "route.WaypointResponse": {
             "type": "object",
             "properties": {
                 "id": {
@@ -749,7 +719,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_presentation_user.CreateUserRequest": {
+        "user.CreateUserRequest": {
             "type": "object",
             "required": [
                 "kratos_id",
@@ -773,15 +743,15 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_presentation_user.UserResponse": {
+        "user.UserResponse": {
             "type": "object",
             "properties": {
                 "user": {
-                    "$ref": "#/definitions/internal_presentation_user.UserResponseModel"
+                    "$ref": "#/definitions/user.UserResponseModel"
                 }
             }
         },
-        "internal_presentation_user.UserResponseModel": {
+        "user.UserResponseModel": {
             "type": "object",
             "properties": {
                 "administrative_area": {

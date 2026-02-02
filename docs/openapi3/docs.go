@@ -21,6 +21,44 @@ const docTemplate = `{
                 },
                 "type": "object"
             },
+            "route.CoursePointRequest": {
+                "properties": {
+                    "bearing_after": {
+                        "type": "integer"
+                    },
+                    "bearing_before": {
+                        "type": "integer"
+                    },
+                    "cum_dist_m": {
+                        "type": "number"
+                    },
+                    "duration": {
+                        "type": "number"
+                    },
+                    "instruction": {
+                        "type": "string"
+                    },
+                    "location": {
+                        "type": "string"
+                    },
+                    "maneuver_type": {
+                        "type": "string"
+                    },
+                    "modifier": {
+                        "type": "string"
+                    },
+                    "road_name": {
+                        "type": "string"
+                    },
+                    "seg_dist_m": {
+                        "type": "number"
+                    }
+                },
+                "required": [
+                    "location"
+                ],
+                "type": "object"
+            },
             "route.CoursePointResponse": {
                 "properties": {
                     "bearing_after": {
@@ -63,6 +101,72 @@ const docTemplate = `{
                 "type": "object"
             },
             "route.CreateRouteRequest": {
+                "properties": {
+                    "course_points": {
+                        "items": {
+                            "$ref": "#/components/schemas/route.CoursePointRequest"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
+                    "description": {
+                        "maxLength": 1000,
+                        "type": "string"
+                    },
+                    "distance": {
+                        "minimum": 0,
+                        "type": "number"
+                    },
+                    "duration": {
+                        "minimum": 0,
+                        "type": "integer"
+                    },
+                    "elevation_gain": {
+                        "minimum": 0,
+                        "type": "number"
+                    },
+                    "elevation_loss": {
+                        "minimum": 0,
+                        "type": "number"
+                    },
+                    "first_point": {
+                        "type": "string"
+                    },
+                    "highlighted_photo_id": {
+                        "type": "integer"
+                    },
+                    "last_point": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "maxLength": 255,
+                        "type": "string"
+                    },
+                    "path_geom": {
+                        "type": "string"
+                    },
+                    "visibility": {
+                        "maximum": 2,
+                        "minimum": 0,
+                        "type": "integer"
+                    },
+                    "waypoints": {
+                        "items": {
+                            "$ref": "#/components/schemas/route.WaypointRequest"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    }
+                },
+                "required": [
+                    "distance",
+                    "duration",
+                    "first_point",
+                    "last_point",
+                    "name",
+                    "path_geom",
+                    "visibility"
+                ],
                 "type": "object"
             },
             "route.RouteListResponse": {
@@ -156,6 +260,83 @@ const docTemplate = `{
                 "type": "object"
             },
             "route.UpdateRouteRequest": {
+                "properties": {
+                    "course_points": {
+                        "items": {
+                            "$ref": "#/components/schemas/route.CoursePointRequest"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
+                    "description": {
+                        "maxLength": 1000,
+                        "type": "string"
+                    },
+                    "distance": {
+                        "minimum": 0,
+                        "type": "number"
+                    },
+                    "duration": {
+                        "minimum": 0,
+                        "type": "integer"
+                    },
+                    "elevation_gain": {
+                        "minimum": 0,
+                        "type": "number"
+                    },
+                    "elevation_loss": {
+                        "minimum": 0,
+                        "type": "number"
+                    },
+                    "first_point": {
+                        "type": "string"
+                    },
+                    "highlighted_photo_id": {
+                        "type": "integer"
+                    },
+                    "last_point": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "maxLength": 255,
+                        "type": "string"
+                    },
+                    "path_geom": {
+                        "type": "string"
+                    },
+                    "visibility": {
+                        "maximum": 2,
+                        "minimum": 0,
+                        "type": "integer"
+                    },
+                    "waypoints": {
+                        "items": {
+                            "$ref": "#/components/schemas/route.WaypointRequest"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    }
+                },
+                "required": [
+                    "distance",
+                    "duration",
+                    "first_point",
+                    "last_point",
+                    "name",
+                    "path_geom",
+                    "visibility"
+                ],
+                "type": "object"
+            },
+            "route.WaypointRequest": {
+                "properties": {
+                    "location": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "location"
+                ],
                 "type": "object"
             },
             "route.WaypointResponse": {

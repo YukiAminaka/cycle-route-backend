@@ -6,14 +6,14 @@ variable "environment" {
   type = string
 }
 
-variable "vpc_id" {
+variable "domain_name" {
   type = string
 }
 
-variable "database_subnet_ids" {
-  type = list(string)
+variable "alb_dns_name" {
+  type = string
 }
 
-variable "db_password_secret" {
+variable "alb_zone_id" {
   type = string
 }

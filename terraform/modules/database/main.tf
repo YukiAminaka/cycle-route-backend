@@ -17,17 +17,6 @@ resource "aws_security_group" "rds" {
   }
 }
 
-resource "aws_vpc_security_group_ingress_rule" "rds_from_backend" {
-  security_group_id            = aws_security_group.rds.id
-  referenced_security_group_id = var.backend_services_sg_id
-
-  ip_protocol = "tcp"
-  from_port   = 5432
-  to_port     = 5432
-
-  description = "Allow Postgres from backend services"
-}
-
 resource "aws_vpc_security_group_egress_rule" "rds_all" {
   security_group_id = aws_security_group.rds.id
   ip_protocol       = "-1"

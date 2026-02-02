@@ -1,10 +1,5 @@
 package route
 
-import (
-	"github.com/paulmach/orb"
-	"github.com/paulmach/orb/geojson"
-)
-
 type RouteResponse struct {
 	Route RouteResponseModel `json:"route"`
 }
@@ -57,22 +52,3 @@ type WaypointResponse struct {
 	Location *string `json:"location"`
 }
 
-// geometryToGeoJSON はorb.Geometryをstringに変換する
-func geometryToGeoJSON(geom orb.Geometry) *string {
-	if geom == nil {
-		return nil
-	}
-	fc := geojson.NewFeatureCollection()
-	fc.Append(geojson.NewFeature(geom))
-	b, _ := fc.MarshalJSON()
-	result := string(b)
-	return &result
-}
-
-// pointToGeoJSON は*orb.Pointをstringに変換する
-func pointToGeoJSON(point *orb.Point) *string {
-	if point == nil {
-		return nil
-	}
-	return geometryToGeoJSON(*point)
-}

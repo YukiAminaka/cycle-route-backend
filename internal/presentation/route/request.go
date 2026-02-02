@@ -1,5 +1,6 @@
 package route
 
+// フロントエンドでは、地理空間データは通常GeoJSON形式で扱われます
 type CreateRouteRequest struct {
 	Name               string               `json:"name" validate:"required,max=255"`
 	Description        string               `json:"description" validate:"max=1000"`

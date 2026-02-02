@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/YukiAminaka/cycle-route-backend/internal/pkg/geojson"
+	"github.com/YukiAminaka/cycle-route-backend/internal/pkg/geometry"
 	"github.com/YukiAminaka/cycle-route-backend/internal/presentation/response"
 	routeUsecase "github.com/YukiAminaka/cycle-route-backend/internal/usecase/route"
 	"github.com/gin-gonic/gin"
@@ -151,10 +152,10 @@ func (h *Handler) CreateRoute(c *gin.Context) {
 			Duration:           dto.Duration,
 			ElevationGain:      dto.ElevationGain,
 			ElevationLoss:      dto.ElevationLoss,
-			PathGeom:           geometryToGeoJSON(dto.PathGeom),
-			Bbox:               geometryToGeoJSON(dto.Bbox),
-			FirstPoint:         geometryToGeoJSON(dto.FirstPoint),
-			LastPoint:          geometryToGeoJSON(dto.LastPoint),
+			PathGeom:           geometry.GeometryToGeoJSON(dto.PathGeom),
+			Bbox:               geometry.GeometryToGeoJSON(dto.Bbox),
+			FirstPoint:         geometry.GeometryToGeoJSON(dto.FirstPoint),
+			LastPoint:          geometry.GeometryToGeoJSON(dto.LastPoint),
 			Visibility:         dto.Visibility,
 		},
 	}
@@ -195,7 +196,7 @@ func (h *Handler) GetRouteByID(c *gin.Context) {
 			RoadName:      cp.RoadName,
 			ManeuverType:  cp.ManeuverType,
 			Modifier:      cp.Modifier,
-			Location:      pointToGeoJSON(cp.Location),
+			Location:      geometry.GeometryToGeoJSON(cp.Location),
 			BearingBefore: cp.BearingBefore,
 			BearingAfter:  cp.BearingAfter,
 		}
@@ -206,7 +207,7 @@ func (h *Handler) GetRouteByID(c *gin.Context) {
 	for i, wp := range dto.Waypoints {
 		waypoints[i] = WaypointResponse{
 			ID:       wp.ID,
-			Location: geometryToGeoJSON(wp.Location),
+			Location: geometry.GeometryToGeoJSON(wp.Location),
 		}
 	}
 
@@ -222,10 +223,10 @@ func (h *Handler) GetRouteByID(c *gin.Context) {
 			Duration:           dto.Duration,
 			ElevationGain:      dto.ElevationGain,
 			ElevationLoss:      dto.ElevationLoss,
-			PathGeom:           geometryToGeoJSON(dto.PathGeom),
-			Bbox:               geometryToGeoJSON(dto.Bbox),
-			FirstPoint:         geometryToGeoJSON(dto.FirstPoint),
-			LastPoint:          geometryToGeoJSON(dto.LastPoint),
+			PathGeom:           geometry.GeometryToGeoJSON(dto.PathGeom),
+			Bbox:               geometry.GeometryToGeoJSON(dto.Bbox),
+			FirstPoint:         geometry.GeometryToGeoJSON(dto.FirstPoint),
+			LastPoint:          geometry.GeometryToGeoJSON(dto.LastPoint),
 			Visibility:         dto.Visibility,
 			CreatedAt:          dto.CreatedAt,
 			UpdatedAt:          dto.UpdatedAt,

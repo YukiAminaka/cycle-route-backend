@@ -33,7 +33,7 @@ func (k *KratosMiddleware) Session() gin.HandlerFunc {
 			return
 		}
 		if !*session.Active {
-			c.Redirect(http.StatusMovedPermanently, "http://your_endpoint")
+			c.Redirect(http.StatusMovedPermanently, "http://127.0.0.1:4455/login")
 			return
 		}
 

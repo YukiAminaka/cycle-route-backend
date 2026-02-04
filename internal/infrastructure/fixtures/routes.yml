@@ -5,7 +5,7 @@
   description: "都内定番のサイクリングコース。初心者にもおすすめの約5kmの周回コース。"
   highlighted_photo_id: 0
   distance: 5000.0
-  duration: 900
+  duration: 900.0
   elevation_gain: 20.0
   elevation_loss: 20.0
   path_geom: "SRID=4326;LINESTRING(139.7528 35.6850, 139.7580 35.6820, 139.7600 35.6780, 139.7580 35.6740, 139.7520 35.6730, 139.7480 35.6770, 139.7490 35.6820, 139.7528 35.6850)"
@@ -24,7 +24,7 @@
   description: "多摩川沿いの気持ち良いサイクリングロード。二子玉川から羽田方面へ。"
   highlighted_photo_id: 0
   distance: 15000.0
-  duration: 2700
+  duration: 2700.0
   elevation_gain: 50.0
   elevation_loss: 60.0
   path_geom: "SRID=4326;LINESTRING(139.6270 35.6110, 139.6350 35.6080, 139.6450 35.6050, 139.6550 35.6020, 139.6650 35.5990, 139.6750 35.5960, 139.6850 35.5930, 139.6950 35.5900)"
@@ -43,7 +43,7 @@
   description: "江ノ島から鎌倉へ続く海沿いの絶景ルート。"
   highlighted_photo_id: 0
   distance: 12000.0
-  duration: 2400
+  duration: 2400.0
   elevation_gain: 100.0
   elevation_loss: 100.0
   path_geom: "SRID=4326;LINESTRING(139.4818 35.3035, 139.4900 35.3050, 139.5000 35.3080, 139.5100 35.3110, 139.5200 35.3150, 139.5300 35.3180, 139.5400 35.3200)"
@@ -62,7 +62,7 @@
   description: "本格的なヒルクライムルート。上級者向けの約40kmコース。"
   highlighted_photo_id: 0
   distance: 40000.0
-  duration: 7200
+  duration: 7200.0
   elevation_gain: 760.0
   elevation_loss: 100.0
   path_geom: "SRID=4326;LINESTRING(139.3400 35.4400, 139.3450 35.4450, 139.3500 35.4500, 139.3550 35.4550, 139.3600 35.4600, 139.3650 35.4650, 139.3700 35.4700, 139.3750 35.4750)"
@@ -81,7 +81,7 @@
   description: "削除テスト用のルート"
   highlighted_photo_id: 0
   distance: 8000.0
-  duration: 1800
+  duration: 1800.0
   elevation_gain: 30.0
   elevation_loss: 30.0
   path_geom: "SRID=4326;LINESTRING(139.7000 35.6800, 139.7100 35.6850, 139.7200 35.6900)"

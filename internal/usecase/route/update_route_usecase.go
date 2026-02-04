@@ -54,7 +54,7 @@ type UpdateRouteUseCaseInputDto struct {
 	Description        string
 	HighlightedPhotoID *int64
 	Distance           float64
-	Duration           int32
+	Duration           float64
 	ElevationGain      float64
 	ElevationLoss      float64
 	PathGeom           orb.LineString

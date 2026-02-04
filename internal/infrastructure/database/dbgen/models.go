@@ -34,7 +34,7 @@ type Route struct {
 	Description        string      `json:"description"`
 	HighlightedPhotoID *int64      `json:"highlighted_photo_id"`
 	Distance           float64     `json:"distance"`
-	Duration           int32       `json:"duration"`
+	Duration           float64     `json:"duration"`
 	ElevationGain      float64     `json:"elevation_gain"`
 	ElevationLoss      float64     `json:"elevation_loss"`
 	PathGeom           OrbGeometry `json:"path_geom"`

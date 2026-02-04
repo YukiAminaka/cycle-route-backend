@@ -6,7 +6,7 @@ type CreateRouteRequest struct {
 	Description        string               `json:"description" validate:"max=1000"`
 	HighlightedPhotoID *int64               `json:"highlighted_photo_id"`
 	Distance           float64              `json:"distance" validate:"required,min=0"`
-	Duration           int32                `json:"duration" validate:"required,min=0"`
+	Duration           float64              `json:"duration" validate:"required,min=0"`
 	ElevationGain      float64              `json:"elevation_gain" validate:"min=0"`
 	ElevationLoss      float64              `json:"elevation_loss" validate:"min=0"`
 	PathGeom           string               `json:"path_geom" validate:"required"`
@@ -22,7 +22,7 @@ type UpdateRouteRequest struct {
 	Description        string               `json:"description" validate:"max=1000"`
 	HighlightedPhotoID *int64               `json:"highlighted_photo_id"`
 	Distance           float64              `json:"distance" validate:"required,min=0"`
-	Duration           int32                `json:"duration" validate:"required,min=0"`
+	Duration           float64              `json:"duration" validate:"required,min=0"`
 	ElevationGain      float64              `json:"elevation_gain" validate:"min=0"`
 	ElevationLoss      float64              `json:"elevation_loss" validate:"min=0"`
 	PathGeom           string               `json:"path_geom" validate:"required"`

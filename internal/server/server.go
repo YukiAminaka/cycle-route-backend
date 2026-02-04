@@ -22,7 +22,9 @@ import (
 func Run(ctx context.Context, conf *config.Config, q *dbgen.Queries, pool *pgxpool.Pool) error {
 	router := gin.Default()
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"*"}
+	FRONTEND_URL := fmt.Sprintf("%s:%s", conf.Server.FRONTEND_ADDRESS, conf.Server.FRONTEND_PORT)
+	config.AllowOrigins = []string{FRONTEND_URL} // Next.jsのオリジン
+	config.AllowCredentials = true// クッキーを許可
 
 	router.Use(cors.New(config))
 	// Recovery ミドルウェアは panic が発生しても 500 エラーを返してくれる

@@ -151,7 +151,7 @@ type Route struct {
 	description        string
 	highlightedPhotoID *int64
 	distance           float64
-	duration           int32
+	duration           float64
 	elevationGain      float64
 	elevationLoss      float64
 	pathGeom           Geometry
@@ -174,7 +174,7 @@ func newRoute(
 	description string,
 	highlightedPhotoID *int64,
 	distance float64,
-	duration int32,
+	duration float64,
 	elevationGain float64,
 	elevationLoss float64,
 	pathGeom Geometry,
@@ -244,7 +244,7 @@ func NewRoute(
 	description string,
 	highlightedPhotoID *int64,
 	distance float64,
-	duration int32,
+	duration float64,
 	elevationGain float64,
 	elevationLoss float64,
 	pathGeom Geometry,
@@ -376,7 +376,7 @@ func (r *Route) recalculateMetrics() {
 	}
 
 	r.distance = totalDistance
-	r.duration = int32(totalDuration)
+	r.duration = totalDuration
 }
 
 // Routeのゲッターメソッド
@@ -404,7 +404,7 @@ func (r *Route) Distance() float64 {
 	return r.distance
 }
 
-func (r *Route) Duration() int32 {
+func (r *Route) Duration() float64 {
 	return r.duration
 }
 
@@ -500,7 +500,7 @@ func ReconstructRoute(
 	description string,
 	highlightedPhotoID *int64,
 	distance float64,
-	duration int32,
+	duration float64,
 	elevationGain float64,
 	elevationLoss float64,
 	pathGeom Geometry,
@@ -565,7 +565,7 @@ func (r *Route) UpdateBasicInfo(
 // ルートのジオメトリ情報を更新する（ルート編集時に使用）
 func (r *Route) UpdateRouteGeometry(
 	distance float64,
-	duration int32,
+	duration float64,
 	elevationGain float64,
 	elevationLoss float64,
 	pathGeom Geometry,

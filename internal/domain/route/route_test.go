@@ -36,7 +36,7 @@ func TestNewRoute(t *testing.T) {
 		description        string
 		highlightedPhotoID *int64
 		distance           float64
-		duration           int32
+		duration           float64
 		elevationGain      float64
 		elevationLoss      float64
 		pathGeom           Geometry
@@ -59,7 +59,7 @@ func TestNewRoute(t *testing.T) {
 				description:        "This is a test route",
 				highlightedPhotoID: nil,
 				distance:           100.0,
-				duration:           600,
+				duration:           600.0,
 				elevationGain:      10.0,
 				elevationLoss:      5.0,
 				pathGeom:           Geometry{orb.LineString{{139.6917, 35.6895}, {139.7000, 35.6900}}},
@@ -77,7 +77,7 @@ func TestNewRoute(t *testing.T) {
 				description:        "This is a test route",
 				highlightedPhotoID: nil,
 				distance:           100.0,
-				duration:           600,
+				duration:           600.0,
 				elevationGain:      10.0,
 				elevationLoss:      5.0,
 				pathGeom:           Geometry{orb.LineString{{139.6917, 35.6895}, {139.7000, 35.6900}}},
@@ -96,7 +96,7 @@ func TestNewRoute(t *testing.T) {
 				description:        "This is a test route",
 				highlightedPhotoID: nil,
 				distance:           100.0,
-				duration:           600,
+				duration:           600.0,
 				elevationGain:      10.0,
 				elevationLoss:      5.0,
 				pathGeom:           Geometry{orb.LineString{{139.6917, 35.6895}, {139.7000, 35.6900}}},
@@ -115,7 +115,7 @@ func TestNewRoute(t *testing.T) {
 				description:        "This is a test route",
 				highlightedPhotoID: nil,
 				distance:           100.0,
-				duration:           600,
+				duration:           600.0,
 				elevationGain:      10.0,
 				elevationLoss:      5.0,
 				pathGeom:           Geometry{},
@@ -134,7 +134,7 @@ func TestNewRoute(t *testing.T) {
 				description:        "This is a test route",
 				highlightedPhotoID: nil,
 				distance:           100.0,
-				duration:           600,
+				duration:           600.0,
 				elevationGain:      10.0,
 				elevationLoss:      5.0,
 				pathGeom:           Geometry{orb.Point{139.6917, 35.6895}},
@@ -153,7 +153,7 @@ func TestNewRoute(t *testing.T) {
 				description:        "This is a test route",
 				highlightedPhotoID: nil,
 				distance:           100.0,
-				duration:           600,
+				duration:           600.0,
 				elevationGain:      10.0,
 				elevationLoss:      5.0,
 				pathGeom:           Geometry{orb.LineString{{139.6917, 35.6895}, {139.7000, 35.6900}}},
@@ -172,7 +172,7 @@ func TestNewRoute(t *testing.T) {
 				description:        "This is a test route",
 				highlightedPhotoID: nil,
 				distance:           100.0,
-				duration:           600,
+				duration:           600.0,
 				elevationGain:      10.0,
 				elevationLoss:      5.0,
 				pathGeom:           Geometry{orb.LineString{{139.6917, 35.6895}, {139.7000, 35.6900}}},
@@ -191,7 +191,7 @@ func TestNewRoute(t *testing.T) {
 				description:        "This is a test route",
 				highlightedPhotoID: nil,
 				distance:           100.0,
-				duration:           600,
+				duration:           600.0,
 				elevationGain:      10.0,
 				elevationLoss:      5.0,
 				pathGeom:           Geometry{orb.LineString{{139.6917, 35.6895}, {139.7000, 35.6900}}},
@@ -501,8 +501,8 @@ func TestAddCoursePoint(t *testing.T) {
 				}
 			}
 			if tt.args.duration != nil {
-				if testRoute.duration != int32(*tt.args.duration) {
-					t.Errorf("route duration = %v, want %v", testRoute.duration, int32(*tt.args.duration))
+				if testRoute.duration != *tt.args.duration {
+					t.Errorf("route duration = %v, want %v", testRoute.duration, *tt.args.duration)
 				}
 			}
 		})
@@ -595,7 +595,7 @@ func TestAddCoursePoint_MultiplePoints(t *testing.T) {
 
 	// メトリクスが再計算されているか確認（全ての距離と時間の合計）
 	expectedDistance := 100.0 + 150.0 + 200.0
-	expectedDuration := int32(300.0 + 400.0 + 500.0)
+	expectedDuration := 300.0 + 400.0 + 500.0
 
 	if route.distance != expectedDistance {
 		t.Errorf("route.distance = %v, want %v", route.distance, expectedDistance)

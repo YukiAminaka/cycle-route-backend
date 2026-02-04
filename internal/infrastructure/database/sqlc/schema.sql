@@ -30,7 +30,7 @@ CREATE TABLE routes (
   description         TEXT NOT NULL DEFAULT '',
   highlighted_photo_id        BIGINT      DEFAULT 0,
   distance            DOUBLE PRECISION NOT NULL CHECK (distance >= 0),   -- 距離(m)
-  duration            INTEGER NOT NULL CHECK (duration >= 0), -- 所要時間(s)
+  duration            DOUBLE PRECISION NOT NULL CHECK (duration >= 0), -- 所要時間(s)
   elevation_gain      DOUBLE PRECISION NOT NULL DEFAULT 0 CHECK (elevation_gain >= 0),
   elevation_loss      DOUBLE PRECISION NOT NULL DEFAULT 0 CHECK (elevation_loss >= 0),
   path_geom           geometry(LineString, 4326) NOT NULL CHECK (NOT ST_IsEmpty(path_geom)) CHECK (ST_NPoints(path_geom) >= 2),  -- 経路パス 空ジオメトリや、点が1個だけの線を保存禁止

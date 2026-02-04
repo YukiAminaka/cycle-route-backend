@@ -38,7 +38,7 @@ func TestRouteRepository_GetRouteByID(t *testing.T) {
 		wantUserID     string
 		wantName       string
 		wantDistance   float64
-		wantDuration   int32
+		wantDuration   float64
 		wantCPCount    int // コースポイント数
 		wantWPCount    int // ウェイポイント数
 		wantErr        bool
@@ -50,7 +50,7 @@ func TestRouteRepository_GetRouteByID(t *testing.T) {
 			wantUserID:   "70d6037a-b67b-4aa8-b5a3-da393b514f24",
 			wantName:     "皇居一周ルート",
 			wantDistance: 5000.0,
-			wantDuration: 900,
+			wantDuration: 900.0,
 			wantCPCount:  4,
 			wantWPCount:  3,
 			wantErr:      false,
@@ -62,7 +62,7 @@ func TestRouteRepository_GetRouteByID(t *testing.T) {
 			wantUserID:   "70d6037a-b67b-4aa8-b5a3-da393b514f24",
 			wantName:     "多摩川サイクリングロード",
 			wantDistance: 15000.0,
-			wantDuration: 2700,
+			wantDuration: 2700.0,
 			wantCPCount:  4,
 			wantWPCount:  3,
 			wantErr:      false,
@@ -102,7 +102,7 @@ func TestRouteRepository_GetRouteByID(t *testing.T) {
 				t.Errorf("Distance mismatch: want %f, got %f", tt.wantDistance, got.Distance())
 			}
 			if got.Duration() != tt.wantDuration {
-				t.Errorf("Duration mismatch: want %d, got %d", tt.wantDuration, got.Duration())
+				t.Errorf("Duration mismatch: want %f, got %f", tt.wantDuration, got.Duration())
 			}
 			if len(got.CoursePoints()) != tt.wantCPCount {
 				t.Errorf("CoursePoints count mismatch: want %d, got %d", tt.wantCPCount, len(got.CoursePoints()))
@@ -245,7 +245,7 @@ func TestRouteRepository_SaveRoute(t *testing.T) {
 		"テスト用の説明",
 		nil,
 		3000.0,
-		600,
+		600.0,
 		10.0,
 		5.0,
 		pathGeom,
@@ -414,8 +414,8 @@ func TestRouteRepository_UpdateRoute(t *testing.T) {
 		"更新された皇居一周ルート",
 		"更新された説明文",
 		nil,
-		6000.0, // 距離を変更
-		1200,   // 時間を変更
+		6000.0,  // 距離を変更
+		1200.0,  // 時間を変更
 		30.0,
 		30.0,
 		pathGeom,
@@ -493,7 +493,7 @@ func TestRouteRepository_UpdateRoute(t *testing.T) {
 				t.Errorf("Distance mismatch: want %f, got %f", tt.route.Distance(), updated.Distance())
 			}
 			if updated.Duration() != tt.route.Duration() {
-				t.Errorf("Duration mismatch: want %d, got %d", tt.route.Duration(), updated.Duration())
+				t.Errorf("Duration mismatch: want %f, got %f", tt.route.Duration(), updated.Duration())
 			}
 			if len(updated.Waypoints()) != len(tt.route.Waypoints()) {
 				t.Errorf("Waypoints count mismatch: want %d, got %d", len(tt.route.Waypoints()), len(updated.Waypoints()))

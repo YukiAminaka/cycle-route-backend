@@ -3,7 +3,9 @@ package middleware
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
+	"net/url"
 
 	"github.com/gin-gonic/gin"
 	ory "github.com/ory/kratos-client-go"
@@ -17,7 +19,7 @@ func NewMiddleware() *KratosMiddleware {
 	configuration := ory.NewConfiguration()
 	configuration.Servers = []ory.ServerConfiguration{
 		{
-			URL: "http://127.0.0.1:4434", // Kratos Admin API
+			URL: "http://kratos:4433", // Kratos Public API
 		},
 	}
 	return &KratosMiddleware{
@@ -29,11 +31,11 @@ func (k *KratosMiddleware) Session() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		session, err := k.validateSession(c.Request)
 		if err != nil {
-			c.Redirect(http.StatusMovedPermanently, "http://127.0.0.1:4455/login")
+			c.Redirect(http.StatusMovedPermanently, "http://127.0.0.1:3000/login")
 			return
 		}
 		if !*session.Active {
-			c.Redirect(http.StatusMovedPermanently, "http://127.0.0.1:4455/login")
+			c.Redirect(http.StatusMovedPermanently, "http://127.0.0.1:3000/login")
 			return
 		}
 
@@ -54,8 +56,14 @@ func (k *KratosMiddleware) validateSession(r *http.Request) (*ory.Session, error
 	if cookie == nil {
 		return nil, errors.New("no session found in cookie")
 	}
-	resp, _, err := k.ory.FrontendAPI.ToSession(context.Background()).Cookie(cookie.String()).Execute()
+	decoded, err := url.QueryUnescape(cookie.Value)// クッキーに=や;などの特殊記号が含まれている場合に備えてデコード。
 	if err != nil {
+		return nil, err
+	}
+	decoded = "ory_kratos_session=" + decoded
+	resp, _, err := k.ory.FrontendAPI.ToSession(context.Background()).Cookie(decoded).Execute()
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
 		return nil, err
 	}
 	return resp, nil

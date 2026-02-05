@@ -4,54 +4,33 @@
 
 ## プロジェクト構成
 
-このプロジェクトはクリーンアーキテクチャに基づいて設計されています。
-
 ```
 cycle-route-backend/
-├── cmd/
-│   └── api/
-│       └── main.go              # アプリケーションのエントリーポイント
+├── cmd/api/                  # アプリケーションのエントリーポイント
 ├── internal/
-│   ├── domain/                  # Domain層（最も内側・ビジネスロジックの核）
-│   │   ├── entity/              # エンティティ（ドメインモデル）
-│   │   │   └── user.go
-│   │   └── repository/          # リポジトリインターフェース定義
-│   │       └── user_repository.go
-│   ├── usecase/                 # Usecase層（アプリケーションのビジネスロジック）
-│   │   └── user_usecase.go
-│   ├── interface/               # Interface層（外部とのやり取り）
-│   │   ├── handler/             # HTTPハンドラー
-│   │   │   └── user_handler.go
-│   │   ├── middleware/          # HTTPミドルウェア
-│   │   │   └── logger.go
-│   │   └── presenter/           # レスポンス整形
-│   │       └── response.go
-│   └── infrastructure/          # Infrastructure層（最も外側・技術的詳細）
-│       ├── database/
-│       │   ├── postgres.go      # DB接続管理
-│       │   └── sqlc/            # SQLCで生成されたコード
-│       │       ├── db.go
-│       │       ├── models.go
-│       │       ├── query.sql.go
-│       │       └── custom_types.go
-│       ├── repository/          # リポジトリの実装
-│       │   └── user_repository_impl.go
-│       └── router/
-│           └── router.go        # ルーティング設定
-├── config/                      # 設定管理
-│   └── config.go
-├── sqlc/                        # SQL定義ファイル
-│   ├── schema.sql
-│   └── query.sql
-├── db/                          # データベース関連
-│   ├── migrations/              # Atlasマイグレーションファイル
-│   └── seeds/                   # シードデータ
-├── .env                         # 環境変数
-├── atlas.hcl                    # Atlas設定ファイル
-├── compose.yml                  # Docker Compose設定
-├── go.mod
-├── go.sum
-└── sqlc.yaml                    # SQLC設定
+│   ├── domain/               # Domain層
+│   │
+│   ├── usecase/              # Usecase層
+|   |
+│   ├── presentation/         # Presentation層
+│   │   ├── middleware/       # HTTPミドルウェア
+│   │   ├── response/         # レスポンス整形
+│   │   ├── user/
+│   │   └── validator/        # バリデーション
+|   |
+│   ├── infrastructure/       # Infrastructure層
+│   │   ├── database/         # DB接続、SQLC生成コード、SQL定義
+│   │   ├── db_test/          # テスト用DBコンテナ
+│   │   ├── fixtures/         # テストフィクスチャ
+│   │   └── repository/       # リポジトリ実装
+│   ├── pkg/                  # 内部共有パッケージ
+│   │
+│   └── server/               # サーバー設定、ルーティング
+├── config/                   # 設定管理
+├── db/                       # マイグレーション、シードデータ
+├── docs/                     # APIドキュメント（Swagger 2.0, OpenAPI 3.1）
+├── scripts/                  # ユーティリティスクリプト
+└── terraform/                # インフラ構成
 ```
 
 ## クリーンアーキテクチャの層
@@ -216,7 +195,7 @@ http://localhost:8080/api/v1/swagger/index.html
 
 ### API ドキュメントの生成
 
-このプロジェクトでは、**Swagger 2.0**（gin-swagger用）と**OpenAPI 3.1**（openapi-typescript用）の2つのバージョンを管理しています。
+このプロジェクトでは、**Swagger 2.0**（gin-swagger 用）と**OpenAPI 3.1**（openapi-typescript 用）の 2 つのバージョンを管理しています。
 
 #### ディレクトリ構成
 
@@ -231,7 +210,7 @@ docs/
     └── swagger.yaml # OpenAPI 3.1
 ```
 
-#### Makefileコマンド
+#### Makefile コマンド
 
 ```bash
 # 両方のバージョンを生成
@@ -262,7 +241,7 @@ swag init -g ./cmd/api/main.go --output docs/openapi3 --v3.1
 
 #### フロントエンドでの型生成
 
-OpenAPI 3.1ドキュメントを使用してTypeScript型を生成できます：
+OpenAPI 3.1 ドキュメントを使用して TypeScript 型を生成できます：
 
 ```bash
 # Next.jsプロジェクトで実行
@@ -330,6 +309,20 @@ atlas migrate apply --env dev --to 20240101000001
 - マイグレーションファイルは `db/migrations/` に自動生成されます
 - ファイル名形式: `20240101000001_migration_name.sql`
 - Atlas が自動的にバージョン管理とチェックサムを管理します
+
+### データベースに接続してテーブル確認したい場合
+
+Terminal から接続 (psql コマンドがインストールされている場合)
+
+```
+psql -h 127.0.0.1 -p 5432 -U postgres postgres_db
+```
+
+Docker コンテナないの psql から接続する場合
+
+```
+docker exec -it postgres psql -U postgres postgres_db
+```
 
 ### 新機能追加の手順
 

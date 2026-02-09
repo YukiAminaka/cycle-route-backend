@@ -85,6 +85,15 @@ SELECT * FROM routes WHERE id = $1;
 -- name: GetRoutesByUserID :many
 SELECT * FROM routes WHERE user_id = $1;
 
+-- name: SearchRoutesByUserID :many
+SELECT * FROM routes
+WHERE user_id = sqlc.arg(user_id)
+  AND (sqlc.arg(name)::TEXT = '' OR name ILIKE '%' || sqlc.arg(name) || '%')
+  AND (sqlc.arg(visibility)::TEXT = '' OR visibility = sqlc.arg(visibility))
+  AND (sqlc.arg(min_distance) IS NULL OR distance >= sqlc.arg(min_distance))
+  AND (sqlc.arg(max_distance) IS NULL OR distance <= sqlc.arg(max_distance))
+  
+
 -- name: CountRoutesByUserID :one
 SELECT COUNT(*) FROM routes WHERE user_id = $1;
 

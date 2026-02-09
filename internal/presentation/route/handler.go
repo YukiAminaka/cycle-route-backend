@@ -244,13 +244,13 @@ func (h *Handler) GetRouteByID(c *gin.Context) {
 //	@Accept		json
 //	@Produce	json
 //	@Security	CookieAuth
-//	@Param		route_id	path		string				true	"Route ID"
-//	@Param		request		body		UpdateRouteRequest	true	"Update Route Request"
+//	@Param		route_id	path	string				true	"Route ID"
+//	@Param		request		body	UpdateRouteRequest	true	"Update Route Request"
 //	@Success	204
-//	@Failure	400		{object}	response.ErrorResponse
-//	@Failure	401		{object}	response.ErrorResponse
-//	@Failure	404		{object}	response.ErrorResponse
-//	@Failure	500		{object}	response.ErrorResponse
+//	@Failure	400	{object}	response.ErrorResponse
+//	@Failure	401	{object}	response.ErrorResponse
+//	@Failure	404	{object}	response.ErrorResponse
+//	@Failure	500	{object}	response.ErrorResponse
 //	@Router		/routes/{route_id} [put]
 func (h *Handler) UpdateRoute(c *gin.Context) {
 	routeID := c.Param("route_id")
@@ -359,12 +359,12 @@ func (h *Handler) UpdateRoute(c *gin.Context) {
 //	@Accept		json
 //	@Produce	json
 //	@Security	CookieAuth
-//	@Param		route_id	path		string	true	"Route ID"
+//	@Param		route_id	path	string	true	"Route ID"
 //	@Success	204
-//	@Failure	400		{object}	response.ErrorResponse
-//	@Failure	401		{object}	response.ErrorResponse
-//	@Failure	404		{object}	response.ErrorResponse
-//	@Failure	500		{object}	response.ErrorResponse
+//	@Failure	400	{object}	response.ErrorResponse
+//	@Failure	401	{object}	response.ErrorResponse
+//	@Failure	404	{object}	response.ErrorResponse
+//	@Failure	500	{object}	response.ErrorResponse
 //	@Router		/routes/{route_id} [delete]
 func (h *Handler) DeleteRoute(c *gin.Context) {
 	routeID := c.Param("route_id")
@@ -394,13 +394,28 @@ func (h *Handler) DeleteRoute(c *gin.Context) {
 //	@Tags		routes
 //	@Accept		json
 //	@Produce	json
-//	@Param		user_id	path		string	true	"User ID"
-//	@Success	200		{object}	RouteListResponse
-//	@Failure	400		{object}	response.ErrorResponse
-//	@Failure	500		{object}	response.ErrorResponse
+//	@Param		user_id			path		string	true	"User ID"
+//	@Param		keyword			query		string	false	"Keyword to search in route names"
+//	@Param		min_distance	query		string	false	"Minimum distance filter"
+//	@Param		max_distance	query		string	false	"Maximum distance filter"
+//	@Param		min_elevation	query		string	false	"Minimum elevation gain filter"
+//	@Param		max_elevation	query		string	false	"Maximum elevation gain filter"
+//	@Param		visibility		query		string	false	"Visibility filter"
+//	@Param		author			query		string	false	"Author filter"
+//	@Success	200				{object}	RouteListResponse
+//	@Failure	400				{object}	response.ErrorResponse
+//	@Failure	500				{object}	response.ErrorResponse
 //	@Router		/users/{user_id}/routes [get]
 func (h *Handler) GetRoutesByUserID(c *gin.Context) {
 	userID := c.Param("user_id")
+	// keyword := c.Query("keyword")
+	// min_distance := c.Query("min_distance")
+	// max_distance := c.Query("max_distance")
+	// min_elevation := c.Query("min_elevation")
+	// max_elevation := c.Query("max_elevation")
+	// visibility := c.Query("visibility")
+	// author := c.Query("author")
+
 
 	dtos, err := h.getRouteUsecase.GetRoutesByUserID(c.Request.Context(), userID)
 	if err != nil {

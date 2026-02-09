@@ -119,7 +119,7 @@ const docTemplate = `{
                     },
                     "duration": {
                         "minimum": 0,
-                        "type": "integer"
+                        "type": "number"
                     },
                     "elevation_gain": {
                         "minimum": 0,
@@ -211,7 +211,7 @@ const docTemplate = `{
                         "type": "number"
                     },
                     "duration": {
-                        "type": "integer"
+                        "type": "number"
                     },
                     "elevation_gain": {
                         "type": "number"
@@ -278,7 +278,7 @@ const docTemplate = `{
                     },
                     "duration": {
                         "minimum": 0,
-                        "type": "integer"
+                        "type": "number"
                     },
                     "elevation_gain": {
                         "minimum": 0,
@@ -899,6 +899,62 @@ const docTemplate = `{
                         "in": "path",
                         "name": "user_id",
                         "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Keyword to search in route names",
+                        "in": "query",
+                        "name": "keyword",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Minimum distance filter",
+                        "in": "query",
+                        "name": "min_distance",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Maximum distance filter",
+                        "in": "query",
+                        "name": "max_distance",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Minimum elevation gain filter",
+                        "in": "query",
+                        "name": "min_elevation",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Maximum elevation gain filter",
+                        "in": "query",
+                        "name": "max_elevation",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Visibility filter",
+                        "in": "query",
+                        "name": "visibility",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Author filter",
+                        "in": "query",
+                        "name": "author",
                         "schema": {
                             "type": "string"
                         }

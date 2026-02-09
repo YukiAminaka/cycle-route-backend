@@ -358,6 +358,48 @@ const docTemplate = `{
                         "name": "user_id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Keyword to search in route names",
+                        "name": "keyword",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Minimum distance filter",
+                        "name": "min_distance",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Maximum distance filter",
+                        "name": "max_distance",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Minimum elevation gain filter",
+                        "name": "min_elevation",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Maximum elevation gain filter",
+                        "name": "max_elevation",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Visibility filter",
+                        "name": "visibility",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Author filter",
+                        "name": "author",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -503,7 +545,7 @@ const docTemplate = `{
                     "minimum": 0
                 },
                 "duration": {
-                    "type": "integer",
+                    "type": "number",
                     "minimum": 0
                 },
                 "elevation_gain": {
@@ -584,7 +626,7 @@ const docTemplate = `{
                     "type": "number"
                 },
                 "duration": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "elevation_gain": {
                     "type": "number"
@@ -657,7 +699,7 @@ const docTemplate = `{
                     "minimum": 0
                 },
                 "duration": {
-                    "type": "integer",
+                    "type": "number",
                     "minimum": 0
                 },
                 "elevation_gain": {

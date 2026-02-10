@@ -449,6 +449,121 @@ const docTemplate = `{
     },
     "paths": {
         "/routes": {
+            "get": {
+                "parameters": [
+                    {
+                        "description": "Keyword to search in route names",
+                        "in": "query",
+                        "name": "keyword",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Minimum distance filter",
+                        "in": "query",
+                        "name": "min_distance",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Maximum distance filter",
+                        "in": "query",
+                        "name": "max_distance",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Minimum elevation gain filter",
+                        "in": "query",
+                        "name": "min_elevation",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Maximum elevation gain filter",
+                        "in": "query",
+                        "name": "max_elevation",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Visibility filter",
+                        "in": "query",
+                        "name": "visibility",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Author filter",
+                        "in": "query",
+                        "name": "author",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/route.RouteListResponse"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/response.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/response.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/response.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Internal Server Error"
+                    }
+                },
+                "summary": "ユーザーのルート一覧を取得する",
+                "tags": [
+                    "routes"
+                ]
+            },
             "post": {
                 "requestBody": {
                     "content": {
@@ -888,122 +1003,6 @@ const docTemplate = `{
                 "summary": "ユーザーを取得する",
                 "tags": [
                     "users"
-                ]
-            }
-        },
-        "/users/{user_id}/routes": {
-            "get": {
-                "parameters": [
-                    {
-                        "description": "User ID",
-                        "in": "path",
-                        "name": "user_id",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "Keyword to search in route names",
-                        "in": "query",
-                        "name": "keyword",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "Minimum distance filter",
-                        "in": "query",
-                        "name": "min_distance",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "Maximum distance filter",
-                        "in": "query",
-                        "name": "max_distance",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "Minimum elevation gain filter",
-                        "in": "query",
-                        "name": "min_elevation",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "Maximum elevation gain filter",
-                        "in": "query",
-                        "name": "max_elevation",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "Visibility filter",
-                        "in": "query",
-                        "name": "visibility",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "Author filter",
-                        "in": "query",
-                        "name": "author",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/route.RouteListResponse"
-                                }
-                            }
-                        },
-                        "description": "OK"
-                    },
-                    "400": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/response.ErrorResponse"
-                                }
-                            }
-                        },
-                        "description": "Bad Request"
-                    },
-                    "500": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/response.ErrorResponse"
-                                }
-                            }
-                        },
-                        "description": "Internal Server Error"
-                    }
-                },
-                "summary": "ユーザーのルート一覧を取得する",
-                "tags": [
-                    "routes"
                 ]
             }
         }

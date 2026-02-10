@@ -52,12 +52,9 @@ func routeRoute(r *gin.RouterGroup, q *dbgen.Queries, pool *pgxpool.Pool, k *mid
 	)
 
 	group := r.Group("/routes")
-	group.POST("",k.Session(), h.CreateRoute)
+	group.POST("", k.Session(), h.CreateRoute)
+	group.GET("", k.Session(), h.GetRoutesByUserID) // 認証ユーザーのルート一覧
 	group.GET("/:route_id", h.GetRouteByID)
-	group.PUT("/:route_id",k.Session(), h.UpdateRoute)
-	group.DELETE("/:route_id",k.Session(), h.DeleteRoute)
-
-	// ユーザーのルート一覧
-	usersGroup := r.Group("/users")
-	usersGroup.GET("/:id/routes", h.GetRoutesByUserID)
+	group.PUT("/:route_id", k.Session(), h.UpdateRoute)
+	group.DELETE("/:route_id", k.Session(), h.DeleteRoute)
 }

@@ -99,7 +99,15 @@ func (u *getRouteUsecase) GetRouteByID(ctx context.Context, routeID string) (*Ro
 	return u.convertToOutputDto(route, user.Name()), nil
 }
 
-func (u *getRouteUsecase) GetRoutesByUserID(ctx context.Context, userID string) ([]*RouteListItemDto, error) {
+func (u *getRouteUsecase) GetRoutesByUserID(ctx context.Context, kratosID string) ([]*RouteListItemDto, error) {
+	// KratosIDからユーザー情報を取得
+	userEntity, err := u.userRepo.GetUserByKratosID(ctx, kratosID)
+	if err != nil {
+		return nil, err
+	}
+
+	userID := userEntity.ID().String()
+
 	routes, err := u.routeRepo.GetRoutesByUserID(ctx, userID)
 	if err != nil {
 		return nil, err

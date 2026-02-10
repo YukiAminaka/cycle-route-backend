@@ -290,6 +290,60 @@ info:
   version: "1.0"
 paths:
   /routes:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Keyword to search in route names
+        in: query
+        name: keyword
+        type: string
+      - description: Minimum distance filter
+        in: query
+        name: min_distance
+        type: string
+      - description: Maximum distance filter
+        in: query
+        name: max_distance
+        type: string
+      - description: Minimum elevation gain filter
+        in: query
+        name: min_elevation
+        type: string
+      - description: Maximum elevation gain filter
+        in: query
+        name: max_elevation
+        type: string
+      - description: Visibility filter
+        in: query
+        name: visibility
+        type: string
+      - description: Author filter
+        in: query
+        name: author
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/route.RouteListResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: ユーザーのルート一覧を取得する
+      tags:
+      - routes
     post:
       consumes:
       - application/json
@@ -495,62 +549,6 @@ paths:
       summary: ユーザーを取得する
       tags:
       - users
-  /users/{user_id}/routes:
-    get:
-      consumes:
-      - application/json
-      parameters:
-      - description: User ID
-        in: path
-        name: user_id
-        required: true
-        type: string
-      - description: Keyword to search in route names
-        in: query
-        name: keyword
-        type: string
-      - description: Minimum distance filter
-        in: query
-        name: min_distance
-        type: string
-      - description: Maximum distance filter
-        in: query
-        name: max_distance
-        type: string
-      - description: Minimum elevation gain filter
-        in: query
-        name: min_elevation
-        type: string
-      - description: Maximum elevation gain filter
-        in: query
-        name: max_elevation
-        type: string
-      - description: Visibility filter
-        in: query
-        name: visibility
-        type: string
-      - description: Author filter
-        in: query
-        name: author
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/route.RouteListResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/response.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/response.ErrorResponse'
-      summary: ユーザーのルート一覧を取得する
-      tags:
-      - routes
 securityDefinitions:
   CookieAuth:
     in: cookie

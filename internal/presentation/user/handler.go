@@ -128,7 +128,7 @@ func (h *Handler) CreateUser(c *gin.Context) {
 			AdministrativeArea: dto.AdministrativeArea,
 			CountryCode:        dto.CountryCode,
 			PostalCode:         dto.PostalCode,
-			Geom:               geometry.GeometryToGeoJSON(dto.Geom),
+			Geom:               geometry.PointToGeoJSON(dto.Geom),
 			FirstName:          dto.FirstName,
 			LastName:           dto.LastName,
 			Email:              dto.Email,

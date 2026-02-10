@@ -153,7 +153,6 @@ func (h *Handler) CreateRoute(c *gin.Context) {
 			ElevationGain:      dto.ElevationGain,
 			ElevationLoss:      dto.ElevationLoss,
 			PathGeom:           geometry.GeometryToGeoJSON(dto.PathGeom),
-			Bbox:               geometry.GeometryToGeoJSON(dto.Bbox),
 			FirstPoint:         geometry.GeometryToGeoJSON(dto.FirstPoint),
 			LastPoint:          geometry.GeometryToGeoJSON(dto.LastPoint),
 			Visibility:         dto.Visibility,

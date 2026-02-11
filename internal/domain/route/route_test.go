@@ -317,6 +317,9 @@ func TestNewRoute(t *testing.T) {
 			}
 			if got.duration != tt.args.duration {
 				t.Errorf("duration = %v, want %v", got.duration, tt.args.duration)
+			} 
+			if got.polyline != "" {
+				t.Errorf("polyline = %v, want empty string", got.polyline)
 			}
 			if got.elevationGain != tt.args.elevationGain {
 				t.Errorf("elevationGain = %v, want %v", got.elevationGain, tt.args.elevationGain)

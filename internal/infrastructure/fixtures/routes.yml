@@ -12,6 +12,7 @@
   bbox: "SRID=4326;POLYGON((139.7480 35.6730, 139.7600 35.6730, 139.7600 35.6850, 139.7480 35.6850, 139.7480 35.6730))"
   first_point: "SRID=4326;POINT(139.7528 35.6850)"
   last_point: "SRID=4326;POINT(139.7528 35.6850)"
+  polyline: "gvxxE_n~sYvQo_@~WoK~WnKfEnd@_X~Wg^gEwQwV"
   created_at: "2024-01-15 10:30:00"
   updated_at: "2024-01-15 10:30:00"
   deleted_at: null
@@ -31,6 +32,7 @@
   bbox: "SRID=4326;POLYGON((139.6270 35.5900, 139.6950 35.5900, 139.6950 35.6110, 139.6270 35.6110, 139.6270 35.5900))"
   first_point: "SRID=4326;POINT(139.6270 35.6110)"
   last_point: "SRID=4326;POINT(139.6950 35.5900)"
+  polyline: "wgjxEw{esYvQ_q@vQo}@vQo}@vQo}@vQo}@vQo}@vQo}@"
   created_at: "2024-01-16 08:00:00"
   updated_at: "2024-01-16 08:00:00"
   deleted_at: null
@@ -50,6 +52,7 @@
   bbox: "SRID=4326;POLYGON((139.4818 35.3035, 139.5400 35.3035, 139.5400 35.3200, 139.4818 35.3200, 139.4818 35.3035))"
   first_point: "SRID=4326;POINT(139.4818 35.3035)"
   last_point: "SRID=4326;POINT(139.5400 35.3200)"
+  polyline: "{envEgpirYkHgr@wQo}@wQo}@_Xo}@wQo}@oKo}@"
   created_at: "2024-02-20 15:00:00"
   updated_at: "2024-02-20 15:00:00"
   deleted_at: null
@@ -69,6 +72,7 @@
   bbox: "SRID=4326;POLYGON((139.3400 35.4400, 139.3750 35.4400, 139.3750 35.4750, 139.3400 35.4750, 139.3400 35.4400))"
   first_point: "SRID=4326;POINT(139.3400 35.4400)"
   last_point: "SRID=4326;POINT(139.3750 35.4750)"
+  polyline: " _{hwE_zmqYg^g^g^g^g^g^g^g^g^g^g^g^g^g^"
   created_at: "2024-03-10 06:00:00"
   updated_at: "2024-03-10 06:00:00"
   deleted_at: null
@@ -88,6 +92,7 @@
   bbox: "SRID=4326;POLYGON((139.7000 35.6800, 139.7200 35.6800, 139.7200 35.6900, 139.7000 35.6900, 139.7000 35.6800))"
   first_point: "SRID=4326;POINT(139.7000 35.6800)"
   last_point: "SRID=4326;POINT(139.7200 35.6900)"
+  polyline: "_wwxE_dtsYg^o}@g^o}@"
   created_at: "2024-01-10 12:00:00"
   updated_at: "2024-01-15 14:00:00"
   deleted_at: "2024-01-15 14:00:00"

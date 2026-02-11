@@ -92,9 +92,10 @@ INSERT INTO routes (
     bbox,
     first_point,
     last_point,
+    polyline,
     visibility
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7, $8, $9, ST_GeomFromEWKB($10), ST_GeomFromEWKB($11), ST_GeomFromEWKB($12), ST_GeomFromEWKB($13), $14
+    $1, $2, $3, $4, $5, $6, $7, $8, $9, ST_GeomFromEWKB($10), ST_GeomFromEWKB($11), ST_GeomFromEWKB($12), ST_GeomFromEWKB($13), ST_AsEncodedPolyline(ST_SimplifyPreserveTopology(ST_GeomFromEWKB($10), 0.0001)), $14
 )
 `
 
@@ -322,7 +323,7 @@ func (q *Queries) GetCoursePointsByRouteID(ctx context.Context, routeID uuid.UUI
 }
 
 const getRouteByID = `-- name: GetRouteByID :one
-SELECT id, user_id, name, description, highlighted_photo_id, distance, duration, elevation_gain, elevation_loss, path_geom, bbox, first_point, last_point, created_at, updated_at, deleted_at, visibility FROM routes WHERE id = $1
+SELECT id, user_id, name, description, highlighted_photo_id, distance, duration, elevation_gain, elevation_loss, path_geom, bbox, first_point, last_point, polyline, created_at, updated_at, deleted_at, visibility FROM routes WHERE id = $1
 `
 
 func (q *Queries) GetRouteByID(ctx context.Context, id uuid.UUID) (Route, error) {
@@ -342,6 +343,7 @@ func (q *Queries) GetRouteByID(ctx context.Context, id uuid.UUID) (Route, error)
 		&i.Bbox,
 		&i.FirstPoint,
 		&i.LastPoint,
+		&i.Polyline,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.DeletedAt,
@@ -351,7 +353,7 @@ func (q *Queries) GetRouteByID(ctx context.Context, id uuid.UUID) (Route, error)
 }
 
 const getRoutesByUserID = `-- name: GetRoutesByUserID :many
-SELECT id, user_id, name, description, highlighted_photo_id, distance, duration, elevation_gain, elevation_loss, path_geom, bbox, first_point, last_point, created_at, updated_at, deleted_at, visibility FROM routes WHERE user_id = $1
+SELECT id, user_id, name, description, highlighted_photo_id, distance, duration, elevation_gain, elevation_loss, path_geom, bbox, first_point, last_point, polyline, created_at, updated_at, deleted_at, visibility FROM routes WHERE user_id = $1
 `
 
 func (q *Queries) GetRoutesByUserID(ctx context.Context, userID uuid.UUID) ([]Route, error) {
@@ -377,6 +379,7 @@ func (q *Queries) GetRoutesByUserID(ctx context.Context, userID uuid.UUID) ([]Ro
 			&i.Bbox,
 			&i.FirstPoint,
 			&i.LastPoint,
+			&i.Polyline,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.DeletedAt,
@@ -479,6 +482,68 @@ func (q *Queries) GetWaypointsByRouteID(ctx context.Context, routeID uuid.UUID) 
 	return items, nil
 }
 
+const searchRoutesByUserID = `-- name: SearchRoutesByUserID :many
+SELECT id, user_id, name, description, highlighted_photo_id, distance, duration, elevation_gain, elevation_loss, path_geom, bbox, first_point, last_point, polyline, created_at, updated_at, deleted_at, visibility FROM routes
+WHERE user_id = $1
+  AND ($2::TEXT = '' OR name ILIKE '%' || $2 || '%')
+  AND ($3::TEXT = '' OR visibility = $3)
+  AND ($4 IS NULL OR distance >= $4)
+  AND ($5 IS NULL OR distance <= $5)
+`
+
+type SearchRoutesByUserIDParams struct {
+	UserID      uuid.UUID   `json:"user_id"`
+	Name        string      `json:"name"`
+	Visibility  string      `json:"visibility"`
+	MinDistance interface{} `json:"min_distance"`
+	MaxDistance interface{} `json:"max_distance"`
+}
+
+func (q *Queries) SearchRoutesByUserID(ctx context.Context, arg SearchRoutesByUserIDParams) ([]Route, error) {
+	rows, err := q.db.Query(ctx, searchRoutesByUserID,
+		arg.UserID,
+		arg.Name,
+		arg.Visibility,
+		arg.MinDistance,
+		arg.MaxDistance,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Route
+	for rows.Next() {
+		var i Route
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.Name,
+			&i.Description,
+			&i.HighlightedPhotoID,
+			&i.Distance,
+			&i.Duration,
+			&i.ElevationGain,
+			&i.ElevationLoss,
+			&i.PathGeom,
+			&i.Bbox,
+			&i.FirstPoint,
+			&i.LastPoint,
+			&i.Polyline,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.DeletedAt,
+			&i.Visibility,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateRoute = `-- name: UpdateRoute :exec
 UPDATE routes SET
     name = $1,
@@ -492,6 +557,7 @@ UPDATE routes SET
     bbox = ST_GeomFromEWKB($9),
     first_point = ST_GeomFromEWKB($10),
     last_point = ST_GeomFromEWKB($11),
+    polyline = ST_AsEncodedPolyline(ST_SimplifyPreserveTopology(ST_GeomFromEWKB($8), 0.0001)),
     visibility = $12
 WHERE id = $13
 `

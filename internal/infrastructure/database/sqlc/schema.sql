@@ -37,6 +37,7 @@ CREATE TABLE routes (
   bbox                geometry(Polygon,4326) NOT NULL,    -- ある地点の指定距離内にあるルートを検索するために使う
   first_point         geometry(Point,4326) NOT NULL,  -- 出発地点（ユーザーが設定）
   last_point          geometry(Point,4326) NOT NULL, -- 目的地（ユーザーが設定）
+  polyline            TEXT NOT NULL,                -- エンコード済みポリライン（静的地図画像で使う）
   created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
   deleted_at          TIMESTAMPTZ,         --　削除日時

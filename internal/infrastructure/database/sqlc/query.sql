@@ -58,9 +58,10 @@ INSERT INTO routes (
     bbox,
     first_point,
     last_point,
+    polyline,
     visibility
 ) VALUES (
-    sqlc.arg(id), sqlc.arg(user_id), sqlc.arg(name), sqlc.arg(description), sqlc.arg(highlighted_photo_id), sqlc.arg(distance), sqlc.arg(duration), sqlc.arg(elevation_gain), sqlc.arg(elevation_loss), ST_GeomFromEWKB(sqlc.arg(path_geom)), ST_GeomFromEWKB(sqlc.arg(bbox)), ST_GeomFromEWKB(sqlc.arg(first_point)), ST_GeomFromEWKB(sqlc.arg(last_point)), sqlc.arg(visibility)
+    sqlc.arg(id), sqlc.arg(user_id), sqlc.arg(name), sqlc.arg(description), sqlc.arg(highlighted_photo_id), sqlc.arg(distance), sqlc.arg(duration), sqlc.arg(elevation_gain), sqlc.arg(elevation_loss), ST_GeomFromEWKB(sqlc.arg(path_geom)), ST_GeomFromEWKB(sqlc.arg(bbox)), ST_GeomFromEWKB(sqlc.arg(first_point)), ST_GeomFromEWKB(sqlc.arg(last_point)), ST_AsEncodedPolyline(ST_SimplifyPreserveTopology(ST_GeomFromEWKB(sqlc.arg(path_geom)), 0.0001)), sqlc.arg(visibility)
 );
 
 -- name: UpdateRoute :exec
@@ -76,6 +77,7 @@ UPDATE routes SET
     bbox = ST_GeomFromEWKB(sqlc.arg(bbox)),
     first_point = ST_GeomFromEWKB(sqlc.arg(first_point)),
     last_point = ST_GeomFromEWKB(sqlc.arg(last_point)),
+    polyline = ST_AsEncodedPolyline(ST_SimplifyPreserveTopology(ST_GeomFromEWKB(sqlc.arg(path_geom)), 0.0001)),
     visibility = sqlc.arg(visibility)
 WHERE id = sqlc.arg(id);
 
@@ -91,7 +93,7 @@ WHERE user_id = sqlc.arg(user_id)
   AND (sqlc.arg(name)::TEXT = '' OR name ILIKE '%' || sqlc.arg(name) || '%')
   AND (sqlc.arg(visibility)::TEXT = '' OR visibility = sqlc.arg(visibility))
   AND (sqlc.arg(min_distance) IS NULL OR distance >= sqlc.arg(min_distance))
-  AND (sqlc.arg(max_distance) IS NULL OR distance <= sqlc.arg(max_distance))
+  AND (sqlc.arg(max_distance) IS NULL OR distance <= sqlc.arg(max_distance));
   
 
 -- name: CountRoutesByUserID :one

@@ -41,6 +41,7 @@ type Route struct {
 	Bbox               OrbGeometry `json:"bbox"`
 	FirstPoint         OrbGeometry `json:"first_point"`
 	LastPoint          OrbGeometry `json:"last_point"`
+	Polyline           string      `json:"polyline"`
 	CreatedAt          time.Time   `json:"created_at"`
 	UpdatedAt          time.Time   `json:"updated_at"`
 	DeletedAt          *time.Time  `json:"deleted_at"`

@@ -79,6 +79,7 @@ type RouteListItemDto struct {
 	ElevationGain      float64
 	ElevationLoss      float64
 	Visibility         int16
+	Polyline           string
 	CreatedAt          string
 	UpdatedAt          string
 }
@@ -197,6 +198,7 @@ func (u *getRouteUsecase) convertToSummaryOutputDto(route *routeDomain.Route, us
 		HighlightedPhotoID: route.HighlightedPhotoID(),
 		Distance:           route.Distance(),
 		Duration:           route.Duration(),
+		Polyline:           route.Polyline(),
 		ElevationGain:      route.ElevationGain(),
 		ElevationLoss:      route.ElevationLoss(),
 		Visibility:         route.Visibility(),

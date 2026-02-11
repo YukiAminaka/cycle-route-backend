@@ -444,6 +444,7 @@ func (h *Handler) GetRoutesByUserID(c *gin.Context) {
 			ElevationGain:      dto.ElevationGain,
 			ElevationLoss:      dto.ElevationLoss,
 			Visibility:         dto.Visibility,
+			Polyline: 		 	dto.Polyline,
 			CreatedAt:          dto.CreatedAt,
 			UpdatedAt:          dto.UpdatedAt,
 		}

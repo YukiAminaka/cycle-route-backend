@@ -158,6 +158,7 @@ type Route struct {
 	bbox               Geometry
 	firstPoint         Geometry
 	lastPoint          Geometry
+	polyline           string
 	visibility         int16
 	createdAt          string
 	updatedAt          string
@@ -207,6 +208,7 @@ func newRoute(
 	if lastPoint.Geometry.GeoJSONType() != "Point" {
 		return nil, errors.New("lastPoint must be a Point")
 	}
+	
 	if distance < 0 {
 		return nil, errors.New("distance must be non-negative")
 	}
@@ -232,6 +234,7 @@ func newRoute(
 		bbox:               Geometry{}, // 空のGeometry
 		firstPoint:         firstPoint,
 		lastPoint:          lastPoint,
+		polyline:           "",
 		visibility:         visibility,
 		coursePoints:       []*CoursePoint{},
 		waypoints:          []*Waypoint{},
@@ -432,6 +435,10 @@ func (r *Route) LastPoint() Geometry {
 	return r.lastPoint
 }
 
+func (r *Route) Polyline() string {
+	return r.polyline
+}
+
 func (r *Route) Visibility() int16 {
 	return r.visibility
 }
@@ -507,6 +514,7 @@ func ReconstructRoute(
 	bbox Geometry,
 	firstPoint Geometry,
 	lastPoint Geometry,
+	polyline string,
 	visibility int16,
 	createdAt string,
 	updatedAt string,
@@ -525,6 +533,7 @@ func ReconstructRoute(
 		bbox:               bbox,
 		firstPoint:         firstPoint,
 		lastPoint:          lastPoint,
+		polyline:           polyline,
 		visibility:         visibility,
 		createdAt:          createdAt,
 		updatedAt:          updatedAt,

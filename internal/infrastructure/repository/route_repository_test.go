@@ -238,6 +238,8 @@ func TestRouteRepository_SaveRoute(t *testing.T) {
 	}
 	firstPoint := routeDomain.Geometry{Geometry: orb.Point{139.7000, 35.6800}}
 	lastPoint := routeDomain.Geometry{Geometry: orb.Point{139.7200, 35.6900}}
+	calculated_bbox := CalculateBbox(pathGeom.Geometry)
+	encodedPolyline := "_wwxE_dtsYo}@_|B" // SELECT ST_AsEncodedPolyline(ST_SimplifyPreserveTopology(GeomFromEWKT('SRID=4326;LINESTRING(139.7000 35.6800, 139.7100 35.6850, 139.7200 35.6900)'), 0.0001));
 
 	newRoute, err := routeDomain.NewRoute(
 		"70d6037a-b67b-4aa8-b5a3-da393b514f24",
@@ -318,6 +320,14 @@ func TestRouteRepository_SaveRoute(t *testing.T) {
 			}
 			if saved.Name() != tt.route.Name() {
 				t.Errorf("Name mismatch: want %s, got %s", tt.route.Name(), saved.Name())
+			}
+			if saved.Bbox().Geometry != nil && calculated_bbox.Geometry != nil {
+				if !orb.Equal(saved.Bbox().Geometry, calculated_bbox.Geometry) {
+					t.Errorf("Bbox mismatch: want %v, got %v", calculated_bbox.Geometry, saved.Bbox().Geometry)
+				}
+			}
+			if saved.Polyline() != encodedPolyline {
+				t.Errorf("Polyline mismatch: want %s, got %s", encodedPolyline, saved.Polyline())
 			}
 			if len(saved.Waypoints()) != len(tt.route.Waypoints()) {
 				t.Errorf("Waypoints count mismatch: want %d, got %d", len(tt.route.Waypoints()), len(saved.Waypoints()))
@@ -406,6 +416,7 @@ func TestRouteRepository_UpdateRoute(t *testing.T) {
 	}
 	firstPoint := routeDomain.Geometry{Geometry: orb.Point{139.7528, 35.6850}}
 	lastPoint := routeDomain.Geometry{Geometry: orb.Point{139.7600, 35.6780}}
+	bbox := CalculateBbox(pathGeom.Geometry) 
 
 	// bboxは既存のルートから取得（データベースで自動生成されたもの）
 	updatedRoute, err := routeDomain.ReconstructRoute(
@@ -419,9 +430,10 @@ func TestRouteRepository_UpdateRoute(t *testing.T) {
 		30.0,
 		30.0,
 		pathGeom,
-		existingRoute.Bbox(), // 既存のbboxを使用
+		routeDomain.Geometry{Geometry: bbox.Geometry},
 		firstPoint,
 		lastPoint,
+		"gvxxE_n~sYvQo_@~WoK",//SELECT ST_AsEncodedPolyline(ST_SimplifyPreserveTopology(GeomFromEWKT('SRID=4326;LINESTRING(139.7528 35.6850,139.7580 35.6820,139.7600 35.6780)'), 0.0001));
 		2,
 		existingRoute.CreatedAt(), // 既存の作成日時を使用
 		existingRoute.UpdatedAt(), // 既存の更新日時を使用
@@ -494,6 +506,14 @@ func TestRouteRepository_UpdateRoute(t *testing.T) {
 			}
 			if updated.Duration() != tt.route.Duration() {
 				t.Errorf("Duration mismatch: want %f, got %f", tt.route.Duration(), updated.Duration())
+			}
+			if updated.Bbox().Geometry != nil &&  tt.route.Bbox().Geometry != nil {
+				if !orb.Equal(updated.Bbox().Geometry,tt.route.Bbox().Geometry) {
+					t.Errorf("Bbox mismatch: want %v, got %v", tt.route.Bbox().Geometry, updated.Bbox().Geometry)
+				}
+			}
+			if updated.Polyline() != tt.route.Polyline() {
+				t.Errorf("Polyline mismatch: want %s, got %s", tt.route.Polyline(), updated.Polyline())
 			}
 			if len(updated.Waypoints()) != len(tt.route.Waypoints()) {
 				t.Errorf("Waypoints count mismatch: want %d, got %d", len(tt.route.Waypoints()), len(updated.Waypoints()))

@@ -155,6 +155,7 @@ func (h *Handler) CreateRoute(c *gin.Context) {
 			PathGeom:           geometry.GeometryToGeoJSON(dto.PathGeom),
 			FirstPoint:         geometry.GeometryToGeoJSON(dto.FirstPoint),
 			LastPoint:          geometry.GeometryToGeoJSON(dto.LastPoint),
+			Polyline:           dto.Polyline,
 			Visibility:         dto.Visibility,
 		},
 	}
@@ -226,6 +227,7 @@ func (h *Handler) GetRouteByID(c *gin.Context) {
 			Bbox:               geometry.GeometryToGeoJSON(dto.Bbox),
 			FirstPoint:         geometry.GeometryToGeoJSON(dto.FirstPoint),
 			LastPoint:          geometry.GeometryToGeoJSON(dto.LastPoint),
+			Polyline:           dto.Polyline,
 			Visibility:         dto.Visibility,
 			CreatedAt:          dto.CreatedAt,
 			UpdatedAt:          dto.UpdatedAt,

@@ -74,6 +74,7 @@ type CreateRouteUseCaseOutputDto struct {
 	PathGeom           orb.LineString
 	FirstPoint         orb.Point
 	LastPoint          orb.Point
+	Polyline           string
 	Visibility         int16
 }
 
@@ -154,6 +155,7 @@ func (u *createRouteUsecase) CreateRoute(ctx context.Context, dto CreateRouteUse
 		PathGeom:           route.PathGeom().Geometry.(orb.LineString),
 		FirstPoint:         route.FirstPoint().Geometry.(orb.Point),
 		LastPoint:          route.LastPoint().Geometry.(orb.Point),
+		Polyline:           route.Polyline(),
 		Visibility:         route.Visibility(),
 	}, nil
 }

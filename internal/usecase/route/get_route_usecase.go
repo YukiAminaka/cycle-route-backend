@@ -60,6 +60,7 @@ type RouteDetaileDto struct {
 	Bbox               orb.Polygon
 	FirstPoint         orb.Point
 	LastPoint          orb.Point
+	Polyline           string
 	Visibility         int16
 	CreatedAt 		   string
 	UpdatedAt 		   string

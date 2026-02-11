@@ -649,6 +649,9 @@ const docTemplate = `{
                 "path_geom": {
                     "type": "string"
                 },
+                "polyline": {
+                    "type": "string"
+                },
                 "updated_at": {
                     "type": "string"
                 },

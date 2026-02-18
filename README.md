@@ -105,30 +105,7 @@ go test ./...
 
 ## 認証が必要な API のテスト
 
-このプロジェクトでは Ory Kratos を使用した認証を実装しています。認証が必要なエンドポイントをテストするには、セッションクッキーが必要です。
-
-### 簡単な方法: Admin API でテストユーザーを作成する
-
-Kratos Admin API を使用してテストユーザーを作成し、セッションクッキーを取得するスクリプトを用意しています。
-
-```bash
-# デフォルト（ランダムなメールアドレス）
-./scripts/create-test-user.sh
-
-# カスタムメールアドレスとパスワード
-./scripts/create-test-user.sh your@email.com YourPassword123!
-
-# 環境変数でKratosのURLを指定
-KRATOS_ADMIN_URL=http://127.0.0.1:4434 ./scripts/create-test-user.sh
-```
-
-このスクリプトは以下の処理を自動で行います：
-
-1. Kratos Admin API を使ってユーザーを作成（既存の場合はスキップ）
-2. 作成したユーザーでログイン
-3. セッショントークンとテストユーザーの情報を表示
-
-### 取得したクッキーの使い方
+このプロジェクトでは Ory Kratos を使用した認証を実装しています。認証が必要なエンドポイントをテストするには、セッショントークンが必要です。
 
 #### curl で API を呼び出す
 
@@ -147,14 +124,13 @@ curl -H 'Cookie: ory_kratos_session=YOUR_SESSION_TOKEN' \
 
 #### Swagger UI で使用
 
-1. `./scripts/create-test-user.sh` を実行
-2. 表示された **Session Token** をコピー
-3. Swagger UI（http://localhost:8080/api/v1/swagger/index.html）を開く
-4. 右上の「Authorize」ボタン（🔒 アイコン）をクリック
-5. `CookieAuth` の欄にセッショントークンを貼り付け
-6. 「Authorize」をクリックして「Close」
+1. ブラウザの開発者ツールで[Application]>[Storage]>[Cookie]を開き **Session Token** をコピー
+2. Swagger UI（http://localhost:8080/api/v1/swagger/index.html）を開く
+3. 右上の「Authorize」ボタンをクリック
+4. `CookieAuth` の欄にセッショントークンを貼り付け
+5. 「Authorize」をクリックして「Close」
 
-これで認証が必要なエンドポイント（🔒 マーク付き）を Swagger UI から試せます。
+これで認証が必要なエンドポイントを Swagger UI から試せる。
 
 ### 手動でクッキーを取得する場合
 

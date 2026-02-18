@@ -2,6 +2,14 @@
 
 サイクリングルート管理アプリケーションのバックエンド API
 
+
+<img src="https://github.com/user-attachments/assets/a885c281-fd0e-43e8-a0bb-d31671858285"
+     width="600" />
+
+<img src="https://github.com/user-attachments/assets/15c32d76-7650-4e23-96c7-25e84174c0ab"
+     width="600" />
+
+
 ## プロジェクト構成
 
 ```

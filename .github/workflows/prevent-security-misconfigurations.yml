@@ -1,0 +1,14 @@
+name: Prevent security misconfigurations
+on: pull_request
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Run Trivy vulnerability scanner in IaC mode
+        uses: aquasecurity/trivy-action@0.34.0 # Trivyの実行
+        with:
+          scan-type: config # セキュリティ設定ミスの検出
+          severity: CRITICAL,HIGH # レポート対象の重大度
+          exit-code: 1 # 問題発見時の終了ステータス

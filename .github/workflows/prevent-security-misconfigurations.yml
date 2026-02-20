@@ -1,0 +1,25 @@
+name: Prevent security misconfigurations
+on: pull_request
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Run Trivy vulnerability scanner in IaC mode
+        uses: aquasecurity/trivy-action@0.34.0 # Trivyの実行
+        with:
+          scan-type: config # セキュリティ設定ミスの検出
+          hide-progress: true # 進捗表示を非表示
+          format: "sarif"
+          output: "trivy-results.sarif"
+          severity: CRITICAL,HIGH # レポート対象の重大度
+          exit-code: 1 # 問題発見時の終了ステータス
+      - name: Upload Trivy scan results to GitHub Security tab
+        if: always()
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: "trivy-results.sarif"

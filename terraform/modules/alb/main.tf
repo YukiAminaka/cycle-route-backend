@@ -56,6 +56,7 @@ resource "aws_lb" "main" {
   subnets            = var.public_subnet_ids
 
   enable_deletion_protection = false
+  drop_invalid_header_fields = true
   tags = {
     Name = "${var.project_name}-${var.environment}-alb"
   }

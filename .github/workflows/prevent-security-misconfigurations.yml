@@ -15,6 +15,7 @@ jobs:
           scan-type: config # セキュリティ設定ミスの検出
           hide-progress: true # 進捗表示を非表示
           format: "sarif"
+          output: "trivy-results.sarif"
           severity: CRITICAL,HIGH # レポート対象の重大度
           exit-code: 1 # 問題発見時の終了ステータス
       - name: Upload Trivy scan results to GitHub Security tab

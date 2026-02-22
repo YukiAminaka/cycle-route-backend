@@ -40,17 +40,11 @@ resource "aws_vpc_security_group_ingress_rule" "alb_https" {
   cidr_ipv4         = "0.0.0.0/0"
 }
 
-resource "aws_vpc_security_group_egress_rule" "alb_all" {
-  security_group_id = aws_security_group.alb.id
-  from_port         = 0
-  to_port           = 0
-  ip_protocol       = "-1"
-  cidr_ipv4         = "0.0.0.0/0"
-}
+# ALBのegressルールは循環参照回避のためルートモジュールで定義
 
 resource "aws_lb" "main" {
   name               = "${var.project_name}-${var.environment}-alb"
-  internal           = false
+  internal           = false #trivy:ignore:AWS-0053 This ALB is intentionally public-facing for frontend access
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb.id]
   subnets            = var.public_subnet_ids

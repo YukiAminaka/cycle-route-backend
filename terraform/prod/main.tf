@@ -89,6 +89,7 @@ module "ecs" {
   alb_security_group_id  = module.alb.alb_security_group_id
   db_endpoint            = module.database.db_endpoint
   db_name                = module.database.db_name
+  db_security_group_id   = module.database.db_security_group_id
   db_password_secret_arn = module.secrets.db_password_secret_arn
   kratos_secrets_arn     = module.secrets.kratos_secrets_arn
   ecr_repositories       = module.ecr.repository_urls
@@ -96,11 +97,31 @@ module "ecs" {
 
 # 循環参照回避のためのセキュリティグループルール
 # databaseモジュールとecsモジュールが相互に依存しないように、ルートで紐付けを行う
-resource "aws_security_group_rule" "db_ingress_from_ecs" {
-  type                     = "ingress"
-  from_port                = 5432
-  to_port                  = 5432
-  protocol                 = "tcp"
-  source_security_group_id = module.ecs.backend_services_sg_id
-  security_group_id        = module.database.security_group_id
+resource "aws_vpc_security_group_ingress_rule" "db_from_ecs" {
+  security_group_id            = module.database.security_group_id
+  referenced_security_group_id = module.ecs.backend_services_sg_id
+  from_port                    = 5432
+  to_port                      = 5432
+  ip_protocol                  = "tcp"
+  description                  = "Allow traffic from ECS backend"
 }
+
+# 循環参照回避のためのセキュリティグループルール
+# albモジュールとecsモジュールが相互に依存しないように、ルートで紐付けを行う
+resource "aws_vpc_security_group_egress_rule" "alb_to_frontend" {
+  security_group_id            = module.alb.alb_security_group_id
+  referenced_security_group_id = module.ecs.frontend_services_sg_id
+  from_port                    = 3000
+  to_port                      = 3000
+  ip_protocol                  = "tcp"
+  description                  = "Allow traffic to Frontend"
+}
+
+resource "aws_vpc_security_group_egress_rule" "alb_to_kratos" {
+  security_group_id            = module.alb.alb_security_group_id
+  referenced_security_group_id = module.ecs.kratos_services_sg_id
+  from_port                    = 4433
+  to_port                      = 4433
+  ip_protocol                  = "tcp"
+  description                  = "Allow traffic to Kratos"
+} 

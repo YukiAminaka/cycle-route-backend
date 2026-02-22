@@ -1,7 +1,7 @@
 name: Test
 on:
   pull_request: # プルリクエストが作成されたら起動
-    paths:
+    paths: # 変更されたファイルが以下のパターンにマッチする場合にのみ実行
       - "**/*.go"
       - "go.mod"
       - "go.sum"

@@ -7,54 +7,158 @@ resource "aws_ecs_cluster" "main" {
   }
 }
 
-resource "aws_security_group" "backend_services" {
-  name        = "${var.project_name}-${var.environment}-backend-services-sg"
-  description = "Security group for backend services (API, Kratos) internal communication"
-  vpc_id      = var.vpc_id
-
-  ingress {
-    from_port   = 0
-    to_port     = 65535
-    protocol    = "tcp"
-    self        = true
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "${var.project_name}-${var.environment}-backend-services-sg"
-  }
-}
-
+# Security Groups
 resource "aws_security_group" "frontend" {
   name        = "${var.project_name}-${var.environment}-frontend-sg"
   description = "Security group for Frontend ECS tasks"
   vpc_id      = var.vpc_id
-
-  ingress {
-    from_port       = 3000
-    to_port         = 3000
-    protocol        = "tcp"
-    security_groups = [var.alb_security_group_id]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
 
   tags = {
     Name = "${var.project_name}-${var.environment}-frontend-sg"
   }
 }
 
+resource "aws_vpc_security_group_ingress_rule" "frontend_from_alb" {
+  security_group_id            = aws_security_group.frontend.id
+  referenced_security_group_id = var.alb_security_group_id
+  from_port                    = 3000
+  to_port                      = 3000
+  ip_protocol                  = "tcp"
+  description                  = "Allow traffic from ALB"
+}
+
+resource "aws_vpc_security_group_egress_rule" "frontend_to_api" {
+  security_group_id            = aws_security_group.frontend.id
+  referenced_security_group_id = aws_security_group.api.id
+  from_port                    = 8080
+  to_port                      = 8080
+  ip_protocol                  = "tcp"
+  description                  = "Allow traffic to API"
+}
+
+resource "aws_vpc_security_group_egress_rule" "frontend_to_kratos" {
+  security_group_id            = aws_security_group.frontend.id
+  referenced_security_group_id = aws_security_group.kratos.id
+  from_port                    = 4433
+  to_port                      = 4433
+  ip_protocol                  = "tcp"
+  description                  = "Allow traffic to Kratos"
+}
+
+# trivy:ignore:AVD-AWS-0104
+resource "aws_vpc_security_group_egress_rule" "frontend_https" {
+  security_group_id = aws_security_group.frontend.id
+  from_port         = 443
+  to_port           = 443
+  ip_protocol       = "tcp"
+  cidr_ipv4         = "0.0.0.0/0"
+  description       = "Allow HTTPS for external APIs"
+}
+
+resource "aws_security_group" "api" {
+  name        = "${var.project_name}-${var.environment}-api-sg"
+  description = "Security group for API ECS tasks"
+  vpc_id      = var.vpc_id
+
+  tags = {
+    Name = "${var.project_name}-${var.environment}-api-sg"
+  }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "api_from_frontend" {
+  security_group_id            = aws_security_group.api.id
+  referenced_security_group_id = aws_security_group.frontend.id
+  from_port                    = 8080
+  to_port                      = 8080
+  ip_protocol                  = "tcp"
+  description                  = "Allow traffic from Frontend"
+}
+
+resource "aws_vpc_security_group_egress_rule" "api_to_db" {
+  security_group_id            = aws_security_group.api.id
+  referenced_security_group_id = var.db_security_group_id
+  from_port                    = 5432
+  to_port                      = 5432
+  ip_protocol                  = "tcp"
+  description                  = "Allow traffic to RDS"
+}
+
+resource "aws_vpc_security_group_egress_rule" "api_to_kratos" {
+  security_group_id            = aws_security_group.api.id
+  referenced_security_group_id = aws_security_group.kratos.id
+  from_port                    = 4434
+  to_port                      = 4434
+  ip_protocol                  = "tcp"
+  description                  = "Allow traffic to Kratos admin"
+}
+
+# trivy:ignore:AVD-AWS-0104
+resource "aws_vpc_security_group_egress_rule" "api_https" {
+  security_group_id = aws_security_group.api.id
+  from_port         = 443
+  to_port           = 443
+  ip_protocol       = "tcp"
+  cidr_ipv4         = "0.0.0.0/0"
+  description       = "Allow HTTPS for external APIs"
+}
+
+resource "aws_security_group" "kratos" {
+  name        = "${var.project_name}-${var.environment}-kratos-sg"
+  description = "Security group for Kratos ECS tasks"
+  vpc_id      = var.vpc_id
+
+  tags = {
+    Name = "${var.project_name}-${var.environment}-kratos-sg"
+  }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "kratos_public_from_alb" {
+  security_group_id            = aws_security_group.kratos.id
+  referenced_security_group_id = var.alb_security_group_id
+  from_port                    = 4433
+  to_port                      = 4433
+  ip_protocol                  = "tcp"
+  description                  = "Allow public API traffic from ALB"
+}
+
+resource "aws_vpc_security_group_ingress_rule" "kratos_public_from_frontend" {
+  security_group_id            = aws_security_group.kratos.id
+  referenced_security_group_id = aws_security_group.frontend.id
+  from_port                    = 4433
+  to_port                      = 4433
+  ip_protocol                  = "tcp"
+  description                  = "Allow public API traffic from Frontend"
+}
+
+resource "aws_vpc_security_group_ingress_rule" "kratos_admin_from_api" {
+  security_group_id            = aws_security_group.kratos.id
+  referenced_security_group_id = aws_security_group.api.id
+  from_port                    = 4434
+  to_port                      = 4434
+  ip_protocol                  = "tcp"
+  description                  = "Allow admin API traffic from API"
+}
+
+resource "aws_vpc_security_group_egress_rule" "kratos_to_db" {
+  security_group_id            = aws_security_group.kratos.id
+  referenced_security_group_id = var.db_security_group_id
+  from_port                    = 5432
+  to_port                      = 5432
+  ip_protocol                  = "tcp"
+  description                  = "Allow traffic to RDS"
+}
+
+# trivy:ignore:AVD-AWS-0104
+resource "aws_vpc_security_group_egress_rule" "kratos_https" {
+  security_group_id = aws_security_group.kratos.id
+  from_port         = 443
+  to_port           = 443
+  ip_protocol       = "tcp"
+  cidr_ipv4         = "0.0.0.0/0"
+  description       = "Allow HTTPS for email/SMS providers"
+}
+
+# IAM Roles
 resource "aws_iam_role" "ecs_task_execution" {
   name = "${var.project_name}-${var.environment}-ecs-task-execution"
 
@@ -94,11 +198,52 @@ resource "aws_iam_role_policy" "secrets_access" {
   })
 }
 
+# CloudWatch Logs
 resource "aws_cloudwatch_log_group" "ecs" {
   for_each = toset(["frontend", "api", "kratos"])
   
   name              = "/ecs/${var.project_name}-${var.environment}/${each.key}"
   retention_in_days = 7
+}
+
+# Service Discovery
+resource "aws_service_discovery_private_dns_namespace" "main" {
+  name = "${var.project_name}-${var.environment}.local"
+  vpc  = var.vpc_id
+}
+
+resource "aws_service_discovery_service" "api" {
+  name = "api"
+
+  dns_config {
+    namespace_id = aws_service_discovery_private_dns_namespace.main.id
+    
+    dns_records {
+      ttl  = 10
+      type = "A"
+    }
+  }
+
+  health_check_custom_config {
+    failure_threshold = 1
+  }
+}
+
+resource "aws_service_discovery_service" "kratos" {
+  name = "kratos"
+
+  dns_config {
+    namespace_id = aws_service_discovery_private_dns_namespace.main.id
+    
+    dns_records {
+      ttl  = 10
+      type = "A"
+    }
+  }
+
+  health_check_custom_config {
+    failure_threshold = 1
+  }
 }
 
 # Frontend Service
@@ -180,7 +325,7 @@ resource "aws_ecs_task_definition" "api" {
       { name = "DB_HOST", value = split(":", var.db_endpoint)[0] },
       { name = "DB_NAME", value = var.db_name },
       { name = "DB_USER", value = "postgres" },
-      { name = "KRATOS_ADMIN_URL", value = "http://kratos:4434" }
+      { name = "KRATOS_ADMIN_URL", value = "http://kratos.${var.project_name}-${var.environment}.local:4434" }
     ]
     secrets = [{
       name      = "DB_PASSWORD"
@@ -198,7 +343,7 @@ resource "aws_ecs_service" "api" {
 
   network_configuration {
     subnets          = var.private_subnet_ids
-    security_groups  = [aws_security_group.backend_services.id]
+    security_groups  = [aws_security_group.api.id]
     assign_public_ip = false
   }
 
@@ -232,8 +377,12 @@ resource "aws_ecs_task_definition" "kratos" {
       }
     }
     environment = [
-      { name = "DSN", value = "postgres://postgres:${var.db_password_secret_arn}@${var.db_endpoint}/${var.db_name}" }
+      { name = "DSN", value = "postgres://postgres@${var.db_endpoint}/${var.db_name}" }
     ]
+    secrets = [{
+      name      = "DB_PASSWORD"
+      valueFrom = "${var.db_password_secret_arn}:password::"
+    }]
   }])
 }
 
@@ -246,7 +395,7 @@ resource "aws_ecs_service" "kratos" {
 
   network_configuration {
     subnets          = var.private_subnet_ids
-    security_groups  = [aws_security_group.backend_services.id]
+    security_groups  = [aws_security_group.kratos.id]
     assign_public_ip = false
   }
 
@@ -258,46 +407,6 @@ resource "aws_ecs_service" "kratos" {
 
   service_registries {
     registry_arn = aws_service_discovery_service.kratos.arn
-  }
-}
-
-# Service Discovery
-resource "aws_service_discovery_private_dns_namespace" "main" {
-  name = "${var.project_name}-${var.environment}.local"
-  vpc  = var.vpc_id
-}
-
-resource "aws_service_discovery_service" "api" {
-  name = "api"
-
-  dns_config {
-    namespace_id = aws_service_discovery_private_dns_namespace.main.id
-    
-    dns_records {
-      ttl  = 10
-      type = "A"
-    }
-  }
-
-  health_check_custom_config {
-    failure_threshold = 1
-  }
-}
-
-resource "aws_service_discovery_service" "kratos" {
-  name = "kratos"
-
-  dns_config {
-    namespace_id = aws_service_discovery_private_dns_namespace.main.id
-    
-    dns_records {
-      ttl  = 10
-      type = "A"
-    }
-  }
-
-  health_check_custom_config {
-    failure_threshold = 1
   }
 }
 

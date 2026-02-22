@@ -14,6 +14,11 @@ variable "private_subnet_ids" {
   type = list(string)
 }
 
+variable "db_security_group_id" {
+  type        = string
+  description = "RDS security group ID"
+}
+
 variable "alb_target_group_arns" {
   type = map(string)
   description = "ALB target group ARNs (frontend, kratos only)"

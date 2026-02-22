@@ -12,6 +12,9 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     timeout-minutes: 5 # タイムアウト
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
       - run: | # 静的解析の実行

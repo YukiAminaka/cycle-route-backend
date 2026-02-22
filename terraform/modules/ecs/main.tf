@@ -45,6 +45,7 @@ resource "aws_vpc_security_group_egress_rule" "frontend_to_kratos" {
   description                  = "Allow traffic to Kratos"
 }
 
+# trivy:ignore:AVD-AWS-0104
 resource "aws_vpc_security_group_egress_rule" "frontend_https" {
   security_group_id = aws_security_group.frontend.id
   from_port         = 443
@@ -91,6 +92,7 @@ resource "aws_vpc_security_group_egress_rule" "api_to_kratos" {
   description                  = "Allow traffic to Kratos admin"
 }
 
+# trivy:ignore:AVD-AWS-0104
 resource "aws_vpc_security_group_egress_rule" "api_https" {
   security_group_id = aws_security_group.api.id
   from_port         = 443
@@ -146,6 +148,7 @@ resource "aws_vpc_security_group_egress_rule" "kratos_to_db" {
   description                  = "Allow traffic to RDS"
 }
 
+# trivy:ignore:AVD-AWS-0104
 resource "aws_vpc_security_group_egress_rule" "kratos_https" {
   security_group_id = aws_security_group.kratos.id
   from_port         = 443

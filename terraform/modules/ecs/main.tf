@@ -201,7 +201,7 @@ resource "aws_iam_role_policy" "secrets_access" {
 # CloudWatch Logs
 resource "aws_cloudwatch_log_group" "ecs" {
   for_each = toset(["frontend", "api", "kratos"])
-  
+
   name              = "/ecs/${var.project_name}-${var.environment}/${each.key}"
   retention_in_days = 7
 }
@@ -217,7 +217,7 @@ resource "aws_service_discovery_service" "api" {
 
   dns_config {
     namespace_id = aws_service_discovery_private_dns_namespace.main.id
-    
+
     dns_records {
       ttl  = 10
       type = "A"
@@ -234,7 +234,7 @@ resource "aws_service_discovery_service" "kratos" {
 
   dns_config {
     namespace_id = aws_service_discovery_private_dns_namespace.main.id
-    
+
     dns_records {
       ttl  = 10
       type = "A"

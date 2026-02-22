@@ -61,7 +61,7 @@ module "ecr" {
 }
 
 module "dns" {
-  source = "../modules/dns"
+  source       = "../modules/dns"
   project_name = var.project_name
   environment  = var.environment
   domain_name  = var.domain_name
@@ -70,12 +70,12 @@ module "dns" {
 }
 
 module "alb" {
-  source = "../modules/alb"
-  domain_name        = var.domain_name
-  project_name       = var.project_name
-  environment        = var.environment
-  vpc_id             = module.network.vpc_id
-  public_subnet_ids  = module.network.public_subnet_ids
+  source            = "../modules/alb"
+  domain_name       = var.domain_name
+  project_name      = var.project_name
+  environment       = var.environment
+  vpc_id            = module.network.vpc_id
+  public_subnet_ids = module.network.public_subnet_ids
 }
 
 module "ecs" {
@@ -124,4 +124,4 @@ resource "aws_vpc_security_group_egress_rule" "alb_to_kratos" {
   to_port                      = 4433
   ip_protocol                  = "tcp"
   description                  = "Allow traffic to Kratos"
-} 
+}

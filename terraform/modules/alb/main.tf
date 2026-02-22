@@ -1,16 +1,16 @@
 # ap-northeast-1のACM証明書のARNを取得
 resource "aws_acm_certificate" "cert" {
-    provider = aws.ap-northeast-1
-    domain_name   = "*.${var.domain_name}"
-    validation_method = "DNS"
+  provider          = aws.ap-northeast-1
+  domain_name       = "*.${var.domain_name}"
+  validation_method = "DNS"
 
-    tags = {
-      Name = "${var.project_name}-${var.environment}-acm-cert"
-    }
+  tags = {
+    Name = "${var.project_name}-${var.environment}-acm-cert"
+  }
 
-    lifecycle {
-      create_before_destroy = true
-    }
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_security_group" "alb" {

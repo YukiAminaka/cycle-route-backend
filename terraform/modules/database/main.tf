@@ -28,7 +28,7 @@ resource "aws_vpc_security_group_egress_rule" "rds_all" {
 
 resource "aws_db_parameter_group" "main" {
   name   = "${var.project_name}-${var.environment}-pg"
-  family = "postgres16" 
+  family = "postgres16"
 
   # スロークエリログの設定（1000ms以上かかるクエリを記録）
   parameter {
@@ -48,29 +48,29 @@ resource "aws_db_parameter_group" "main" {
 }
 
 resource "aws_db_instance" "main" {
-  identifier             = "${var.project_name}-${var.environment}-db"
-  engine                 = "postgres"
-  engine_version         = "16.3"
-  instance_class         = "db.t3.micro"
-  db_name                = "postgres_db"
-  username               = "postgres"
+  identifier                  = "${var.project_name}-${var.environment}-db"
+  engine                      = "postgres"
+  engine_version              = "16.3"
+  instance_class              = "db.t3.micro"
+  db_name                     = "postgres_db"
+  username                    = "postgres"
   manage_master_user_password = true
 
   # ストレージ
-  allocated_storage      = 20
-  storage_type           = "gp3"
-  storage_encrypted      = true
-  
+  allocated_storage = 20
+  storage_type      = "gp3"
+  storage_encrypted = true
+
   # ネットワーク設定
   db_subnet_group_name   = aws_db_subnet_group.main.name
   vpc_security_group_ids = [aws_security_group.rds.id]
 
-  parameter_group_name   = aws_db_parameter_group.main.name
-  
-  backup_retention_period = 7
-  skip_final_snapshot     = false
+  parameter_group_name = aws_db_parameter_group.main.name
+
+  backup_retention_period   = 7
+  skip_final_snapshot       = false
   final_snapshot_identifier = "${var.project_name}-${var.environment}-final-snapshot"
-  
+
   enabled_cloudwatch_logs_exports = ["postgresql"]
 
   tags = {

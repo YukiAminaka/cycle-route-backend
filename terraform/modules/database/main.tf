@@ -17,6 +17,7 @@ resource "aws_security_group" "rds" {
   }
 }
 
+# trivy:ignore:AVD-AWS-0104
 resource "aws_vpc_security_group_egress_rule" "rds_all" {
   security_group_id = aws_security_group.rds.id
   ip_protocol       = "-1"

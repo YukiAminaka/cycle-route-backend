@@ -20,7 +20,7 @@ variable "db_security_group_id" {
 }
 
 variable "alb_target_group_arns" {
-  type = map(string)
+  type        = map(string)
   description = "ALB target group ARNs (frontend, kratos only)"
 }
 

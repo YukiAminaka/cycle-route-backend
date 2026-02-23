@@ -8,23 +8,6 @@ import (
 	"github.com/paulmach/orb"
 )
 
-// ヘルパー関数
-func ptrFloat64(f float64) *float64 {
-	return &f
-}
-
-func ptrString(s string) *string {
-	return &s
-}
-
-func ptrInt32(i int32) *int32 {
-	return &i
-}
-
-func ptrRouteGeom(g orb.Geometry) *routeDomain.Geometry {
-	return &routeDomain.Geometry{Geometry: g}
-}
-
 func TestRouteRepository_GetRouteByID(t *testing.T) {
 	q := GetTestQueries()
 	routeRepository := NewRouteRepository(q)
@@ -267,16 +250,16 @@ func TestRouteRepository_SaveRoute(t *testing.T) {
 
 	// コースポイントを追加
 	err = newRoute.AddCoursePoint(
-		ptrFloat64(0.0),
-		ptrFloat64(0.0),
-		ptrFloat64(0.0),
-		ptrString("スタート"),
-		ptrString("テスト道路"),
-		ptrString("depart"),
+		new(0.0),
+		new(0.0),
+		new(0.0),
+		new("スタート"),
+		new("テスト道路"),
+		new("depart"),
 		nil,
-		ptrRouteGeom(orb.Point{139.7000, 35.6800}),
+		&routeDomain.Geometry{Geometry: orb.Point{139.7000, 35.6800}},
 		nil,
-		ptrInt32(90),
+		new(int32(90)),
 	)
 	if err != nil {
 		t.Fatalf("failed to add course point: %v", err)
@@ -450,16 +433,16 @@ func TestRouteRepository_UpdateRoute(t *testing.T) {
 
 	// 新しいコースポイントを追加
 	err = updatedRoute.AddCoursePoint(
-		ptrFloat64(0.0),
-		ptrFloat64(0.0),
-		ptrFloat64(0.0),
-		ptrString("更新されたスタート"),
-		ptrString("更新された道路"),
-		ptrString("depart"),
+		new(0.0),
+		new(0.0),
+		new(0.0),
+		new("更新されたスタート"),
+		new("更新された道路"),
+		new("depart"),
 		nil,
-		ptrRouteGeom(orb.Point{139.7528, 35.6850}),
+		&routeDomain.Geometry{Geometry:orb.Point{139.7528, 35.6850}},
 		nil,
-		ptrInt32(90),
+		new(int32(90)),
 	)
 	if err != nil {
 		t.Fatalf("failed to add course point: %v", err)

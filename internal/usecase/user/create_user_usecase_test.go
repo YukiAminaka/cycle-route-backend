@@ -10,12 +10,6 @@ import (
 	"go.uber.org/mock/gomock"
 )
 
-// ptr は文字列のポインタを返すヘルパー関数
-// テストデータでポインタ型のフィールドに値を設定する際に使用
-func ptr(s string) *string {
-	return &s
-}
-
 func Test_createUserUsecase_CreateUser(t *testing.T) {
 	// gomockのコントローラーを作成
 	ctrl := gomock.NewController(t)
@@ -37,9 +31,9 @@ func Test_createUserUsecase_CreateUser(t *testing.T) {
 			input: CreateUserUseCaseInputDto{
 				KratosID:  "2eb50f70-3a23-4067-99f6-9fd645686880",
 				Name:      "Test User",
-				FirstName: ptr("Test"),
-				LastName:  ptr("User"),
-				Email:     ptr("test@example.com"),
+				FirstName: new("Test"),
+				LastName:  new("User"),
+				Email:     new("test@example.com"),
 			},
 			mockFunc: func() {
 				// モックの振る舞いを定義
@@ -53,16 +47,16 @@ func Test_createUserUsecase_CreateUser(t *testing.T) {
 							"2eb50f70-3a23-4067-99f6-9fd645686880",
 							"Test User",
 							nil,                     // highlightedPhotoID (schema.sql: DEFAULT 0、nilで表現)
-							ptr("ja"),               // locale (schema.sql: DEFAULT 'ja')
+							new("ja"),               // locale (schema.sql: DEFAULT 'ja')
 							nil,                     // description
 							nil,                     // locality
 							nil,                     // administrativeArea
-							ptr("JP"),               // countryCode (schema.sql: DEFAULT 'JP')
+							new("JP"),               // countryCode (schema.sql: DEFAULT 'JP')
 							nil,                     // postalCode
 							nil,                     // geom
-							ptr("Test"),             // firstName
-							ptr("User"),             // lastName
-							ptr("test@example.com"), // email
+							new("Test"),             // firstName
+							new("User"),             // lastName
+							new("test@example.com"), // email
 							false,                   // hasSetLocation (schema.sql: DEFAULT FALSE)
 						)
 					})
@@ -70,15 +64,15 @@ func Test_createUserUsecase_CreateUser(t *testing.T) {
 			want: &CreateUserUseCaseOutputDto{
 				ID:                 "019b5a8d-16a7-700a-be92-9ae11e7e5b9a",
 				Name:               "Test User",
-				FirstName:          ptr("Test"),
-				LastName:           ptr("User"),
-				Email:              ptr("test@example.com"), // 修正: 正しいメールアドレスに
+				FirstName:          new("Test"),
+				LastName:           new("User"),
+				Email:              new("test@example.com"), // 修正: 正しいメールアドレスに
 				HighlightedPhotoID: nil,
-				Locale:             ptr("ja"), // schema.sql: DEFAULT 'ja'
+				Locale:             new("ja"), // schema.sql: DEFAULT 'ja'
 				Description:        nil,
 				Locality:           nil,
 				AdministrativeArea: nil,
-				CountryCode:        ptr("JP"), // schema.sql: DEFAULT 'JP'
+				CountryCode:        new("JP"), // schema.sql: DEFAULT 'JP'
 				PostalCode:         nil,
 				Geom:               nil,
 				HasSetLocation:     false, // schema.sql: DEFAULT FALSE

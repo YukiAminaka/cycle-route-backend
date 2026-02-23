@@ -15,19 +15,6 @@ import (
 //メトリクス(distance/duration)の再計算
 //不変条件の確認: RouteIDが正しく設定されているか
 
-// ヘルパー関数
-func ptr(s string) *string {
-	return &s
-}
-
-func ptrFloat64(f float64) *float64 {
-	return &f
-}
-
-func ptrInt32(i int32) *int32 {
-	return &i
-}
-
 func TestNewRoute(t *testing.T) {
 	userID := user.NewUserID()
 	type args struct {
@@ -367,16 +354,16 @@ func TestAddCoursePoint(t *testing.T) {
 		{
 			name: "正常系: 全てのフィールドが正しい",
 			args: args{
-				segDistM:      ptrFloat64(100.0),
-				cumDistM:      ptrFloat64(100.0),
-				duration:      ptrFloat64(600.0),
-				instruction:   ptr("Turn right"),
-				roadName:      ptr("Main St"),
-				maneuverType:  ptr("turn"),
-				modifier:      ptr("right"),
+				segDistM:      new(100.0),
+				cumDistM:      new(100.0),
+				duration:      new(600.0),
+				instruction:   new("Turn right"),
+				roadName:      new("Main St"),
+				maneuverType:  new("turn"),
+				modifier:      new("right"),
 				location:      &Geometry{orb.Point{139.6917, 35.6895}},
-				bearingBefore: ptrInt32(90),
-				bearingAfter:  ptrInt32(180),
+				bearingBefore: new(int32(90)),
+				bearingAfter:  new(int32(180)),
 			},
 			wantErr: false,
 		},
@@ -399,16 +386,16 @@ func TestAddCoursePoint(t *testing.T) {
 		{
 			name: "異常系: locationがnil",
 			args: args{
-				segDistM:      ptrFloat64(100.0),
-				cumDistM:      ptrFloat64(100.0),
-				duration:      ptrFloat64(600.0),
-				instruction:   ptr("Turn right"),
-				roadName:      ptr("Main St"),
-				maneuverType:  ptr("turn"),
-				modifier:      ptr("right"),
+				segDistM:      new(100.0),
+				cumDistM:      new(100.0),
+				duration:      new(600.0),
+				instruction:   new("Turn right"),
+				roadName:      new("Main St"),
+				maneuverType:  new("turn"),
+				modifier:      new("right"),
 				location:      nil,
-				bearingBefore: ptrInt32(90),
-				bearingAfter:  ptrInt32(180),
+				bearingBefore: new(int32(90)),
+				bearingAfter:  new(int32(180)),
 			},
 			wantErr: true,
 			errMsg:  "location is required",
@@ -416,16 +403,16 @@ func TestAddCoursePoint(t *testing.T) {
 		{
 			name: "異常系: locationがPointではない",
 			args: args{
-				segDistM:      ptrFloat64(100.0),
-				cumDistM:      ptrFloat64(100.0),
-				duration:      ptrFloat64(600.0),
-				instruction:   ptr("Turn right"),
-				roadName:      ptr("Main St"),
-				maneuverType:  ptr("turn"),
-				modifier:      ptr("right"),
+				segDistM:      new(100.0),
+				cumDistM:      new(100.0),
+				duration:      new(600.0),
+				instruction:   new("Turn right"),
+				roadName:      new("Main St"),
+				maneuverType:  new("turn"),
+				modifier:      new("right"),
 				location:      &Geometry{orb.LineString{{139.6917, 35.6895}, {139.7000, 35.6900}}},
-				bearingBefore: ptrInt32(90),
-				bearingAfter:  ptrInt32(180),
+				bearingBefore: new(int32(90)),
+				bearingAfter:  new(int32(180)),
 			},
 			wantErr: true,
 			errMsg:  "location must be a Point geometry",
@@ -536,48 +523,48 @@ func TestAddCoursePoint_MultiplePoints(t *testing.T) {
 
 	// 複数のCoursePointを追加
 	err = route.AddCoursePoint(
-		ptrFloat64(100.0),
-		ptrFloat64(100.0),
-		ptrFloat64(300.0),
-		ptr("Turn right"),
-		ptr("Main St"),
-		ptr("turn"),
-		ptr("right"),
+		new(100.0),
+		new(100.0),
+		new(300.0),
+		new("Turn right"),
+		new("Main St"),
+		new("turn"),
+		new("right"),
 		&Geometry{orb.Point{139.6917, 35.6895}},
-		ptrInt32(90),
-		ptrInt32(180),
+		new(int32(90)),
+		new(int32(180)),
 	)
 	if err != nil {
 		t.Fatalf("Failed to add first course point: %v", err)
 	}
 
 	err = route.AddCoursePoint(
-		ptrFloat64(150.0),
-		ptrFloat64(250.0),
-		ptrFloat64(400.0),
-		ptr("Turn left"),
-		ptr("Second St"),
-		ptr("turn"),
-		ptr("left"),
+		new(150.0),
+		new(250.0),
+		new(400.0),
+		new("Turn left"),
+		new("Second St"),
+		new("turn"),
+		new("left"),
 		&Geometry{orb.Point{139.6950, 35.6897}},
-		ptrInt32(180),
-		ptrInt32(270),
+		new(int32(180)),
+		new(int32(270)),
 	)
 	if err != nil {
 		t.Fatalf("Failed to add second course point: %v", err)
 	}
 
 	err = route.AddCoursePoint(
-		ptrFloat64(200.0),
-		ptrFloat64(450.0),
-		ptrFloat64(500.0),
-		ptr("Go straight"),
-		ptr("Third Ave"),
-		ptr("straight"),
+		new(200.0),
+		new(450.0),
+		new(500.0),
+		new("Go straight"),
+		new("Third Ave"),
+		new("straight"),
 		nil,
 		&Geometry{orb.Point{139.7000, 35.6900}},
-		ptrInt32(270),
-		ptrInt32(270),
+		new(int32(270)),
+		new(int32(270)),
 	)
 	if err != nil {
 		t.Fatalf("Failed to add third course point: %v", err)

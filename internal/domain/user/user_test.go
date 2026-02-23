@@ -7,11 +7,6 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 )
 
-// 文字列のポインタを返すヘルパー関数
-func ptr(s string) *string {
-	return &s
-}
-
 func TestNewUser(t *testing.T) {
 	type args struct {
 		kratosID string
@@ -31,9 +26,9 @@ func TestNewUser(t *testing.T) {
 			args: args{
 				kratosID: "2eb50f70-3a23-4067-99f6-9fd645686880",
 				name:      "John Doe",
-				email:     ptr("test@example.com"),  // ポインタ型
-				firstName: ptr("John"),             
-				lastName:  ptr("Doe"),               
+				email:     new("test@example.com"),  // ポインタ型
+				firstName: new("John"),             
+				lastName:  new("Doe"),               
 			},
 			want: &User{
 				kratosID:      "2eb50f70-3a23-4067-99f6-9fd645686880",
@@ -46,9 +41,9 @@ func TestNewUser(t *testing.T) {
 				countryCode:    nil,
 				postalCode:     nil,
 				geom:           nil,
-				email:          ptr("test@example.com"),  
-				firstName:      ptr("John"),
-				lastName:       ptr("Doe"),
+				email:          new("test@example.com"),  
+				firstName:      new("John"),
+				lastName:       new("Doe"),
 				hasSetLocation: false,
 			}, 
 			wantErr: false,

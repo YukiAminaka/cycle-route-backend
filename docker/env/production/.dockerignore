@@ -1,0 +1,10 @@
+.git
+.gitignore
+test
+*_test.go
+node_modules
+*.md
+*.log
+Dockerfile
+docker-compose.yml
+.env

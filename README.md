@@ -9,6 +9,9 @@
 <img src="https://github.com/user-attachments/assets/15c32d76-7650-4e23-96c7-25e84174c0ab"
      width="600" />
 
+<img width="1301" height="515" alt="cycle-route-archtecture drawio" src="https://github.com/user-attachments/assets/df66c52e-c80c-47d3-9b2f-59dea5735bb9" />
+
+
 
 ## プロジェクト構成
 

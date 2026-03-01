@@ -2,6 +2,7 @@
 # Workload Identity Pool
 # ============================================================
 
+# 外部ワークロードID の集合を表します
 resource "google_iam_workload_identity_pool" "github" {
   workload_identity_pool_id = "${var.project_name}-github-pool"
   display_name              = "GitHub Actions Pool"
@@ -49,6 +50,7 @@ resource "google_service_account" "github_actions" {
 # Allow GitHub Actions (WIF) to impersonate the Service Account
 # ============================================================
 
+# 外部ID(メンバー)に対してGitHub Actionsが指定したサービスアカウントになりすますロールが付与される
 resource "google_service_account_iam_member" "workload_identity_binding" {
   service_account_id = google_service_account.github_actions.name
   role               = "roles/iam.workloadIdentityUser"

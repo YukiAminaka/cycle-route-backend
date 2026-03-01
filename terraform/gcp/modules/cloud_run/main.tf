@@ -87,7 +87,7 @@ resource "google_secret_manager_secret_iam_member" "kratos_dsn" {
 }
 
 # ============================================================
-# Kratos Public (port 4433) — accessible via load balancer
+# Kratos Public (port 4433) —　publicly accessible
 # ============================================================
 
 resource "google_cloud_run_v2_service" "kratos_public" {
@@ -158,7 +158,7 @@ resource "google_cloud_run_v2_service" "kratos_public" {
   ]
 }
 
-# IAM: Allow load balancer / public access to Kratos public
+# IAM: Allow public access to Kratos public
 resource "google_cloud_run_v2_service_iam_member" "kratos_public_invoker" {
   project  = google_cloud_run_v2_service.kratos_public.project
   location = google_cloud_run_v2_service.kratos_public.location

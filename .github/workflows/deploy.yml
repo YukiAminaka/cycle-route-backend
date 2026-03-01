@@ -22,9 +22,12 @@ env:
   ARTIFACT_REPO: ${{ secrets.ARTIFACT_REPO }}
 
   ROOT_PATH_API: .
+  DOCKERFILE_API: docker/api/Dockerfile.prod
+  DOCKERFILE_KRATOS: docker/kratos/Dockerfile
   ROOT_PATH_IAC_APPLICATION: ./terraform/application
 
   IMAGE_SUFFIX_API: api
+  IMAGE_SUFFIX_KRATOS: kratos
 
   API_URL: "http://localhost:8080"
 
@@ -60,7 +63,15 @@ jobs:
         uses: ./.github/actions/docker-image-build-and-rotate
         with:
           context: "${{ env.ROOT_PATH_API }}"
+          dockerfile: "${{ env.DOCKERFILE_API }}"
           image_suffix: "${{ env.IMAGE_SUFFIX_API }}"
+          build_args: ""
+      - name: Handle Docker Image for Kratos
+        uses: ./.github/actions/docker-image-build-and-rotate
+        with:
+          context: "${{ env.ROOT_PATH_API }}"
+          dockerfile: "${{ env.DOCKERFILE_KRATOS }}"
+          image_suffix: "${{ env.IMAGE_SUFFIX_KRATOS }}"
           build_args: ""
 
   terraform-test:

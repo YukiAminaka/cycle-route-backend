@@ -69,7 +69,9 @@ services:
     networks:
       - intranet
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: docker/api/Dockerfile
     volumes:
       - .:/app
     ports:

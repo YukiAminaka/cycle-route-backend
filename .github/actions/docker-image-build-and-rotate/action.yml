@@ -4,6 +4,9 @@ inputs:
   context:
     description: "Build context for Docker image"
     required: true
+  dockerfile:
+    description: "Path to the Dockerfile (relative to context)"
+    required: true
   image_suffix:
     description: "Image suffix for tagging"
     required: true
@@ -19,6 +22,7 @@ runs:
       uses: docker/build-push-action@v6
       with:
         context: ${{ inputs.context }}
+        file: ${{ inputs.dockerfile }}
         platforms: linux/amd64
         push: true
         tags: |

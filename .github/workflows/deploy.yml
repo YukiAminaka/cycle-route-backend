@@ -31,17 +31,18 @@ env:
   OPERATION_ACCOUNT_EMAIL: ${{ secrets.OPERATION_ACCOUNT }}
   WORKLOAD_IDENTITY_PROVIDER_NAME: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
 
-  ARTIFACT_REPO: ${{ secrets.ARTIFACT_REPO }}
+  ARTIFACT_REPO_API: ${{ secrets.ARTIFACT_REPO_API }}
+  ARTIFACT_REPO_KRATOS: ${{ secrets.ARTIFACT_REPO_KRATOS }}
 
   ROOT_PATH_API: .
   DOCKERFILE_API: docker/api/Dockerfile.prod
   DOCKERFILE_KRATOS: docker/kratos/Dockerfile
-  ROOT_PATH_IAC_APPLICATION: ./terraform/application
-
-  IMAGE_SUFFIX_API: api
-  IMAGE_SUFFIX_KRATOS: kratos
+  ROOT_PATH_IAC_APPLICATION: ./terraform
 
   API_URL: "http://localhost:8080"
+concurrency: # 多重実行の防止
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name != 'pull_request'}}
 
 jobs:
   build-api:
@@ -77,14 +78,15 @@ jobs:
         with:
           context: "${{ env.ROOT_PATH_API }}"
           dockerfile: "${{ env.DOCKERFILE_API }}"
-          image_suffix: "${{ env.IMAGE_SUFFIX_API }}"
+          artifact_repo: "${{ env.ARTIFACT_REPO_API }}"
           build_args: ""
+          push_image: ${{ github.event_name != 'pull_request'}} # PRのときはイメージをビルドするだけでpushしない
       - name: Handle Docker Image for Kratos
         uses: ./.github/actions/docker-image-build-and-rotate
         with:
           context: "${{ env.ROOT_PATH_API }}"
           dockerfile: "${{ env.DOCKERFILE_KRATOS }}"
-          image_suffix: "${{ env.IMAGE_SUFFIX_KRATOS }}"
+          artifact_repo: "${{ env.ARTIFACT_REPO_KRATOS }}"
           build_args: ""
           push_image: ${{ github.event_name != 'pull_request'}} # PRのときはイメージをビルドするだけでpushしない
 
@@ -148,7 +150,7 @@ jobs:
       - name: Get Latest Image Tag of Github SHA
         id: get_sha
         run: |
-          github_sha_latest_text=$(gcloud artifacts docker images list ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO }}/${{ env.IMAGE_SUFFIX_WEB }} --limit=1 --include-tags --filter="tags[]=latest" --format="json" | jq -r '.[0].tags[0]')
+          github_sha_latest_text=$(gcloud artifacts docker images list ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO_API }} --limit=1 --include-tags --filter="tags[]=latest" --format="json" | jq -r '.[0].tags[0]')
           if [ -z "$github_sha_latest_text" ]; then
             echo "No Latest image found."
             exit 1
@@ -168,8 +170,8 @@ jobs:
         run: terraform plan -no-color -lock=false
         continue-on-error: true
         env:
-          TF_VAR_docker_image_api: "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO }}/${{ env.IMAGE_SUFFIX_API }}:${{ env.github_sha_latest }}"
-          TF_VAR_docker_image_web: "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO }}/${{ env.IMAGE_SUFFIX_WEB }}:${{ env.github_sha_latest }}"
+          TF_VAR_docker_image_api: "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO_API }}:${{ env.github_sha_latest }}"
+          TF_VAR_docker_image_kratos: "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO_KRATOS }}:${{ env.github_sha_latest }}"
           TF_VAR_region: ${{ env.REGION }}
           TF_VAR_service_account: ${{ env.OPERATION_ACCOUNT_EMAIL }}
       - id: "pull-request-comment"
@@ -234,7 +236,7 @@ jobs:
       - name: Get Latest Image Tag of Github SHA
         id: get_sha
         run: |
-          github_sha_latest_text=$(gcloud artifacts docker images list ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO }}/${{ env.IMAGE_SUFFIX_WEB }} --limit=1 --include-tags --filter="tags[]=latest" --format="json" | jq -r '.[0].tags[0]')
+          github_sha_latest_text=$(gcloud artifacts docker images list ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO_API }} --limit=1 --include-tags --filter="tags[]=latest" --format="json" | jq -r '.[0].tags[0]')
           if [ -z "$github_sha_latest_text" ]; then
             echo "No Latest image found."
             exit 1
@@ -254,8 +256,8 @@ jobs:
         run: terraform plan -no-color -lock=false
         continue-on-error: true
         env:
-          TF_VAR_docker_image_api: "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO }}/${{ env.IMAGE_SUFFIX_API }}:${{ env.github_sha_latest }}"
-          TF_VAR_docker_image_web: "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO }}/${{ env.IMAGE_SUFFIX_WEB }}:${{ env.github_sha_latest }}"
+          TF_VAR_docker_image_api: "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO_API }}:${{ env.github_sha_latest }}"
+          TF_VAR_docker_image_kratos: "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO_KRATOS }}:${{ env.github_sha_latest }}"
           TF_VAR_region: ${{ env.REGION }}
           TF_VAR_service_account: ${{ env.OPERATION_ACCOUNT_EMAIL }}
       - id: apply
@@ -264,7 +266,7 @@ jobs:
         run: terraform apply -auto-approve -lock=false
         continue-on-error: true
         env:
-          TF_VAR_docker_image_api: "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO }}/${{ env.IMAGE_SUFFIX_API }}:${{ env.github_sha_latest }}"
-          TF_VAR_docker_image_web: "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO }}/${{ env.IMAGE_SUFFIX_WEB }}:${{ env.github_sha_latest }}"
+          TF_VAR_docker_image_api: "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO_API }}:${{ env.github_sha_latest }}"
+          TF_VAR_docker_image_kratos: "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO_KRATOS }}:${{ env.github_sha_latest }}"
           TF_VAR_region: ${{ env.REGION }}
           TF_VAR_service_account: ${{ env.OPERATION_ACCOUNT_EMAIL }}

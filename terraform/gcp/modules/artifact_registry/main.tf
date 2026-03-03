@@ -1,3 +1,11 @@
+
+# Artifact Registryのアクセス権限はリポジトリ単位で設定できる。
+# 例えばCloud Run(A)はリポジトリAだけ読み取れればよく、リポジトリBへのアクセスは不要
+# 1つにまとめると過剰な権限を与えることになる
+# クリーンアップポリシーもリポジトリ単位で設定する
+# サービスごとに保持数や期間を変えたい場合、分かれていた方が柔軟に対応できる
+# Artifact Registry / Docker Hubともに「1リポジトリ = 1イメージ種別」が一般的
+
 resource "google_artifact_registry_repository" "repos" {
   for_each = toset(var.repositories)
 

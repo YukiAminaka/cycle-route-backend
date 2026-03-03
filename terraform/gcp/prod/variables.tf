@@ -33,3 +33,12 @@ variable "github_repo" {
   default     = "cycle-route-backend"
 }
 
+variable "docker_image_api" {
+  description = "API container image with tag (e.g. region-docker.pkg.dev/project/repo:sha)"
+  type        = string
+}
+
+variable "docker_image_kratos" {
+  description = "Kratos container image with tag (e.g. region-docker.pkg.dev/project/repo:sha)"
+  type        = string
+}

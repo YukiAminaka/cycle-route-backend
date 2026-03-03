@@ -95,6 +95,10 @@ resource "google_cloud_run_v2_service" "kratos_public" {
   location = var.region
   ingress  = "INGRESS_TRAFFIC_ALL"
 
+  lifecycle {
+    ignore_changes = [template[0].containers[0].image]
+  }
+
   template {
     service_account = google_service_account.kratos.email
 
@@ -176,6 +180,10 @@ resource "google_cloud_run_v2_service" "kratos_admin" {
   location = var.region
   ingress  = "INGRESS_TRAFFIC_INTERNAL_ONLY"
 
+  lifecycle {
+    ignore_changes = [template[0].containers[0].image]
+  }
+
   template {
     service_account = google_service_account.kratos.email
 
@@ -247,6 +255,10 @@ resource "google_cloud_run_v2_service" "api" {
   name     = "${var.project_name}-${var.environment}-api"
   location = var.region
   ingress  = "INGRESS_TRAFFIC_INTERNAL_ONLY"
+
+  lifecycle {
+    ignore_changes = [template[0].containers[0].image]
+  }
 
   template {
     service_account = google_service_account.api.email
@@ -337,6 +349,10 @@ resource "google_cloud_run_v2_service" "frontend" {
   name     = "${var.project_name}-${var.environment}-frontend"
   location = var.region
   ingress  = "INGRESS_TRAFFIC_ALL"
+
+  lifecycle {
+    ignore_changes = [template[0].containers[0].image]
+  }
 
   template {
     service_account = google_service_account.frontend.email

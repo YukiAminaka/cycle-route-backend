@@ -111,6 +111,6 @@ module "cloud_run" {
   kratos_secrets_secret_id = module.secrets.kratos_secrets_secret_id
 
   frontend_image = "${module.artifact_registry.repository_urls["frontend"]}:latest"
-  api_image      = var.docker_image_api
-  kratos_image   = var.docker_image_kratos
+  api_image      = "${module.artifact_registry.repository_urls["api"]}:latest"
+  kratos_image   = "${module.artifact_registry.repository_urls["kratos"]}:latest"
 }

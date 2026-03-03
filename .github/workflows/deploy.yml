@@ -1,4 +1,5 @@
 name: Deploy
+
 on:
   push:
     branches: ["main"]
@@ -7,7 +8,6 @@ on:
       - "internal/**"
       - "config/**"
       - "docker/**"
-      - "terraform/**"
       - "go.mod"
       - "go.sum"
       - ".github/workflows/deploy.yml"
@@ -19,27 +19,30 @@ on:
       - "internal/**"
       - "config/**"
       - "docker/**"
-      - "terraform/**"
       - "go.mod"
       - "go.sum"
       - ".github/workflows/deploy.yml"
       - ".github/actions/**"
+
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   REGION: ${{ secrets.GCP_REGION }}
   BUILD_ACCOUNT_EMAIL: ${{ secrets.BUILD_ACCOUNT }}
-  OPERATION_ACCOUNT_EMAIL: ${{ secrets.OPERATION_ACCOUNT }}
   WORKLOAD_IDENTITY_PROVIDER_NAME: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
 
   ARTIFACT_REPO_API: ${{ secrets.ARTIFACT_REPO_API }}
   ARTIFACT_REPO_KRATOS: ${{ secrets.ARTIFACT_REPO_KRATOS }}
 
+  CLOUD_RUN_API: cycle-route-prod-api
+  CLOUD_RUN_KRATOS_PUBLIC: cycle-route-prod-kratos-public
+  CLOUD_RUN_KRATOS_ADMIN: cycle-route-prod-kratos-admin
+
   ROOT_PATH_API: .
   DOCKERFILE_API: docker/api/Dockerfile.prod
   DOCKERFILE_KRATOS: docker/kratos/Dockerfile
-  ROOT_PATH_IAC_APPLICATION: ./terraform
 
   API_URL: "http://localhost:8080"
+
 concurrency: # 多重実行の防止
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name != 'pull_request'}}
@@ -89,184 +92,24 @@ jobs:
           artifact_repo: "${{ env.ARTIFACT_REPO_KRATOS }}"
           build_args: ""
           push_image: ${{ github.event_name != 'pull_request'}} # PRのときはイメージをビルドするだけでpushしない
-
-  terraform-test:
-    name: Terraform Test
-    runs-on: ubuntu-latest
-    timeout-minutes: 3
-    permissions:
-      id-token: write
-      contents: read
-      pull-requests: write
-    steps:
-      - id: "checkout"
-        name: "Checkout"
-        uses: actions/checkout@v4
-      - id: "auth"
-        name: "Authenticate to Google Cloud"
-        uses: "google-github-actions/auth@v3"
+      - name: Deploy API to Cloud Run
+        if: github.event_name != 'pull_request'
+        uses: google-github-actions/deploy-cloudrun@v3
         with:
-          token_format: "access_token"
-          service_account: ${{ env.BUILD_ACCOUNT_EMAIL }}
-          workload_identity_provider: "${{ env.WORKLOAD_IDENTITY_PROVIDER_NAME }}"
-      - id: "terraform-setup"
-        name: setup
-        uses: hashicorp/setup-terraform@v3
-      - id: fmt
-        name: Terraform fmt
-        working-directory: "${{ env.ROOT_PATH_IAC_APPLICATION }}"
-        run: terraform fmt -recursive
-        continue-on-error: true
-      - id: init
-        name: Terraform Init
-        working-directory: "${{ env.ROOT_PATH_IAC_APPLICATION }}"
-        run: terraform init
-      - id: validate
-        name: Terraform Validate
-        working-directory: "${{ env.ROOT_PATH_IAC_APPLICATION }}"
-        run: terraform validate -no-color
-
-  terraform-plan:
-    name: Terraform Plan
-    runs-on: ubuntu-latest
-    timeout-minutes: 2
-    if: (github.event_name == 'pull_request' && github.base_ref == 'main')
-    needs: [terraform-test, build-api]
-    permissions:
-      id-token: write
-      contents: read
-      pull-requests: write
-    steps:
-      - id: "checkout"
-        name: "Checkout"
-        uses: actions/checkout@v4
-      - id: "auth"
-        name: "Authenticate to Google Cloud"
-        uses: "google-github-actions/auth@v3"
+          service: ${{ env.CLOUD_RUN_API }}
+          image: "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO_API }}:${{ github.sha }}"
+          region: ${{ env.REGION }}
+      - name: Deploy Kratos Public to Cloud Run
+        if: github.event_name != 'pull_request'
+        uses: google-github-actions/deploy-cloudrun@v3
         with:
-          token_format: "access_token"
-          service_account: ${{ env.BUILD_ACCOUNT_EMAIL }}
-          workload_identity_provider: "${{ env.WORKLOAD_IDENTITY_PROVIDER_NAME }}"
-      - name: Get Latest Image Tag of Github SHA
-        id: get_sha
-        run: |
-          github_sha_latest_text=$(gcloud artifacts docker images list ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO_API }} --limit=1 --include-tags --filter="tags[]=latest" --format="json" | jq -r '.[0].tags[0]')
-          if [ -z "$github_sha_latest_text" ]; then
-            echo "No Latest image found."
-            exit 1
-          fi
-          echo "Latest image sha tag is $github_sha_latest_text"
-          echo "github_sha_latest=$github_sha_latest_text" >> $GITHUB_ENV
-      - id: "terraform-setup"
-        name: setup
-        uses: hashicorp/setup-terraform@v3
-      - id: init
-        name: Terraform Init
-        working-directory: "${{ env.ROOT_PATH_IAC_APPLICATION }}"
-        run: terraform init
-      - id: plan
-        name: Terraform Plan
-        working-directory: "${{ env.ROOT_PATH_IAC_APPLICATION }}"
-        run: terraform plan -no-color -lock=false
-        continue-on-error: true
-        env:
-          TF_VAR_docker_image_api: "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO_API }}:${{ env.github_sha_latest }}"
-          TF_VAR_docker_image_kratos: "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO_KRATOS }}:${{ env.github_sha_latest }}"
-          TF_VAR_region: ${{ env.REGION }}
-          TF_VAR_service_account: ${{ env.OPERATION_ACCOUNT_EMAIL }}
-      - id: "pull-request-comment"
-        name: Create Pull Request Comment
-        uses: actions/github-script@v7
-        env:
-          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+          service: ${{ env.CLOUD_RUN_KRATOS_PUBLIC }}
+          image: "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO_KRATOS }}:${{ github.sha }}"
+          region: ${{ env.REGION }}
+      - name: Deploy Kratos Admin to Cloud Run
+        if: github.event_name != 'pull_request'
+        uses: google-github-actions/deploy-cloudrun@v3
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
-            #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
-            #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
-            <details><summary>Validation Output</summary>
-
-            \`\`\`\n
-            ${{ steps.validate.outputs.stdout }}
-            \`\`\`
-
-            </details>
-
-            #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
-
-            <details><summary>Show Plan</summary>
-
-            \`\`\`\n
-            ${process.env.PLAN}
-            \`\`\`
-
-            </details>
-
-            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ env.tf_actions_working_dir }}\`, Workflow: \`${{ github.workflow }}\`*`;
-
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: output
-            })
-
-  deploy:
-    name: Deploy(terraform apply)
-    runs-on: ubuntu-latest
-    timeout-minutes: 8
-    if: github.ref == 'refs/heads/main'
-    needs: [build-api]
-    permissions:
-      id-token: write
-      contents: read
-      pull-requests: write
-    steps:
-      - id: "checkout"
-        name: "Checkout"
-        uses: actions/checkout@v4
-      - id: "auth"
-        name: "Authenticate to Google Cloud"
-        uses: "google-github-actions/auth@v3"
-        with:
-          token_format: "access_token"
-          service_account: ${{ env.BUILD_ACCOUNT_EMAIL }}
-          workload_identity_provider: "${{ env.WORKLOAD_IDENTITY_PROVIDER_NAME }}"
-      - name: Get Latest Image Tag of Github SHA
-        id: get_sha
-        run: |
-          github_sha_latest_text=$(gcloud artifacts docker images list ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO_API }} --limit=1 --include-tags --filter="tags[]=latest" --format="json" | jq -r '.[0].tags[0]')
-          if [ -z "$github_sha_latest_text" ]; then
-            echo "No Latest image found."
-            exit 1
-          fi
-          echo "Latest image sha tag is $github_sha_latest_text"
-          echo "github_sha_latest=$github_sha_latest_text" >> $GITHUB_ENV
-      - id: "terraform-setup"
-        name: setup
-        uses: hashicorp/setup-terraform@v3
-      - id: init
-        name: Terraform Init
-        working-directory: "${{ env.ROOT_PATH_IAC_APPLICATION }}"
-        run: terraform init
-      - id: plan
-        name: Terraform Plan
-        working-directory: "${{ env.ROOT_PATH_IAC_APPLICATION }}"
-        run: terraform plan -no-color -lock=false
-        continue-on-error: true
-        env:
-          TF_VAR_docker_image_api: "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO_API }}:${{ env.github_sha_latest }}"
-          TF_VAR_docker_image_kratos: "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO_KRATOS }}:${{ env.github_sha_latest }}"
-          TF_VAR_region: ${{ env.REGION }}
-          TF_VAR_service_account: ${{ env.OPERATION_ACCOUNT_EMAIL }}
-      - id: apply
-        name: Terraform Apply
-        working-directory: "${{ env.ROOT_PATH_IAC_APPLICATION }}"
-        run: terraform apply -auto-approve -lock=false
-        continue-on-error: true
-        env:
-          TF_VAR_docker_image_api: "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO_API }}:${{ env.github_sha_latest }}"
-          TF_VAR_docker_image_kratos: "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO_KRATOS }}:${{ env.github_sha_latest }}"
-          TF_VAR_region: ${{ env.REGION }}
-          TF_VAR_service_account: ${{ env.OPERATION_ACCOUNT_EMAIL }}
+          service: ${{ env.CLOUD_RUN_KRATOS_ADMIN }}
+          image: "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO_KRATOS }}:${{ github.sha }}"
+          region: ${{ env.REGION }}

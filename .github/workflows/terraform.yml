@@ -43,7 +43,7 @@ jobs:
         uses: google-github-actions/auth@v3
         with:
           token_format: access_token
-          service_account: ${{ env.BUILD_ACCOUNT_EMAIL }}
+          service_account: ${{ env.OPERATION_ACCOUNT_EMAIL }}
           workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER_NAME }}
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -121,7 +121,7 @@ jobs:
         uses: google-github-actions/auth@v3
         with:
           token_format: access_token
-          service_account: ${{ env.BUILD_ACCOUNT_EMAIL }}
+          service_account: ${{ env.OPERATION_ACCOUNT_EMAIL }}
           workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER_NAME }}
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3

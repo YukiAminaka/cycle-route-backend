@@ -40,6 +40,7 @@ resource "google_iam_workload_identity_pool_provider" "github" {
 # Service Account for GitHub Actions
 # ============================================================
 
+# Actionsで借用したい権限を持つサービスアカウント
 resource "google_service_account" "github_actions" {
   account_id   = "${var.project_name}-github-actions"
   display_name = "${var.project_name} GitHub Actions Service Account"
@@ -61,6 +62,8 @@ resource "google_service_account_iam_member" "workload_identity_binding" {
 # IAM: Artifact Registry への push 権限
 # ============================================================
 
+# 指定したプロジェクトの特定のプリンシパルの特定のロールを一括で管理するリソース
+# 今回は、GitHub Actionsのサービスアカウントに対して、Artifact Registryへのpush権限を付与するために使用
 resource "google_project_iam_member" "github_actions_ar_writer" {
   project = var.project_id
   role    = "roles/artifactregistry.writer"
@@ -88,4 +91,60 @@ resource "google_service_account_iam_member" "github_actions_sa_user" {
   service_account_id = "projects/${var.project_id}/serviceAccounts/${each.value}"
   role               = "roles/iam.serviceAccountUser"
   member             = "serviceAccount:${google_service_account.github_actions.email}"
+}
+
+# ============================================================
+# Service Account for Terraform
+# ============================================================
+
+resource "google_service_account" "terraform" {
+  account_id   = "${var.project_name}-terraform"
+  display_name = "${var.project_name} Terraform Service Account"
+  description  = "Service Account used by GitHub Actions for Terraform operations"
+}
+
+# ============================================================
+# Allow GitHub Actions (WIF) to impersonate the Terraform SA
+# ============================================================
+
+resource "google_service_account_iam_member" "terraform_wif_binding" {
+  service_account_id = google_service_account.terraform.name
+  role               = "roles/iam.workloadIdentityUser"
+  member             = "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github.name}/attribute.repository/${var.github_org}/${var.github_repo}"
+}
+
+# ============================================================
+# IAM: Terraform SA に必要なプロジェクトレベル権限
+# ============================================================
+
+locals {
+  terraform_project_roles = toset([
+    "roles/serviceusage.serviceUsageAdmin",  # google_project_service でAPIを有効化
+    "roles/iam.serviceAccountAdmin",         # google_service_account の作成・IAM設定
+    "roles/iam.workloadIdentityPoolAdmin",   # google_iam_workload_identity_pool の管理
+    "roles/resourcemanager.projectIamAdmin", # google_project_iam_member の設定
+    "roles/run.admin",                       # Cloud Run サービス作成・IAM設定
+    "roles/secretmanager.admin",             # google_secret_manager_secret の管理
+    "roles/cloudsql.admin",                  # google_sql_database_instance の管理
+    "roles/artifactregistry.admin",          # google_artifact_registry_repository の作成
+  ])
+}
+
+resource "google_project_iam_member" "terraform_roles" {
+  for_each = local.terraform_project_roles
+
+  project = var.project_id
+  role    = each.value
+  member  = "serviceAccount:${google_service_account.terraform.email}"
+}
+
+# ============================================================
+# IAM: GCS state バケットへのアクセス（バケットレベルで最小権限）
+# roles/storage.admin はバケット自体のIAM設定(setIamPolicy)を含むため必要
+# ============================================================
+
+resource "google_storage_bucket_iam_member" "terraform_state" {
+  bucket = var.terraform_state_bucket
+  role   = "roles/storage.objectAdmin"
+  member = "serviceAccount:${google_service_account.terraform.email}"
 }

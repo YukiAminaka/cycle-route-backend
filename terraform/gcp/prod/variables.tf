@@ -19,7 +19,6 @@ variable "project_name" {
 variable "environment" {
   description = "Environment name"
   type        = string
-  default     = "prod"
 }
 
 variable "github_org" {

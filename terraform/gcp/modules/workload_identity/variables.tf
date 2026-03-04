@@ -23,3 +23,8 @@ variable "cloud_run_service_account_emails" {
   type        = list(string)
   default     = []
 }
+
+variable "terraform_state_bucket" {
+  description = "Terraform state を保存する GCS バケット名"
+  type        = string
+}

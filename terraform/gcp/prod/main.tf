@@ -32,7 +32,7 @@ resource "google_project_service" "apis" {
     "run.googleapis.com", # Cloud Run Admin API を有効にする
     "sqladmin.googleapis.com", # SQL Admin API を有効にする
     "secretmanager.googleapis.com", # Secret Manager API を有効にする
-    "artifactregistry.googleapis.com",
+    "artifactregistry.googleapis.com", # Artifact Registry API を有効にする
     "compute.googleapis.com",
     "cloudresourcemanager.googleapis.com",
     "iam.googleapis.com",
@@ -90,6 +90,8 @@ module "workload_identity" {
     module.cloud_run.api_service_account_email,
     module.cloud_run.kratos_service_account_email,
   ]
+
+  terraform_state_bucket = "cycle-route-488410-terraform-state"
 
   depends_on = [google_project_service.apis]
 }

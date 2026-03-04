@@ -74,8 +74,20 @@ resource "google_secret_manager_secret_iam_member" "kratos_db_password" {
   member    = "serviceAccount:${google_service_account.kratos.email}"
 }
 
-resource "google_secret_manager_secret_iam_member" "kratos_kratos_secrets" {
-  secret_id = var.kratos_secrets_secret_id
+resource "google_secret_manager_secret_iam_member" "kratos_cookie_secret" {
+  secret_id = var.kratos_cookie_secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.kratos.email}"
+}
+
+resource "google_secret_manager_secret_iam_member" "kratos_cipher_secret" {
+  secret_id = var.kratos_cipher_secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.kratos.email}"
+}
+
+resource "google_secret_manager_secret_iam_member" "kratos_smtp" {
+  secret_id = var.kratos_smtp_secret_id
   role      = "roles/secretmanager.secretAccessor"
   member    = "serviceAccount:${google_service_account.kratos.email}"
 }
@@ -134,7 +146,7 @@ resource "google_cloud_run_v2_service" "kratos_public" {
       }
 
       env {
-        name = "DSN"
+        name = "KRATOS_DSN"
         value_source {
           secret_key_ref {
             secret  = google_secret_manager_secret.kratos_dsn.secret_id
@@ -144,13 +156,53 @@ resource "google_cloud_run_v2_service" "kratos_public" {
       }
 
       env {
-        name = "SECRETS_COOKIE"
+        name = "KRATOS_COOKIE_SECRET"
         value_source {
           secret_key_ref {
-            secret  = var.kratos_secrets_secret_id
+            secret  = var.kratos_cookie_secret_id
             version = "latest"
           }
         }
+      }
+
+      env {
+        name = "KRATOS_CIPHER_SECRET"
+        value_source {
+          secret_key_ref {
+            secret  = var.kratos_cipher_secret_id
+            version = "latest"
+          }
+        }
+      }
+
+      env {
+        name = "KRATOS_SMTP_CONNECTION_URI"
+        value_source {
+          secret_key_ref {
+            secret  = var.kratos_smtp_secret_id
+            version = "latest"
+          }
+        }
+      }
+
+      env {
+        name  = "KRATOS_PUBLIC_BASE_URL"
+        value = var.kratos_public_base_url
+      }
+
+      env {
+        name  = "KRATOS_ADMIN_BASE_URL"
+        value = var.kratos_admin_base_url
+      }
+
+      env {
+        name  = "FRONTEND_URL"
+        value = var.frontend_url
+      }
+
+      env {
+        name  = "BACKEND_URL"
+        value = var.backend_url
       }
     }
   }
@@ -158,6 +210,9 @@ resource "google_cloud_run_v2_service" "kratos_public" {
   depends_on = [
     google_secret_manager_secret_version.kratos_dsn,
     google_secret_manager_secret_iam_member.kratos_dsn,
+    google_secret_manager_secret_iam_member.kratos_cookie_secret,
+    google_secret_manager_secret_iam_member.kratos_cipher_secret,
+    google_secret_manager_secret_iam_member.kratos_smtp,
     google_project_iam_member.kratos_cloudsql_client,
   ]
 }
@@ -219,7 +274,7 @@ resource "google_cloud_run_v2_service" "kratos_admin" {
       }
 
       env {
-        name = "DSN"
+        name = "KRATOS_DSN"
         value_source {
           secret_key_ref {
             secret  = google_secret_manager_secret.kratos_dsn.secret_id
@@ -229,13 +284,53 @@ resource "google_cloud_run_v2_service" "kratos_admin" {
       }
 
       env {
-        name = "SECRETS_COOKIE"
+        name = "KRATOS_COOKIE_SECRET"
         value_source {
           secret_key_ref {
-            secret  = var.kratos_secrets_secret_id
+            secret  = var.kratos_cookie_secret_id
             version = "latest"
           }
         }
+      }
+
+      env {
+        name = "KRATOS_CIPHER_SECRET"
+        value_source {
+          secret_key_ref {
+            secret  = var.kratos_cipher_secret_id
+            version = "latest"
+          }
+        }
+      }
+
+      env {
+        name = "KRATOS_SMTP_CONNECTION_URI"
+        value_source {
+          secret_key_ref {
+            secret  = var.kratos_smtp_secret_id
+            version = "latest"
+          }
+        }
+      }
+
+      env {
+        name  = "KRATOS_PUBLIC_BASE_URL"
+        value = var.kratos_public_base_url
+      }
+
+      env {
+        name  = "KRATOS_ADMIN_BASE_URL"
+        value = var.kratos_admin_base_url
+      }
+
+      env {
+        name  = "FRONTEND_URL"
+        value = var.frontend_url
+      }
+
+      env {
+        name  = "BACKEND_URL"
+        value = var.backend_url
       }
     }
   }
@@ -243,6 +338,9 @@ resource "google_cloud_run_v2_service" "kratos_admin" {
   depends_on = [
     google_secret_manager_secret_version.kratos_dsn,
     google_secret_manager_secret_iam_member.kratos_dsn,
+    google_secret_manager_secret_iam_member.kratos_cookie_secret,
+    google_secret_manager_secret_iam_member.kratos_cipher_secret,
+    google_secret_manager_secret_iam_member.kratos_smtp,
     google_project_iam_member.kratos_cloudsql_client,
   ]
 }

@@ -44,9 +44,43 @@ variable "db_password_secret_id" {
   type        = string
 }
 
-variable "kratos_secrets_secret_id" {
-  description = "Secret Manager secret ID for Kratos cookie/CSRF secrets"
+variable "kratos_cookie_secret_id" {
+  description = "Secret Manager secret ID for Kratos cookie secret"
   type        = string
+}
+
+variable "kratos_cipher_secret_id" {
+  description = "Secret Manager secret ID for Kratos cipher secret"
+  type        = string
+}
+
+variable "kratos_smtp_secret_id" {
+  description = "Secret Manager secret ID for Kratos SMTP connection URI"
+  type        = string
+}
+
+variable "kratos_public_base_url" {
+  description = "Externally accessible base URL for Kratos public API (set after first deployment)"
+  type        = string
+  default     = ""
+}
+
+variable "kratos_admin_base_url" {
+  description = "Internally accessible base URL for Kratos admin API (set after first deployment)"
+  type        = string
+  default     = ""
+}
+
+variable "frontend_url" {
+  description = "Frontend service URL (set after first deployment)"
+  type        = string
+  default     = ""
+}
+
+variable "backend_url" {
+  description = "API service URL (set after first deployment)"
+  type        = string
+  default     = ""
 }
 
 variable "frontend_image" {

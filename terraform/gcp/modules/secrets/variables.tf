@@ -7,3 +7,9 @@ variable "environment" {
   description = "Environment name"
   type        = string
 }
+
+variable "kratos_smtp_connection_uri" {
+  description = "SMTP connection URI for Kratos courier (e.g. smtps://user:password@smtp.example.com:465)"
+  type        = string
+  sensitive   = true
+}

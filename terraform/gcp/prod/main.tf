@@ -12,7 +12,7 @@ terraform {
   }
 
   backend "gcs" {
-    bucket = "cycle-route-488410-terraform-state"
+    bucket = "rideline-489422-terraform-state"
     prefix  = "terraform/state"
   }
 }
@@ -92,7 +92,7 @@ module "workload_identity" {
     module.cloud_run.kratos_service_account_email,
   ]
 
-  terraform_state_bucket = "cycle-route-488410-terraform-state"
+  terraform_state_bucket = "rideline-489422-terraform-state"
 
   depends_on = [google_project_service.apis]
 }

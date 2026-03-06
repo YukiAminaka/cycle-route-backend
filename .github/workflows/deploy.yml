@@ -33,9 +33,9 @@ env:
   ARTIFACT_REPO_API: ${{ secrets.ARTIFACT_REPO_API }}
   ARTIFACT_REPO_KRATOS: ${{ secrets.ARTIFACT_REPO_KRATOS }}
 
-  CLOUD_RUN_API: cycle-route-prod-api
-  CLOUD_RUN_KRATOS_PUBLIC: cycle-route-prod-kratos-public
-  CLOUD_RUN_KRATOS_ADMIN: cycle-route-prod-kratos-admin
+  CLOUD_RUN_API: rideline-prod-api
+  CLOUD_RUN_KRATOS_PUBLIC: rideline-prod-kratos-public
+  CLOUD_RUN_KRATOS_ADMIN: rideline-prod-kratos-admin
 
   ROOT_PATH_API: .
   DOCKERFILE_API: docker/api/Dockerfile.prod

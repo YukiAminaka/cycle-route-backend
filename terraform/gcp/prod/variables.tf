@@ -13,7 +13,7 @@ variable "region" {
 variable "project_name" {
   description = "Project name used for resource naming"
   type        = string
-  default     = "cycle-route"
+  default     = "rideline"
 }
 
 variable "environment" {

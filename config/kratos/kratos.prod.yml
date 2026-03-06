@@ -32,7 +32,7 @@ selfservice:
       enabled: true
     totp:
       config:
-        issuer: Kratos
+        issuer: Rideline
       enabled: true
     lookup_secret:
       enabled: true
@@ -115,3 +115,7 @@ courier:
 
 feature_flags:
   use_continue_with_transitions: true
+
+session:
+  cookie:
+    domain: ride-line.net

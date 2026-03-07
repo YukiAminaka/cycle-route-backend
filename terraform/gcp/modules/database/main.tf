@@ -50,3 +50,14 @@ resource "google_sql_user" "main" {
   instance = google_sql_database_instance.main.name
   password = var.db_password
 }
+
+resource "google_service_account" "database" {
+  account_id   = "${var.project_name}-${var.environment}-db-sa"
+  display_name = "${var.project_name} Database Service Account"
+}
+
+resource "google_project_iam_member" "database_sa" {
+  project = var.project_id
+  role    = "roles/cloudsql.client"
+  member  = "serviceAccount:${google_service_account.database.email}"
+}

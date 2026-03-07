@@ -60,6 +60,7 @@ module "secrets" {
 module "database" {
   source = "../modules/database"
 
+  project_id   = var.project_id
   project_name = var.project_name
   environment  = var.environment
   region       = var.region

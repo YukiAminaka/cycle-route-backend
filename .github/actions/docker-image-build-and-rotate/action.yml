@@ -37,6 +37,7 @@ runs:
 
     # Artifact Registryにあるイメージのタグのリストを取得する
     - name: Get Image Tags
+      if: inputs.push_image == 'true'
       shell: bash
       run: |
         TAGS_JSON=$(gcloud artifacts docker tags list ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ inputs.artifact_repo }} --format="json(TAG)")
@@ -46,6 +47,7 @@ runs:
 
     # Artifact Registryにあるbackupイメージを削除する
     - name: Remove Previous Image
+      if: inputs.push_image == 'true'
       shell: bash
       run: |
         TAGS_JSON=$(cat /tmp/image_tags.json)
@@ -59,6 +61,7 @@ runs:
 
     # Artifact Registryにあるlatestイメージにbackupタグをつける
     - name: Tag Docker image backup
+      if: inputs.push_image == 'true'
       shell: bash
       run: |
         TAGS_JSON=$(cat /tmp/image_tags.json)
@@ -76,6 +79,7 @@ runs:
 
     # Artifact Registryにpushしたイメージにlatestタグをつける
     - name: Tag Docker image latest
+      if: inputs.push_image == 'true'
       shell: bash
       run: |
         echo "Tagging pushed image as latest..."

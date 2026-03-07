@@ -36,6 +36,7 @@ env:
   CLOUD_RUN_API: rideline-prod-api
   CLOUD_RUN_KRATOS_PUBLIC: rideline-prod-kratos-public
   CLOUD_RUN_KRATOS_ADMIN: rideline-prod-kratos-admin
+  CLOUD_RUN_KRATOS_MIGRATE_JOB: rideline-prod-kratos-migrate
 
   ROOT_PATH_API: .
   DOCKERFILE_API: docker/api/Dockerfile.prod
@@ -99,6 +100,18 @@ jobs:
           service: ${{ env.CLOUD_RUN_API }}
           image: "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO_API }}:${{ github.sha }}"
           region: ${{ env.REGION }}
+      - name: Update Kratos Migration Job image
+        if: github.event_name != 'pull_request'
+        run: |
+          gcloud run jobs update ${{ env.CLOUD_RUN_KRATOS_MIGRATE_JOB }} \
+            --image "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO_KRATOS }}:${{ github.sha }}" \
+            --region ${{ env.REGION }}
+      - name: Run Kratos Migration
+        if: github.event_name != 'pull_request'
+        run: |
+          gcloud run jobs execute ${{ env.CLOUD_RUN_KRATOS_MIGRATE_JOB }} \
+            --region ${{ env.REGION }} \
+            --wait
       - name: Deploy Kratos Public to Cloud Run
         if: github.event_name != 'pull_request'
         uses: google-github-actions/deploy-cloudrun@v3

@@ -116,7 +116,7 @@ resource "google_cloud_run_v2_service" "kratos_public" {
 
     scaling {
       min_instance_count = 0
-      max_instance_count = 3
+      max_instance_count = 2
     }
 
     volumes {
@@ -244,7 +244,7 @@ resource "google_cloud_run_v2_service" "kratos_admin" {
 
     scaling {
       min_instance_count = 0
-      max_instance_count = 3
+      max_instance_count = 2
     }
 
     volumes {
@@ -346,6 +346,120 @@ resource "google_cloud_run_v2_service" "kratos_admin" {
 }
 
 # ============================================================
+# Kratos Migration Job
+# ============================================================
+
+resource "google_cloud_run_v2_job" "kratos_migrate" {
+  name     = "${var.project_name}-${var.environment}-kratos-migrate"
+  location = var.region
+
+  lifecycle {
+    ignore_changes = [template[0].template[0].containers[0].image]
+  }
+
+  template {
+    template {
+      service_account = google_service_account.kratos.email
+
+      max_retries = 1
+
+      volumes {
+        name = "cloudsql"
+        cloud_sql_instance {
+          instances = [var.db_connection_name]
+        }
+      }
+
+      containers {
+        image = var.kratos_image
+        args  = ["-c", "/etc/config/kratos/kratos.prod.yml", "migrate", "sql", "-e", "--yes"]
+
+        resources {
+          limits = {
+            cpu    = "1"
+            memory = "512Mi"
+          }
+        }
+
+        volume_mounts {
+          name       = "cloudsql"
+          mount_path = "/cloudsql"
+        }
+
+        env {
+          name = "KRATOS_DSN"
+          value_source {
+            secret_key_ref {
+              secret  = google_secret_manager_secret.kratos_dsn.secret_id
+              version = "latest"
+            }
+          }
+        }
+
+        env {
+          name = "KRATOS_COOKIE_SECRET"
+          value_source {
+            secret_key_ref {
+              secret  = var.kratos_cookie_secret_id
+              version = "latest"
+            }
+          }
+        }
+
+        env {
+          name = "KRATOS_CIPHER_SECRET"
+          value_source {
+            secret_key_ref {
+              secret  = var.kratos_cipher_secret_id
+              version = "latest"
+            }
+          }
+        }
+
+        env {
+          name = "KRATOS_SMTP_CONNECTION_URI"
+          value_source {
+            secret_key_ref {
+              secret  = var.kratos_smtp_secret_id
+              version = "latest"
+            }
+          }
+        }
+
+        env {
+          name  = "KRATOS_PUBLIC_BASE_URL"
+          value = var.kratos_public_base_url
+        }
+
+        env {
+          name  = "KRATOS_ADMIN_BASE_URL"
+          value = var.kratos_admin_base_url
+        }
+
+        env {
+          name  = "FRONTEND_URL"
+          value = var.frontend_url
+        }
+
+        env {
+          name  = "BACKEND_URL"
+          value = var.backend_url
+        }
+      }
+    }
+  }
+
+  depends_on = [
+    google_secret_manager_secret_version.kratos_dsn,
+    google_secret_manager_secret_iam_member.kratos_dsn,
+    google_secret_manager_secret_iam_member.kratos_cookie_secret,
+    google_secret_manager_secret_iam_member.kratos_cipher_secret,
+    google_secret_manager_secret_iam_member.kratos_smtp,
+    google_project_iam_member.kratos_cloudsql_client,
+  ]
+}
+
+# ============================================================
 # API Service (port 8080) — internal only
 # ============================================================
 
@@ -363,7 +477,7 @@ resource "google_cloud_run_v2_service" "api" {
 
     scaling {
       min_instance_count = 0
-      max_instance_count = 3
+      max_instance_count = 2
     }
 
     volumes {
@@ -457,7 +571,7 @@ resource "google_cloud_run_v2_service" "frontend" {
 
     scaling {
       min_instance_count = 0
-      max_instance_count = 3
+      max_instance_count = 2
     }
 
     containers {

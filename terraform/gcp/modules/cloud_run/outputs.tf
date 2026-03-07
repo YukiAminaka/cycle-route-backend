@@ -47,3 +47,8 @@ output "kratos_service_account_email" {
   description = "Kratos Cloud Run service account email"
   value       = google_service_account.kratos.email
 }
+
+output "kratos_migrate_job_name" {
+  description = "Kratos migration Cloud Run Job name"
+  value       = google_cloud_run_v2_job.kratos_migrate.name
+}

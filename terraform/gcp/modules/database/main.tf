@@ -4,7 +4,8 @@ resource "google_sql_database_instance" "main" {
   region           = var.region
 
   settings {
-    tier = var.instance_tier # マシンタイプ
+    tier    = var.instance_tier # マシンタイプ
+    edition = "ENTERPRISE"
 
     ip_configuration {
       ipv4_enabled = true # このCloud SQLインスタンスにパブリックIPv4アドレスを割り当てるかどうか

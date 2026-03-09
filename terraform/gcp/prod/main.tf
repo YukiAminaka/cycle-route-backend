@@ -53,6 +53,7 @@ module "secrets" {
   project_name               = var.project_name
   environment                = var.environment
   kratos_smtp_connection_uri = var.kratos_smtp_connection_uri
+  kratos_smtp_from_address   = var.kratos_smtp_from_address
 
   depends_on = [google_project_service.apis] # google_project_service.apisが作成されてから作成する
 }
@@ -112,9 +113,10 @@ module "cloud_run" {
   db_password           = module.secrets.db_password
   db_password_secret_id = module.secrets.db_password_secret_id
 
-  kratos_cookie_secret_id = module.secrets.kratos_cookie_secret_id
-  kratos_cipher_secret_id = module.secrets.kratos_cipher_secret_id
-  kratos_smtp_secret_id   = module.secrets.kratos_smtp_secret_id
+  kratos_cookie_secret_id            = module.secrets.kratos_cookie_secret_id
+  kratos_cipher_secret_id            = module.secrets.kratos_cipher_secret_id
+  kratos_smtp_secret_id              = module.secrets.kratos_smtp_secret_id
+  kratos_smtp_from_address_secret_id = module.secrets.kratos_smtp_from_address_secret_id
 
   kratos_public_base_url = var.kratos_public_base_url
   kratos_admin_base_url  = var.kratos_admin_base_url

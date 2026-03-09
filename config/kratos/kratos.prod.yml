@@ -112,6 +112,8 @@ identity:
 courier:
   smtp:
     connection_uri: ${KRATOS_SMTP_CONNECTION_URI}
+    from_address: ${KRATOS_SMTP_FROM_ADDRESS}
+    from_name: Rideline
 
 feature_flags:
   use_continue_with_transitions: true

@@ -92,6 +92,12 @@ resource "google_secret_manager_secret_iam_member" "kratos_smtp" {
   member    = "serviceAccount:${google_service_account.kratos.email}"
 }
 
+resource "google_secret_manager_secret_iam_member" "kratos_smtp_from_address" {
+  secret_id = var.kratos_smtp_from_address_secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.kratos.email}"
+}
+
 resource "google_secret_manager_secret_iam_member" "kratos_dsn" {
   secret_id = google_secret_manager_secret.kratos_dsn.secret_id
   role      = "roles/secretmanager.secretAccessor"
@@ -186,6 +192,16 @@ resource "google_cloud_run_v2_service" "kratos_public" {
       }
 
       env {
+        name = "KRATOS_SMTP_FROM_ADDRESS"
+        value_source {
+          secret_key_ref {
+            secret  = var.kratos_smtp_from_address_secret_id
+            version = "latest"
+          }
+        }
+      }
+
+      env {
         name  = "KRATOS_PUBLIC_BASE_URL"
         value = var.kratos_public_base_url
       }
@@ -213,6 +229,7 @@ resource "google_cloud_run_v2_service" "kratos_public" {
     google_secret_manager_secret_iam_member.kratos_cookie_secret,
     google_secret_manager_secret_iam_member.kratos_cipher_secret,
     google_secret_manager_secret_iam_member.kratos_smtp,
+    google_secret_manager_secret_iam_member.kratos_smtp_from_address,
     google_project_iam_member.kratos_cloudsql_client,
   ]
 }
@@ -314,6 +331,16 @@ resource "google_cloud_run_v2_service" "kratos_admin" {
       }
 
       env {
+        name = "KRATOS_SMTP_FROM_ADDRESS"
+        value_source {
+          secret_key_ref {
+            secret  = var.kratos_smtp_from_address_secret_id
+            version = "latest"
+          }
+        }
+      }
+
+      env {
         name  = "KRATOS_PUBLIC_BASE_URL"
         value = var.kratos_public_base_url
       }
@@ -341,6 +368,7 @@ resource "google_cloud_run_v2_service" "kratos_admin" {
     google_secret_manager_secret_iam_member.kratos_cookie_secret,
     google_secret_manager_secret_iam_member.kratos_cipher_secret,
     google_secret_manager_secret_iam_member.kratos_smtp,
+    google_secret_manager_secret_iam_member.kratos_smtp_from_address,
     google_project_iam_member.kratos_cloudsql_client,
   ]
 }
@@ -427,6 +455,16 @@ resource "google_cloud_run_v2_job" "kratos_migrate" {
         }
 
         env {
+          name = "KRATOS_SMTP_FROM_ADDRESS"
+          value_source {
+            secret_key_ref {
+              secret  = var.kratos_smtp_from_address_secret_id
+              version = "latest"
+            }
+          }
+        }
+
+        env {
           name  = "KRATOS_PUBLIC_BASE_URL"
           value = var.kratos_public_base_url
         }
@@ -455,6 +493,7 @@ resource "google_cloud_run_v2_job" "kratos_migrate" {
     google_secret_manager_secret_iam_member.kratos_cookie_secret,
     google_secret_manager_secret_iam_member.kratos_cipher_secret,
     google_secret_manager_secret_iam_member.kratos_smtp,
+    google_secret_manager_secret_iam_member.kratos_smtp_from_address,
     google_project_iam_member.kratos_cloudsql_client,
   ]
 }

@@ -38,6 +38,12 @@ variable "kratos_smtp_connection_uri" {
   sensitive   = true
 }
 
+variable "kratos_smtp_from_address" {
+  description = "From email address for Kratos courier SMTP"
+  type        = string
+  sensitive   = true
+}
+
 variable "kratos_public_base_url" {
   description = "Externally accessible base URL for Kratos public API. Set after first deployment using terraform output kratos_public_url."
   type        = string

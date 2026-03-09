@@ -59,6 +59,11 @@ variable "kratos_smtp_secret_id" {
   type        = string
 }
 
+variable "kratos_smtp_from_address_secret_id" {
+  description = "Secret Manager secret ID for Kratos SMTP from address"
+  type        = string
+}
+
 variable "kratos_public_base_url" {
   description = "Externally accessible base URL for Kratos public API (set after first deployment)"
   type        = string

@@ -13,3 +13,9 @@ variable "kratos_smtp_connection_uri" {
   type        = string
   sensitive   = true
 }
+
+variable "kratos_smtp_from_address" {
+  description = "From email address for Kratos courier SMTP"
+  type        = string
+  sensitive   = true
+}

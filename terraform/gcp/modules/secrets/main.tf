@@ -84,3 +84,21 @@ resource "google_secret_manager_secret_version" "kratos_smtp" {
   secret      = google_secret_manager_secret.kratos_smtp.id
   secret_data = var.kratos_smtp_connection_uri
 }
+
+resource "google_secret_manager_secret" "kratos_smtp_from_address" {
+  secret_id = "${var.project_name}-${var.environment}-kratos-smtp-from-address"
+
+  replication {
+    auto {}
+  }
+
+  labels = {
+    project     = var.project_name
+    environment = var.environment
+  }
+}
+
+resource "google_secret_manager_secret_version" "kratos_smtp_from_address" {
+  secret      = google_secret_manager_secret.kratos_smtp_from_address.id
+  secret_data = var.kratos_smtp_from_address
+}

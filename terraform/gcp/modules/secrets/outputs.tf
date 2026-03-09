@@ -23,3 +23,8 @@ output "kratos_smtp_secret_id" {
   description = "Secret Manager secret ID for Kratos SMTP connection URI"
   value       = google_secret_manager_secret.kratos_smtp.secret_id
 }
+
+output "kratos_smtp_from_address_secret_id" {
+  description = "Secret Manager secret ID for Kratos SMTP from address"
+  value       = google_secret_manager_secret.kratos_smtp_from_address.secret_id
+}

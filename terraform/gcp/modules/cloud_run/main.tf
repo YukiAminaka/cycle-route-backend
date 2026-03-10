@@ -109,9 +109,10 @@ resource "google_secret_manager_secret_iam_member" "kratos_dsn" {
 # ============================================================
 
 resource "google_cloud_run_v2_service" "kratos_public" {
-  name     = "${var.project_name}-${var.environment}-kratos-public"
-  location = var.region
-  ingress  = "INGRESS_TRAFFIC_ALL"
+  name                 = "${var.project_name}-${var.environment}-kratos-public"
+  location             = var.region
+  ingress              = "INGRESS_TRAFFIC_ALL"
+  deletion_protection  = false
 
   lifecycle {
     ignore_changes = [template[0].containers[0].image]
@@ -248,9 +249,10 @@ resource "google_cloud_run_v2_service_iam_member" "kratos_public_invoker" {
 # ============================================================
 
 resource "google_cloud_run_v2_service" "kratos_admin" {
-  name     = "${var.project_name}-${var.environment}-kratos-admin"
-  location = var.region
-  ingress  = "INGRESS_TRAFFIC_INTERNAL_ONLY"
+  name                = "${var.project_name}-${var.environment}-kratos-admin"
+  location            = var.region
+  ingress             = "INGRESS_TRAFFIC_INTERNAL_ONLY"
+  deletion_protection = false
 
   lifecycle {
     ignore_changes = [template[0].containers[0].image]
@@ -503,9 +505,10 @@ resource "google_cloud_run_v2_job" "kratos_migrate" {
 # ============================================================
 
 resource "google_cloud_run_v2_service" "api" {
-  name     = "${var.project_name}-${var.environment}-api"
-  location = var.region
-  ingress  = "INGRESS_TRAFFIC_INTERNAL_ONLY"
+  name                = "${var.project_name}-${var.environment}-api"
+  location            = var.region
+  ingress             = "INGRESS_TRAFFIC_INTERNAL_ONLY"
+  deletion_protection = false
 
   lifecycle {
     ignore_changes = [template[0].containers[0].image]
@@ -597,9 +600,10 @@ resource "google_cloud_run_v2_service_iam_member" "api_invokes_kratos_admin" {
 # ============================================================
 
 resource "google_cloud_run_v2_service" "frontend" {
-  name     = "${var.project_name}-${var.environment}-frontend"
-  location = var.region
-  ingress  = "INGRESS_TRAFFIC_ALL"
+  name                = "${var.project_name}-${var.environment}-frontend"
+  location            = var.region
+  ingress             = "INGRESS_TRAFFIC_ALL"
+  deletion_protection = false
 
   lifecycle {
     ignore_changes = [template[0].containers[0].image]

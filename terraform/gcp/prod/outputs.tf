@@ -1,11 +1,16 @@
 output "workload_identity_provider" {
-  description = "Workload Identity Provider のリソース名 (GitHub Secrets の WIF_PROVIDER に設定)"
+  description = "Workload Identity Provider のリソース名 (GitHub Secrets の WORKLOAD_IDENTITY_PROVIDER に設定)"
   value       = module.workload_identity.workload_identity_provider
 }
 
 output "github_actions_service_account" {
-  description = "GitHub Actions SA のメールアドレス (GitHub Secrets の WIF_SERVICE_ACCOUNT に設定)"
+  description = "GitHub Actions SA のメールアドレス (GitHub Secrets の BUILD_ACCOUNT に設定)"
   value       = module.workload_identity.service_account_email
+}
+
+output "terraform_service_account" {
+  description = "Terraform SA のメールアドレス (GitHub Secrets の OPERATION_ACCOUNT に設定)"
+  value       = module.workload_identity.terraform_service_account_email
 }
 
 output "artifact_registry_urls" {

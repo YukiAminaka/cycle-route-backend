@@ -29,7 +29,7 @@ resource "google_artifact_registry_repository" "repos" {
     action = "DELETE"
 
     condition {
-      older_than = "86400s" # 1日以上経過したものを削除対象とする（KEEPポリシーで保護されているものは削除されません）
+      older_than = "86400s" # 1日以上経過したものを削除対象とする（KEEPポリシーで保護されているものは削除されない）
     }
   }
 }

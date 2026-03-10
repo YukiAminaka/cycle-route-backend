@@ -1,5 +1,5 @@
 # ============================================================
-# Kratos DSN secret (assembled here once DB connection name is known)
+# Kratos DSN secret 
 # ============================================================
 
 resource "google_secret_manager_secret" "kratos_dsn" {

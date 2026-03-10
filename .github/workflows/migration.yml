@@ -22,6 +22,7 @@ concurrency:
 jobs:
   sqlc-check:
     runs-on: ubuntu-latest
+    timeout-minutes: 3
     permissions:
       contents: read
     steps:
@@ -35,6 +36,7 @@ jobs:
   migrate-deploy:
     if: github.ref == 'refs/heads/main' # メインブランチ時のみ実行
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       id-token: write
       contents: read

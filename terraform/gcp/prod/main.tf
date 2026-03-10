@@ -22,10 +22,6 @@ provider "google" {
   region  = var.region
 }
 
-# ============================================================
-# Enable required GCP APIs
-# ============================================================
-
 # Google Cloudの指定した公開APIを有効化する
 resource "google_project_service" "apis" {
   for_each = toset([
@@ -42,10 +38,6 @@ resource "google_project_service" "apis" {
   service            = each.value # 有効にするサービス
   disable_on_destroy = false # Terraformリソースが破棄されたときにサービスを無効にするか
 }
-
-# ============================================================
-# Modules
-# ============================================================
 
 module "secrets" {
   source = "../modules/secrets"

@@ -310,18 +310,18 @@ docker exec -it postgres psql -U postgres postgres_db
 
 ### 新機能追加の手順
 
-1. **Domain 層**: エンティティとリポジトリインターフェースを定義
-2. **Usecase 層**: ビジネスロジックを実装
-3. **Infrastructure 層**: リポジトリの実装
-4. **Interface 層**: HTTP ハンドラーを実装
-5. **Router**: ルーティングを設定
+1. Domain 層: エンティティとリポジトリインターフェースを定義
+2. Usecase 層: ビジネスロジックを実装
+3. Infrastructure 層: リポジトリの実装
+4. Interface 層: HTTP ハンドラーを実装
+5. Router: ルーティングを設定
 
 ### 技術スタック
 
 - **言語**: Go 1.26.0
 - **データベース**: PostgreSQL with PostGIS
 - **マイグレーション**: Atlas
-- **OR マッパー**: sqlc
+- **ORM**: sqlc
 - **DB 接続**: pgx/v5
 - **地理情報処理**: paulmach/orb
-- **認証**: Ory Kratos
+- **認証**: Ory Kratos(Apache License 2.0) https://github.com/erda-project/ory-kratos

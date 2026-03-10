@@ -8,3 +8,13 @@ node_modules
 Dockerfile
 docker-compose.yml
 .env
+.env.*
+atlas.hcl
+Makefile
+sqlc.yaml
+terraform
+.air.toml
+db
+.vscode
+.github
+

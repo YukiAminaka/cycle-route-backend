@@ -75,4 +75,4 @@ jobs:
           dir: db/migrations
       - name: Stop Cloud SQL Proxy
         if: always()
-        run: kill $(ps aux | grep cloud-sql-proxy | grep -v grep | awk '{print $2}') || true
+        run: pkill -f cloud-sql-proxy || true

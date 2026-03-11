@@ -6,7 +6,7 @@ concurrency: # 自動キャンセル
 jobs:
   lint:
     runs-on: ubuntu-latest
-    timeout-minutes: 5 # タイムアウト
+    timeout-minutes: 10 # タイムアウト
     permissions:
       contents: read
       pull-requests: write

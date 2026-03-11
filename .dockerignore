@@ -17,4 +17,4 @@ terraform
 db
 .vscode
 .github
-
+.trivyignore

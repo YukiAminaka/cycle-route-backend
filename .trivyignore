@@ -1,0 +1,2 @@
+# oryd/kratosはnon-rootユーザー(UID 10000)で実行されるため、USERコマンドは不要
+DS-0002 docker/kratos/Dockerfile

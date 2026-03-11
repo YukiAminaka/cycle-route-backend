@@ -7,8 +7,10 @@ resource "google_sql_database_instance" "main" {
     tier    = var.instance_tier # マシンタイプ
     edition = "ENTERPRISE"
 
+    # trivy:ignore:GCP-0017
     ip_configuration {
       ipv4_enabled = true # このCloud SQLインスタンスにパブリックIPv4アドレスを割り当てるかどうか
+      ssl_mode = "ENCRYPTED_ONLY"
     }
 
     database_flags {

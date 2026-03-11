@@ -1,3 +1,7 @@
+config {
+  call_module_type = "all"
+}
+
 plugin "google" {
     enabled = true
     version = "0.38.0"

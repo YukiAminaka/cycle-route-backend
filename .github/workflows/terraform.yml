@@ -71,8 +71,8 @@ jobs:
         working-directory: ${{ env.ROOT_PATH_IAC_APPLICATION }}
         run: tflint --init --config "$(pwd)"/.tflint.hcl
       - name: Run TFLint
-        working-directory: ${{ env.ROOT_PATH_IAC_ROOT }}
-        run: tflint --recursive --config "$(pwd)"/.tflint.hcl --format compact
+        working-directory: ${{ env.ROOT_PATH_IAC_APPLICATION }}
+        run: tflint --config "$(pwd)"/.tflint.hcl --format compact
       - name: Terraform Plan
         id: plan
         working-directory: ${{ env.ROOT_PATH_IAC_APPLICATION }}

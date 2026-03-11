@@ -50,6 +50,7 @@ jobs:
   build-api:
     name: Docker Build API
     runs-on: ubuntu-latest
+    environment: prod
     timeout-minutes: 15
     if: (github.event_name == 'pull_request' && github.base_ref == 'main') || github.ref == 'refs/heads/main'
     permissions:
@@ -82,6 +83,7 @@ jobs:
   build-kratos:
     name: Docker Build Kratos
     runs-on: ubuntu-latest
+    environment: prod
     timeout-minutes: 15
     if: (github.event_name == 'pull_request' && github.base_ref == 'main') || github.ref == 'refs/heads/main'
     permissions:
@@ -114,6 +116,7 @@ jobs:
   migrate:
     name: Run Kratos Migration
     runs-on: ubuntu-latest
+    environment: prod
     timeout-minutes: 10
     if: github.ref == 'refs/heads/main'
     needs: build-kratos
@@ -140,6 +143,7 @@ jobs:
   deploy-api:
     name: Deploy API
     runs-on: ubuntu-latest
+    environment: prod
     timeout-minutes: 5
     if: github.ref == 'refs/heads/main'
     needs: [build-api, migrate]
@@ -162,6 +166,7 @@ jobs:
   deploy-kratos:
     name: Deploy Kratos
     runs-on: ubuntu-latest
+    environment: prod
     timeout-minutes: 5
     if: github.ref == 'refs/heads/main'
     needs: migrate

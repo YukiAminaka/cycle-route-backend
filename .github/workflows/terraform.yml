@@ -28,6 +28,7 @@ jobs:
   terraform-plan:
     name: Terraform Plan
     runs-on: ubuntu-latest
+    environment: prod
     timeout-minutes: 10
     if: github.event_name == 'pull_request' && github.base_ref == 'main'
     permissions:
@@ -137,6 +138,7 @@ jobs:
   terraform-apply:
     name: Terraform Apply
     runs-on: ubuntu-latest
+    environment: prod
     timeout-minutes: 15
     if: github.ref == 'refs/heads/main'
     permissions:

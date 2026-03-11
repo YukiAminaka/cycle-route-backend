@@ -36,6 +36,7 @@ jobs:
   migrate-deploy:
     if: github.ref == 'refs/heads/main' # メインブランチ時のみ実行
     runs-on: ubuntu-latest
+    environment: prod
     timeout-minutes: 10
     permissions:
       id-token: write

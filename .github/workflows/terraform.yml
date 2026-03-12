@@ -15,6 +15,14 @@ on:
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   REGION: ${{ secrets.GCP_REGION }}
+  PROJECT_NAME: ${{ secrets.PROJECT_NAME }}
+  ENVIRONMENT: "production"
+  KRATOS_SMTP_CONNECTION_URI: ${{ secrets.KRATOS_SMTP_CONNECTION_URI }}
+  KRATOS_SMTP_FROM_ADDRESS: ${{ secrets.KRATOS_SMTP_FROM_ADDRESS }}
+  KRATOS_PUBLIC_BASE_URL: ${{ secrets.KRATOS_PUBLIC_BASE_URL }}
+  KRATOS_ADMIN_BASE_URL: ${{ secrets.KRATOS_ADMIN_BASE_URL }}
+  FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
+  BACKEND_URL: ${{ secrets.BACKEND_URL }}
   OPERATION_ACCOUNT_EMAIL: ${{ secrets.OPERATION_ACCOUNT }}
   WORKLOAD_IDENTITY_PROVIDER_NAME: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
   ROOT_PATH_IAC_APPLICATION: ./terraform/gcp/prod
@@ -79,7 +87,16 @@ jobs:
         run: terraform plan -no-color -lock-timeout=60s
         env:
           TF_VAR_region: ${{ env.REGION }}
-          TF_VAR_service_account: ${{ env.OPERATION_ACCOUNT_EMAIL }}
+          TF_VAR_project_name: ${{ env.PROJECT_NAME }}
+          TF_VAR_environment: ${{ env.ENVIRONMENT }}
+          TF_VAR_github_org: ${{ github.repository_owner }}
+          TF_VAR_github_repo: ${{ github.repository }}
+          TF_VAR_kratos_smtp_connection_uri: ${{ env.KRATOS_SMTP_CONNECTION_URI }}
+          TF_VAR_kratos_smtp_from_address: ${{ env.KRATOS_SMTP_FROM_ADDRESS }}
+          TF_VAR_kratos_public_base_url: ${{ env.KRATOS_PUBLIC_BASE_URL }}
+          TF_VAR_kratos_admin_base_url: ${{ env.KRATOS_ADMIN_BASE_URL }}
+          TF_VAR_frontend_url: ${{ env.FRONTEND_URL }}
+          TF_VAR_backend_url: ${{ env.BACKEND_URL }}
       - name: Create Pull Request Comment
         if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
@@ -164,4 +181,13 @@ jobs:
         run: terraform apply -auto-approve
         env:
           TF_VAR_region: ${{ env.REGION }}
-          TF_VAR_service_account: ${{ env.OPERATION_ACCOUNT_EMAIL }}
+          TF_VAR_project_name: ${{ env.PROJECT_NAME }}
+          TF_VAR_environment: ${{ env.ENVIRONMENT }}
+          TF_VAR_github_org: ${{ github.repository_owner }}
+          TF_VAR_github_repo: ${{ github.repository }}
+          TF_VAR_kratos_smtp_connection_uri: ${{ env.KRATOS_SMTP_CONNECTION_URI }}
+          TF_VAR_kratos_smtp_from_address: ${{ env.KRATOS_SMTP_FROM_ADDRESS }}
+          TF_VAR_kratos_public_base_url: ${{ env.KRATOS_PUBLIC_BASE_URL }}
+          TF_VAR_kratos_admin_base_url: ${{ env.KRATOS_ADMIN_BASE_URL }}
+          TF_VAR_frontend_url: ${{ env.FRONTEND_URL }}
+          TF_VAR_backend_url: ${{ env.BACKEND_URL }}

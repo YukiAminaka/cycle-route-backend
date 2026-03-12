@@ -86,6 +86,7 @@ jobs:
         working-directory: ${{ env.ROOT_PATH_IAC_APPLICATION }}
         run: terraform plan -no-color -lock-timeout=60s
         env:
+          TF_VAR_project_id: ${{ env.PROJECT_ID }}
           TF_VAR_region: ${{ env.REGION }}
           TF_VAR_project_name: ${{ env.PROJECT_NAME }}
           TF_VAR_environment: ${{ env.ENVIRONMENT }}
@@ -180,6 +181,7 @@ jobs:
         working-directory: ${{ env.ROOT_PATH_IAC_APPLICATION }}
         run: terraform apply -auto-approve
         env:
+          TF_VAR_project_id: ${{ env.PROJECT_ID }}
           TF_VAR_region: ${{ env.REGION }}
           TF_VAR_project_name: ${{ env.PROJECT_NAME }}
           TF_VAR_environment: ${{ env.ENVIRONMENT }}

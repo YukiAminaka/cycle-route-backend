@@ -30,6 +30,7 @@ runs:
         file: ${{ inputs.dockerfile }}
         platforms: linux/amd64
         push: ${{ inputs.push_image }}
+        provenance: false
         # イメージタグにはコミットのハッシュ値(SHA)を指定する
         tags: |
           ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ inputs.artifact_repo }}:${{ github.sha }}

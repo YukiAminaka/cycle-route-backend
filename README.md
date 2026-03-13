@@ -2,7 +2,6 @@
 
 サイクリングルート管理アプリケーションのバックエンド API
 
-
 <img src="https://github.com/user-attachments/assets/a885c281-fd0e-43e8-a0bb-d31671858285"
      width="600" />
 
@@ -12,8 +11,7 @@
 <img width="1301" height="515" alt="cycle-route-archtecture drawio" src="https://github.com/user-attachments/assets/df66c52e-c80c-47d3-9b2f-59dea5735bb9" />
 
 
-
-## プロジェクト構成
+### プロジェクト構成
 
 ```
 cycle-route-backend/
@@ -44,9 +42,11 @@ cycle-route-backend/
 └── terraform/                # インフラ構成
 ```
 
-## クリーンアーキテクチャの層
+## アーキテクチャ
 
-### 1. Domain 層（内側）
+クリーンアーキテクチャ風の構成で開発する
+
+1.  Domain 層（内側）
 
 - **責務**: ビジネスロジックの核となる部分
 - **依存**: 他のどの層にも依存しない
@@ -54,19 +54,19 @@ cycle-route-backend/
   - Entity: ビジネスルール、ドメインモデル
   - Repository Interface: データアクセスの抽象化
 
-### 2. Usecase 層
+2. Usecase 層
 
 - **責務**: アプリケーション固有のビジネスロジック
 - **依存**: Domain 層のみに依存
 - **内容**: ユースケースの実装、ビジネスフロー
 
-### 3. Interface 層
+3. Interface 層
 
 - **責務**: 外部とのインターフェース
 - **依存**: Usecase と Domain 層に依存
 - **内容**: HTTP ハンドラー、プレゼンター、ミドルウェア
 
-### 4. Infrastructure 層（外側）
+4. Infrastructure 層（外側）
 
 - **責務**: 技術的な実装詳細
 - **依存**: すべての層に依存可能
@@ -313,17 +313,18 @@ docker exec -it postgres psql -U postgres postgres_db
 
 ### 新機能追加の手順
 
-1. **Domain 層**: エンティティとリポジトリインターフェースを定義
-2. **Usecase 層**: ビジネスロジックを実装
-3. **Infrastructure 層**: リポジトリの実装
-4. **Interface 層**: HTTP ハンドラーを実装
-5. **Router**: ルーティングを設定
+1. Domain 層: エンティティとリポジトリインターフェースを定義
+2. Usecase 層: ビジネスロジックを実装
+3. Infrastructure 層: リポジトリの実装
+4. Interface 層: HTTP ハンドラーを実装
+5. Router: ルーティングを設定
 
-## 技術スタック
+### 技術スタック
 
-- **言語**: Go 1.25.1
+- **言語**: Go 1.26.0
 - **データベース**: PostgreSQL with PostGIS
 - **マイグレーション**: Atlas
-- **OR マッパー**: sqlc
+- **ORM**: sqlc
 - **DB 接続**: pgx/v5
 - **地理情報処理**: paulmach/orb
+- **認証**: Ory Kratos(Apache License 2.0) https://github.com/erda-project/ory-kratos

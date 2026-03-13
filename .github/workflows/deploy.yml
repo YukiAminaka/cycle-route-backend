@@ -1,0 +1,193 @@
+name: Deploy
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "cmd/**"
+      - "internal/**"
+      - "config/**"
+      - "docker/**"
+      - "go.mod"
+      - "go.sum"
+      - ".github/workflows/deploy.yml"
+      - ".github/actions/**"
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "cmd/**"
+      - "internal/**"
+      - "config/**"
+      - "docker/**"
+      - "go.mod"
+      - "go.sum"
+      - ".github/workflows/deploy.yml"
+      - ".github/actions/**"
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  REGION: ${{ secrets.GCP_REGION }}
+  BUILD_ACCOUNT_EMAIL: ${{ secrets.BUILD_ACCOUNT }}
+  WORKLOAD_IDENTITY_PROVIDER_NAME: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+
+  ARTIFACT_REPO_API: ${{ secrets.ARTIFACT_REPO_API }}
+  ARTIFACT_REPO_KRATOS: ${{ secrets.ARTIFACT_REPO_KRATOS }}
+
+  CLOUD_RUN_API: rideline-prod-api
+  CLOUD_RUN_KRATOS_PUBLIC: rideline-prod-kratos-public
+  CLOUD_RUN_KRATOS_ADMIN: rideline-prod-kratos-admin
+  CLOUD_RUN_KRATOS_MIGRATE_JOB: rideline-prod-kratos-migrate
+
+  ROOT_PATH_API: .
+  DOCKERFILE_API: docker/api/Dockerfile.prod
+  DOCKERFILE_KRATOS: docker/kratos/Dockerfile
+
+concurrency: # 多重実行の防止
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }} # PRのみキャンセル可
+
+jobs:
+  build-api:
+    name: Docker Build API
+    runs-on: ubuntu-latest
+    environment: prod
+    timeout-minutes: 15
+    if: (github.event_name == 'pull_request' && github.base_ref == 'main') || github.ref == 'refs/heads/main'
+    permissions:
+      contents: "read"
+      id-token: "write"
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v4
+      - name: "Authenticate to Google Cloud"
+        id: "auth"
+        uses: "google-github-actions/auth@v3"
+        with:
+          token_format: "access_token"
+          service_account: ${{ env.BUILD_ACCOUNT_EMAIL }}
+          workload_identity_provider: "${{ env.WORKLOAD_IDENTITY_PROVIDER_NAME }}"
+      - name: Authorize Docker
+        uses: "docker/login-action@v3"
+        with:
+          username: "oauth2accesstoken"
+          password: "${{ steps.auth.outputs.access_token }}"
+          registry: "${{ env.REGION }}-docker.pkg.dev"
+      - name: Handle Docker Image for API
+        uses: ./.github/actions/docker-image-build-and-rotate
+        with:
+          context: "${{ env.ROOT_PATH_API }}"
+          dockerfile: "${{ env.DOCKERFILE_API }}"
+          artifact_repo: "${{ env.ARTIFACT_REPO_API }}"
+          push_image: ${{ github.event_name != 'pull_request' }} # PRのときはイメージをビルドするだけでpushしない
+
+  build-kratos:
+    name: Docker Build Kratos
+    runs-on: ubuntu-latest
+    environment: prod
+    timeout-minutes: 15
+    if: (github.event_name == 'pull_request' && github.base_ref == 'main') || github.ref == 'refs/heads/main'
+    permissions:
+      contents: "read"
+      id-token: "write"
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v4
+      - name: "Authenticate to Google Cloud"
+        id: "auth"
+        uses: "google-github-actions/auth@v3"
+        with:
+          token_format: "access_token"
+          service_account: ${{ env.BUILD_ACCOUNT_EMAIL }}
+          workload_identity_provider: "${{ env.WORKLOAD_IDENTITY_PROVIDER_NAME }}"
+      - name: Authorize Docker
+        uses: "docker/login-action@v3"
+        with:
+          username: "oauth2accesstoken"
+          password: "${{ steps.auth.outputs.access_token }}"
+          registry: "${{ env.REGION }}-docker.pkg.dev"
+      - name: Handle Docker Image for Kratos
+        uses: ./.github/actions/docker-image-build-and-rotate
+        with:
+          context: "${{ env.ROOT_PATH_API }}"
+          dockerfile: "${{ env.DOCKERFILE_KRATOS }}"
+          artifact_repo: "${{ env.ARTIFACT_REPO_KRATOS }}"
+          push_image: ${{ github.event_name != 'pull_request' }} # PRのときはイメージをビルドするだけでpushしない
+
+  migrate:
+    name: Run Kratos Migration
+    runs-on: ubuntu-latest
+    environment: prod
+    timeout-minutes: 10
+    if: github.ref == 'refs/heads/main'
+    needs: build-kratos
+    permissions:
+      contents: "read"
+      id-token: "write"
+    steps:
+      - name: "Authenticate to Google Cloud"
+        uses: "google-github-actions/auth@v3"
+        with:
+          service_account: ${{ env.BUILD_ACCOUNT_EMAIL }}
+          workload_identity_provider: "${{ env.WORKLOAD_IDENTITY_PROVIDER_NAME }}"
+      - name: Update Kratos Migration Job image
+        run: |
+          gcloud run jobs update ${{ env.CLOUD_RUN_KRATOS_MIGRATE_JOB }} \
+            --image "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO_KRATOS }}:${{ github.sha }}" \
+            --region ${{ env.REGION }}
+      - name: Run Kratos Migration
+        run: |
+          gcloud run jobs execute ${{ env.CLOUD_RUN_KRATOS_MIGRATE_JOB }} \
+            --region ${{ env.REGION }} \
+            --wait
+
+  deploy-api:
+    name: Deploy API
+    runs-on: ubuntu-latest
+    environment: prod
+    timeout-minutes: 5
+    if: github.ref == 'refs/heads/main'
+    needs: [build-api, migrate]
+    permissions:
+      contents: "read"
+      id-token: "write"
+    steps:
+      - name: "Authenticate to Google Cloud"
+        uses: "google-github-actions/auth@v3"
+        with:
+          service_account: ${{ env.BUILD_ACCOUNT_EMAIL }}
+          workload_identity_provider: "${{ env.WORKLOAD_IDENTITY_PROVIDER_NAME }}"
+      - name: Deploy API to Cloud Run
+        uses: google-github-actions/deploy-cloudrun@v3
+        with:
+          service: ${{ env.CLOUD_RUN_API }}
+          image: "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO_API }}:${{ github.sha }}"
+          region: ${{ env.REGION }}
+
+  deploy-kratos:
+    name: Deploy Kratos
+    runs-on: ubuntu-latest
+    environment: prod
+    timeout-minutes: 5
+    if: github.ref == 'refs/heads/main'
+    needs: migrate
+    permissions:
+      contents: "read"
+      id-token: "write"
+    steps:
+      - name: "Authenticate to Google Cloud"
+        uses: "google-github-actions/auth@v3"
+        with:
+          service_account: ${{ env.BUILD_ACCOUNT_EMAIL }}
+          workload_identity_provider: "${{ env.WORKLOAD_IDENTITY_PROVIDER_NAME }}"
+      - name: Deploy Kratos Public to Cloud Run
+        uses: google-github-actions/deploy-cloudrun@v3
+        with:
+          service: ${{ env.CLOUD_RUN_KRATOS_PUBLIC }}
+          image: "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO_KRATOS }}:${{ github.sha }}"
+          region: ${{ env.REGION }}
+      - name: Deploy Kratos Admin to Cloud Run
+        uses: google-github-actions/deploy-cloudrun@v3
+        with:
+          service: ${{ env.CLOUD_RUN_KRATOS_ADMIN }}
+          image: "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO_KRATOS }}:${{ github.sha }}"
+          region: ${{ env.REGION }}

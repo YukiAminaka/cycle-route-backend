@@ -1,0 +1,123 @@
+version: v0.13.0
+
+dsn: ${KRATOS_DSN}
+
+serve:
+  public:
+    base_url: ${KRATOS_PUBLIC_BASE_URL}
+    cors:
+      enabled: true
+      allow_credentials: true
+      allowed_origins:
+        - ${FRONTEND_URL}
+      allowed_methods:
+        - POST
+        - GET
+        - PUT
+        - PATCH
+        - DELETE
+      allowed_headers:
+        - Content-Type
+        - Authorization
+  admin:
+    base_url: ${KRATOS_ADMIN_BASE_URL}
+
+selfservice:
+  default_browser_return_url: ${FRONTEND_URL}/
+  allowed_return_urls:
+    - ${FRONTEND_URL}
+
+  methods:
+    password:
+      enabled: true
+    totp:
+      config:
+        issuer: Rideline
+      enabled: true
+    lookup_secret:
+      enabled: true
+    link:
+      enabled: true
+    code:
+      enabled: true
+
+  flows:
+    error:
+      ui_url: ${FRONTEND_URL}/error
+
+    settings:
+      ui_url: ${FRONTEND_URL}/settings
+      privileged_session_max_age: 15m
+      required_aal: highest_available
+
+    recovery:
+      enabled: true
+      ui_url: ${FRONTEND_URL}/recovery
+      use: code
+
+    verification:
+      enabled: true
+      ui_url: ${FRONTEND_URL}/verification
+      use: code
+      after:
+        default_browser_return_url: ${FRONTEND_URL}/
+
+    logout:
+      after:
+        default_browser_return_url: ${FRONTEND_URL}/login
+
+    login:
+      ui_url: ${FRONTEND_URL}/login
+      lifespan: 10m
+
+    registration:
+      lifespan: 10m
+      ui_url: ${FRONTEND_URL}/register
+      after:
+        password:
+          hooks:
+            - hook: session
+            - hook: show_verification_ui
+            - hook: web_hook
+              config:
+                url: ${BACKEND_URL}/api/v1/users
+                method: POST
+                body: file:///etc/config/kratos/hooks/create-profile.jsonnet
+
+log:
+  level: info
+  format: json
+  leak_sensitive_values: false
+
+secrets:
+  cookie:
+    - ${KRATOS_COOKIE_SECRET}
+  cipher:
+    - ${KRATOS_CIPHER_SECRET}
+
+ciphers:
+  algorithm: xchacha20-poly1305
+
+hashers:
+  algorithm: bcrypt
+  bcrypt:
+    cost: 8
+
+identity:
+  default_schema_id: default
+  schemas:
+    - id: default
+      url: file:///etc/config/kratos/identity.schema.json
+
+courier:
+  smtp:
+    connection_uri: ${KRATOS_SMTP_CONNECTION_URI}
+    from_address: ${KRATOS_SMTP_FROM_ADDRESS}
+    from_name: Rideline
+
+feature_flags:
+  use_continue_with_transitions: true
+
+session:
+  cookie:
+    domain: ride-line.net

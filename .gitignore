@@ -1,6 +1,7 @@
 *.env
 *tmp/
 CLAUDE.md
+.vscode/
 
 # Terraform
 .terraform/

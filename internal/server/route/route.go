@@ -1,6 +1,7 @@
 package route
 
 import (
+	"github.com/YukiAminaka/cycle-route-backend/config"
 	"github.com/YukiAminaka/cycle-route-backend/internal/infrastructure/database/dbgen"
 	"github.com/YukiAminaka/cycle-route-backend/internal/infrastructure/repository"
 	"github.com/YukiAminaka/cycle-route-backend/internal/presentation/middleware"
@@ -14,8 +15,8 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-func InitRoute(api *gin.Engine, q *dbgen.Queries, pool *pgxpool.Pool) {
-	k := middleware.NewMiddleware()
+func InitRoute(conf *config.Config, api *gin.Engine, q *dbgen.Queries, pool *pgxpool.Pool) {
+	k := middleware.NewMiddleware(conf)
 	
 	apiGroup := api.Group("/api")
 	v1 := apiGroup.Group("/v1")

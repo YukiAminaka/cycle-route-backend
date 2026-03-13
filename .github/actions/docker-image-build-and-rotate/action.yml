@@ -1,0 +1,89 @@
+name: "Docker Image Build and Rotate"
+description: "Build, Push, and Manage Docker images at Artifact Registry"
+inputs:
+  context:
+    description: "Build context for Docker image"
+    required: true
+  dockerfile:
+    description: "Path to the Dockerfile (relative to context)"
+    required: true
+  artifact_repo:
+    description: "Artifact Registry repository name (e.g. myproject-api)"
+    required: true
+  build_args:
+    description: "Optional build arguments for Docker build"
+    required: false
+  push_image:
+    description: "Whether to push the image to Artifact Registry (true/false)"
+    required: true
+outputs: {}
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    # DockerイメージをビルドしてArtifact Registryにpushする
+    - name: Build Docker Image
+      uses: docker/build-push-action@v6
+      with:
+        context: ${{ inputs.context }}
+        file: ${{ inputs.dockerfile }}
+        platforms: linux/amd64
+        push: ${{ inputs.push_image }}
+        # イメージタグにはコミットのハッシュ値(SHA)を指定する
+        tags: |
+          ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ inputs.artifact_repo }}:${{ github.sha }}
+        build-args: ${{ inputs.build_args }}
+
+    # Artifact Registryにあるイメージのタグのリストを取得する
+    - name: Get Image Tags
+      if: inputs.push_image == 'true'
+      shell: bash
+      run: |
+        TAGS_JSON=$(gcloud artifacts docker tags list ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ inputs.artifact_repo }} --format="json(TAG)")
+        echo "${TAGS_JSON}" > /tmp/image_tags.json
+        TAGS_LIST=($(echo "${TAGS_JSON}" | jq -r '.[].tag | split("/") | last'))
+        echo "Tags: ${TAGS_LIST[@]}"
+
+    # Artifact Registryにあるbackupイメージを削除する
+    - name: Remove Previous Image
+      if: inputs.push_image == 'true'
+      shell: bash
+      run: |
+        TAGS_JSON=$(cat /tmp/image_tags.json)
+        TAGS_LIST=($(echo "${TAGS_JSON}" | jq -r '.[].tag | split("/") | last'))
+        if [[ " ${TAGS_LIST[@]} " =~ "backup" ]]; then
+          echo "Backup tag found. Deleting..."
+          gcloud artifacts docker images delete ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ inputs.artifact_repo }}:backup --delete-tags --quiet 
+        else
+          echo "No backup tag found."
+        fi
+
+    # Artifact Registryにあるlatestイメージにbackupタグをつける
+    - name: Tag Docker image backup
+      if: inputs.push_image == 'true'
+      shell: bash
+      run: |
+        TAGS_JSON=$(cat /tmp/image_tags.json)
+        TAGS_LIST=($(echo "${TAGS_JSON}" | jq -r '.[].tag | split("/") | last'))
+        if [[ " ${TAGS_LIST[@]} " =~ "latest" ]]; then
+          echo "Latest tag found"
+          echo "Tagging latest image as backup..."
+          gcloud artifacts docker tags add \
+          ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ inputs.artifact_repo }}:latest \
+          ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ inputs.artifact_repo }}:backup \
+          --quiet
+        else
+          echo "No latest tag found"
+        fi
+
+    # Artifact Registryにpushしたイメージにlatestタグをつける
+    - name: Tag Docker image latest
+      if: inputs.push_image == 'true'
+      shell: bash
+      run: |
+        echo "Tagging pushed image as latest..."
+        gcloud artifacts docker tags add \
+        ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ inputs.artifact_repo }}:${{ github.sha }} \
+        ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ inputs.artifact_repo }}:latest \
+        --quiet

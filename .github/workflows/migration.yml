@@ -1,0 +1,78 @@
+name: DB Migration and Check
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "db/migrations/**"
+  pull_request:
+    paths:
+      - "db/migrations/**"
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  REGION: ${{ secrets.GCP_REGION }}
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
+  MIGRATION_ACCOUNT_EMAIL: ${{ secrets.MIGRATION__ACCOUNT }}
+  WORKLOAD_IDENTITY_PROVIDER_NAME: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+  INSTANCE_CONNECTION_NAME: ${{ secrets.CLOUD_SQL_INSTANCE_CONNECTION_NAME }}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name != 'pull_request' }}
+jobs:
+  sqlc-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: sqlc-dev/setup-sqlc@v4
+        with:
+          sqlc-version: "1.27.0"
+      - name: SQLC Compile
+        run: sqlc compile
+
+  migrate-deploy:
+    if: github.ref == 'refs/heads/main' # メインブランチ時のみ実行
+    runs-on: ubuntu-latest
+    environment: prod
+    timeout-minutes: 10
+    permissions:
+      id-token: write
+      contents: read
+    needs: sqlc-check
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ariga/setup-atlas@v0
+      - name: "Authenticate to Google Cloud"
+        id: "auth"
+        uses: "google-github-actions/auth@v3"
+        with:
+          token_format: "access_token"
+          service_account: ${{ env.MIGRATION_ACCOUNT_EMAIL }} # 利用したいサービスアカウント
+          workload_identity_provider: "${{ env.WORKLOAD_IDENTITY_PROVIDER_NAME }}"
+      - name: Download Cloud SQL Proxy
+        run: |
+          wget "https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.20.0/cloud-sql-proxy.linux.amd64" -O cloud-sql-proxy
+          chmod +x cloud-sql-proxy
+
+      - name: Start Cloud SQL Proxy
+        run: ./cloud-sql-proxy --port 5432 ${{ env.INSTANCE_CONNECTION_NAME }} &
+
+      - name: Wait for Cloud SQL Proxy to Start
+        run: |
+          for i in $(seq 1 30); do
+            nc -z 127.0.0.1 5432 && echo "Cloud SQL Proxy is running" && break
+            echo "Waiting for Cloud SQL Proxy... ($i/30)"
+            sleep 1
+          done
+
+      - name: Deploy Atlas Migrations
+        uses: ariga/atlas-action/migrate/apply@v1
+        with:
+          url: ${{ env.DATABASE_URL }}
+          dir: db/migrations
+      - name: Stop Cloud SQL Proxy
+        if: always()
+        run: pkill -f cloud-sql-proxy || true

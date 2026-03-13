@@ -1,0 +1,12 @@
+.git
+.gitignore
+*.md
+*.log
+docker
+terraform
+.github
+internal
+cmd
+db
+env
+tmp

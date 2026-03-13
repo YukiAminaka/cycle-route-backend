@@ -7,35 +7,39 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/YukiAminaka/cycle-route-backend/config"
 	"github.com/gin-gonic/gin"
 	ory "github.com/ory/kratos-client-go"
 )
 
 type KratosMiddleware struct {
 	ory *ory.APIClient
+	conf *config.Config
 }
 
-func NewMiddleware() *KratosMiddleware {
+func NewMiddleware(conf *config.Config) *KratosMiddleware {
 	configuration := ory.NewConfiguration()
 	configuration.Servers = []ory.ServerConfiguration{
 		{
-			URL: "http://kratos:4433", // Kratos Public API
+			URL: conf.Server.KratosPublicUrl, // Kratos Public API
 		},
 	}
 	return &KratosMiddleware{
 		ory: ory.NewAPIClient(configuration),
+		conf: conf,
 	}
 }
 
 func (k *KratosMiddleware) Session() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		session, err := k.validateSession(c.Request)
+		redirectURL := fmt.Sprintf("%s/login", k.conf.Server.FrontendOrigin)
 		if err != nil {
-			c.Redirect(http.StatusMovedPermanently, "http://127.0.0.1:3000/login")
+			c.Redirect(http.StatusMovedPermanently, redirectURL)
 			return
 		}
 		if !*session.Active {
-			c.Redirect(http.StatusMovedPermanently, "http://127.0.0.1:3000/login")
+			c.Redirect(http.StatusMovedPermanently, redirectURL)
 			return
 		}
 

@@ -33,6 +33,9 @@ env:
   ARTIFACT_REPO_API: ${{ secrets.ARTIFACT_REPO_API }}
   ARTIFACT_REPO_KRATOS: ${{ secrets.ARTIFACT_REPO_KRATOS }}
 
+  IMAGE_NAME_API: api
+  IMAGE_NAME_KRATOS: kratos
+
   CLOUD_RUN_API: rideline-prod-api
   CLOUD_RUN_KRATOS_PUBLIC: rideline-prod-kratos-public
   CLOUD_RUN_KRATOS_ADMIN: rideline-prod-kratos-admin
@@ -77,6 +80,7 @@ jobs:
         with:
           context: "${{ env.ROOT_PATH_API }}"
           dockerfile: "${{ env.DOCKERFILE_API }}"
+          image_name: ${{ env.IMAGE_NAME_API }}
           artifact_repo: "${{ env.ARTIFACT_REPO_API }}"
           push_image: ${{ github.event_name != 'pull_request' }} # PRのときはイメージをビルドするだけでpushしない
 
@@ -110,6 +114,7 @@ jobs:
         with:
           context: "${{ env.ROOT_PATH_API }}"
           dockerfile: "${{ env.DOCKERFILE_KRATOS }}"
+          image_name: ${{ env.IMAGE_NAME_KRATOS }}
           artifact_repo: "${{ env.ARTIFACT_REPO_KRATOS }}"
           push_image: ${{ github.event_name != 'pull_request' }} # PRのときはイメージをビルドするだけでpushしない
 
@@ -132,7 +137,7 @@ jobs:
       - name: Update Kratos Migration Job image
         run: |
           gcloud run jobs update ${{ env.CLOUD_RUN_KRATOS_MIGRATE_JOB }} \
-            --image "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO_KRATOS }}:${{ github.sha }}" \
+            --image "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO_KRATOS }}/${{ env.IMAGE_NAME_KRATOS }}:${{ github.sha }}" \
             --region ${{ env.REGION }}
       - name: Run Kratos Migration
         run: |
@@ -160,7 +165,7 @@ jobs:
         uses: google-github-actions/deploy-cloudrun@v3
         with:
           service: ${{ env.CLOUD_RUN_API }}
-          image: "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO_API }}:${{ github.sha }}"
+          image: "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO_API }}/${{ env.IMAGE_NAME_API }}:${{ github.sha }}"
           region: ${{ env.REGION }}
 
   deploy-kratos:
@@ -183,11 +188,11 @@ jobs:
         uses: google-github-actions/deploy-cloudrun@v3
         with:
           service: ${{ env.CLOUD_RUN_KRATOS_PUBLIC }}
-          image: "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO_KRATOS }}:${{ github.sha }}"
+          image: "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO_KRATOS }}/${{ env.IMAGE_NAME_KRATOS }}:${{ github.sha }}"
           region: ${{ env.REGION }}
       - name: Deploy Kratos Admin to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v3
         with:
           service: ${{ env.CLOUD_RUN_KRATOS_ADMIN }}
-          image: "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO_KRATOS }}:${{ github.sha }}"
+          image: "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO_KRATOS }}/${{ env.IMAGE_NAME_KRATOS }}:${{ github.sha }}"
           region: ${{ env.REGION }}

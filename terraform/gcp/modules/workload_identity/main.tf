@@ -124,6 +124,7 @@ locals {
     "roles/iam.workloadIdentityPoolAdmin",   # google_iam_workload_identity_pool の管理
     "roles/resourcemanager.projectIamAdmin", # google_project_iam_member の設定
     "roles/run.admin",                       # Cloud Run サービス作成・IAM設定
+    "roles/storage.admin",                   # google_storage_bucket の管理
     "roles/secretmanager.admin",             # google_secret_manager_secret の管理
     "roles/cloudsql.admin",                  # google_sql_database_instance の管理
     "roles/artifactregistry.admin",          # google_artifact_registry_repository の作成
@@ -136,15 +137,4 @@ resource "google_project_iam_member" "terraform_roles" {
   project = var.project_id
   role    = each.value
   member  = "serviceAccount:${google_service_account.terraform.email}"
-}
-
-# ============================================================
-# IAM: GCS state バケットへのアクセス（バケットレベルで最小権限）
-# roles/storage.admin はバケット自体のIAM設定(setIamPolicy)を含むため必要
-# ============================================================
-
-resource "google_storage_bucket_iam_member" "terraform_state" {
-  bucket = var.terraform_state_bucket
-  role   = "roles/storage.objectAdmin"
-  member = "serviceAccount:${google_service_account.terraform.email}"
 }

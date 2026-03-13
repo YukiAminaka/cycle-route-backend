@@ -77,8 +77,7 @@ module "workload_identity" {
 
   project_id   = var.project_id
   project_name = var.project_name
-  github_org   = var.github_org
-  github_repo  = var.github_repo
+  github_repository = var.github_repository
 
   cloud_run_service_account_emails = [
     module.cloud_run.frontend_service_account_email,

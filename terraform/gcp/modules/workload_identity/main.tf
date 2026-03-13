@@ -33,7 +33,7 @@ resource "google_iam_workload_identity_pool_provider" "github" {
   }
 
   # このリポジトリからのリクエストのみ許可
-  attribute_condition = "attribute.repository == '${var.github_org}/${var.github_repo}'"
+  attribute_condition = "attribute.repository == '${var.github_repository}'"
 }
 
 # ============================================================
@@ -55,7 +55,7 @@ resource "google_service_account" "github_actions" {
 resource "google_service_account_iam_member" "workload_identity_binding" {
   service_account_id = google_service_account.github_actions.name
   role               = "roles/iam.workloadIdentityUser"
-  member             = "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github.name}/attribute.repository/${var.github_org}/${var.github_repo}"
+  member             = "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github.name}/attribute.repository/${var.github_repository}"
 }
 
 # ============================================================
@@ -110,7 +110,7 @@ resource "google_service_account" "terraform" {
 resource "google_service_account_iam_member" "terraform_wif_binding" {
   service_account_id = google_service_account.terraform.name
   role               = "roles/iam.workloadIdentityUser"
-  member             = "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github.name}/attribute.repository/${var.github_org}/${var.github_repo}"
+  member             = "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github.name}/attribute.repository/${var.github_repository}"
 }
 
 # ============================================================

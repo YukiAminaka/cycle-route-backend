@@ -23,7 +23,7 @@ func Run(ctx context.Context, conf *config.Config, q *dbgen.Queries, pool *pgxpo
 	router := gin.Default()
 	config := cors.DefaultConfig()
 	config.AllowOrigins = []string{conf.Server.FrontendOrigin} // Next.jsのオリジン
-	config.AllowCredentials = true// クッキーを許可
+	config.AllowCredentials = true                             // クッキーを許可
 
 	router.Use(cors.New(config))
 	// Recovery ミドルウェアは panic が発生しても 500 エラーを返してくれる

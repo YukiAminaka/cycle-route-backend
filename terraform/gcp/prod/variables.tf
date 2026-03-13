@@ -20,15 +20,9 @@ variable "environment" {
   type        = string
 }
 
-variable "github_org" {
-  description = "GitHub organization or username"
+variable "github_repository" {
+  description = "GitHub repository in 'org/repo' format (e.g. 'myorg/myrepo')"
   type        = string
-}
-
-variable "github_repo" {
-  description = "GitHub repository name"
-  type        = string
-  default     = "cycle-route-backend"
 }
 
 variable "kratos_smtp_connection_uri" {

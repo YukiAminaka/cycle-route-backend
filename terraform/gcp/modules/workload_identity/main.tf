@@ -93,6 +93,15 @@ resource "google_service_account_iam_member" "github_actions_sa_user" {
   member             = "serviceAccount:${google_service_account.github_actions.email}"
 }
 
+# cloud runサービスアカウントを、Terraformのサービスアカウントが借用する権限が必要 
+resource "google_service_account_iam_member" "terraform_sa_user" {
+  for_each = toset(var.cloud_run_service_account_emails)
+
+  service_account_id = "projects/${var.project_id}/serviceAccounts/${each.value}"
+  role               = "roles/iam.serviceAccountUser" # サービスアカウントとして操作を実行するロール
+  member             = "serviceAccount:${google_service_account.terraform.email}"
+}
+
 # ============================================================
 # Service Account for Terraform
 # ============================================================
@@ -120,7 +129,7 @@ resource "google_service_account_iam_member" "terraform_wif_binding" {
 locals {
   terraform_project_roles = toset([
     "roles/serviceusage.serviceUsageAdmin",  # google_project_service でAPIを有効化
-    "roles/iam.serviceAccountAdmin",         # google_service_account の作成・IAM設定
+    "roles/iam.serviceAccountAdmin",         # サービスアカウントの作成・管理
     "roles/iam.workloadIdentityPoolAdmin",   # google_iam_workload_identity_pool の管理
     "roles/resourcemanager.projectIamAdmin", # google_project_iam_member の設定
     "roles/run.admin",                       # Cloud Run サービス作成・IAM設定

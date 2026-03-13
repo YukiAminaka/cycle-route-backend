@@ -7,6 +7,9 @@ inputs:
   dockerfile:
     description: "Path to the Dockerfile (relative to context)"
     required: true
+  image_name:
+    description: "Name of the Docker image"
+    required: true
   artifact_repo:
     description: "Artifact Registry repository name (e.g. myproject-api)"
     required: true
@@ -33,7 +36,7 @@ runs:
         provenance: false
         # イメージタグにはコミットのハッシュ値(SHA)を指定する
         tags: |
-          ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ inputs.artifact_repo }}:${{ github.sha }}
+          ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ inputs.artifact_repo }}/${{ inputs.image_name }}:${{ github.sha }}
         build-args: ${{ inputs.build_args }}
 
     # Artifact Registryにあるイメージのタグのリストを取得する
@@ -41,7 +44,7 @@ runs:
       if: inputs.push_image == 'true'
       shell: bash
       run: |
-        TAGS_JSON=$(gcloud artifacts docker tags list ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ inputs.artifact_repo }} --format="json(TAG)")
+        TAGS_JSON=$(gcloud artifacts docker tags list ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ inputs.artifact_repo }}/${{ inputs.image_name }} --format="json(TAG)")
         echo "${TAGS_JSON}" > /tmp/image_tags.json
         TAGS_LIST=($(echo "${TAGS_JSON}" | jq -r '.[].tag | split("/") | last'))
         echo "Tags: ${TAGS_LIST[@]}"
@@ -55,7 +58,7 @@ runs:
         TAGS_LIST=($(echo "${TAGS_JSON}" | jq -r '.[].tag | split("/") | last'))
         if [[ " ${TAGS_LIST[@]} " =~ "backup" ]]; then
           echo "Backup tag found. Deleting..."
-          gcloud artifacts docker images delete ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ inputs.artifact_repo }}:backup --delete-tags --quiet 
+          gcloud artifacts docker images delete ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ inputs.artifact_repo }}/${{ inputs.image_name }}:backup --delete-tags --quiet 
         else
           echo "No backup tag found."
         fi
@@ -71,8 +74,8 @@ runs:
           echo "Latest tag found"
           echo "Tagging latest image as backup..."
           gcloud artifacts docker tags add \
-          ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ inputs.artifact_repo }}:latest \
-          ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ inputs.artifact_repo }}:backup \
+          ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ inputs.artifact_repo }}/${{ inputs.image_name }}:latest \
+          ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ inputs.artifact_repo }}/${{ inputs.image_name }}:backup \
           --quiet
         else
           echo "No latest tag found"
@@ -85,6 +88,6 @@ runs:
       run: |
         echo "Tagging pushed image as latest..."
         gcloud artifacts docker tags add \
-        ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ inputs.artifact_repo }}:${{ github.sha }} \
-        ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ inputs.artifact_repo }}:latest \
+        ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ inputs.artifact_repo }}/${{ inputs.image_name }}:${{ github.sha }} \
+        ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ inputs.artifact_repo }}/${{ inputs.image_name }}:latest \
         --quiet

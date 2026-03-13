@@ -66,7 +66,7 @@ resource "google_service_account_iam_member" "workload_identity_binding" {
 # 今回は、GitHub Actionsのサービスアカウントに対して、Artifact Registryへのpush権限を付与するために使用
 resource "google_project_iam_member" "github_actions_ar_writer" {
   project = var.project_id
-  role    = "roles/artifactregistry.writer"
+  role    = "roles/artifactregistry.repoAdmin"
   member  = "serviceAccount:${google_service_account.github_actions.email}"
 }
 

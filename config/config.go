@@ -26,8 +26,8 @@ type DBConfig struct {
 type Server struct {
 	Address string `env:"ADDRESS" envDefault:"0.0.0.0"`
 	Port    string `env:"PORT" envDefault:"8080"`
-	FRONTEND_ADDRESS string `env:"FRONTEND_ADDRESS" envDefault:"localhost"`
-	FRONTEND_PORT    string `env:"FRONTEND_PORT" envDefault:"3000"`
+	FrontendOrigin string `env:"FRONTEND_ORIGIN" envDefault:"http://localhost:3000"`
+	KratosPublicUrl string `env:"KRATOS_PUBLIC_URL" envDefault:"http://kratos:4433"`
 }
 
 // 読み込み

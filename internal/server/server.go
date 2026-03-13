@@ -22,8 +22,7 @@ import (
 func Run(ctx context.Context, conf *config.Config, q *dbgen.Queries, pool *pgxpool.Pool) error {
 	router := gin.Default()
 	config := cors.DefaultConfig()
-	FRONTEND_URL := fmt.Sprintf("%s:%s", conf.Server.FRONTEND_ADDRESS, conf.Server.FRONTEND_PORT)
-	config.AllowOrigins = []string{FRONTEND_URL} // Next.jsのオリジン
+	config.AllowOrigins = []string{conf.Server.FrontendOrigin} // Next.jsのオリジン
 	config.AllowCredentials = true// クッキーを許可
 
 	router.Use(cors.New(config))
@@ -31,7 +30,7 @@ func Run(ctx context.Context, conf *config.Config, q *dbgen.Queries, pool *pgxpo
 	router.Use(gin.Recovery())
 	router.Use(gin.Logger())
 
-	route.InitRoute(router, q, pool)
+	route.InitRoute(conf, router, q, pool)
 
 	address := conf.Server.Address + ":" + conf.Server.Port
 	log.Printf("Starting server on %s...\n", address)

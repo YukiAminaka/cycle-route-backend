@@ -36,10 +36,10 @@ env:
   IMAGE_NAME_API: api
   IMAGE_NAME_KRATOS: kratos
 
-  CLOUD_RUN_API: rideline-prod-api
-  CLOUD_RUN_KRATOS_PUBLIC: rideline-prod-kratos-public
-  CLOUD_RUN_KRATOS_ADMIN: rideline-prod-kratos-admin
-  CLOUD_RUN_KRATOS_MIGRATE_JOB: rideline-prod-kratos-migrate
+  CLOUD_RUN_API: rideline-production-api
+  CLOUD_RUN_KRATOS_PUBLIC: rideline-production-kratos-public
+  CLOUD_RUN_KRATOS_ADMIN: rideline-production-kratos-admin
+  CLOUD_RUN_KRATOS_MIGRATE_JOB: rideline-production-kratos-migrate
 
   ROOT_PATH_API: .
   DOCKERFILE_API: docker/api/Dockerfile.prod

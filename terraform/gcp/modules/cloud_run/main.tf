@@ -109,10 +109,10 @@ resource "google_secret_manager_secret_iam_member" "kratos_dsn" {
 # ============================================================
 
 resource "google_cloud_run_v2_service" "kratos_public" {
-  name                 = "${var.project_name}-${var.environment}-kratos-public"
-  location             = var.region
-  ingress              = "INGRESS_TRAFFIC_ALL"
-  deletion_protection  = false
+  name                = "${var.project_name}-${var.environment}-kratos-public"
+  location            = var.region
+  ingress             = "INGRESS_TRAFFIC_ALL"
+  deletion_protection = false
 
   lifecycle {
     ignore_changes = [template[0].containers[0].image]

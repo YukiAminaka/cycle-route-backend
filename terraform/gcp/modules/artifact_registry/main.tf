@@ -9,10 +9,10 @@
 resource "google_artifact_registry_repository" "repos" {
   for_each = toset(var.repositories)
 
-  repository_id = "${var.project_name}-${each.value}"
-  location      = var.region
-  format        = "DOCKER"
-  description   = "Docker repository for ${var.project_name} ${each.value}"
+  repository_id          = "${var.project_name}-${each.value}"
+  location               = var.region
+  format                 = "DOCKER"
+  description            = "Docker repository for ${var.project_name} ${each.value}"
   cleanup_policy_dry_run = false
 
   cleanup_policies {

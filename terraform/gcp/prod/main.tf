@@ -13,7 +13,7 @@ terraform {
 
   backend "gcs" {
     bucket = "rideline-489422-terraform-state"
-    prefix  = "terraform/state"
+    prefix = "terraform/state"
   }
 }
 
@@ -25,9 +25,9 @@ provider "google" {
 # Google Cloudの指定した公開APIを有効化する
 resource "google_project_service" "apis" {
   for_each = toset([
-    "run.googleapis.com", # Cloud Run Admin API を有効にする
-    "sqladmin.googleapis.com", # SQL Admin API を有効にする
-    "secretmanager.googleapis.com", # Secret Manager API を有効にする
+    "run.googleapis.com",              # Cloud Run Admin API を有効にする
+    "sqladmin.googleapis.com",         # SQL Admin API を有効にする
+    "secretmanager.googleapis.com",    # Secret Manager API を有効にする
     "artifactregistry.googleapis.com", # Artifact Registry API を有効にする
     "compute.googleapis.com",
     "cloudresourcemanager.googleapis.com",
@@ -36,7 +36,7 @@ resource "google_project_service" "apis" {
   ])
 
   service            = each.value # 有効にするサービス
-  disable_on_destroy = false # Terraformリソースが破棄されたときにサービスを無効にするか
+  disable_on_destroy = false      # Terraformリソースが破棄されたときにサービスを無効にするか
 }
 
 module "secrets" {

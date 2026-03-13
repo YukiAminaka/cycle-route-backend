@@ -39,11 +39,13 @@ var (
 func GetConfig() *Config {
 	// goroutine実行中でも一度だけ実行される
 	once.Do(func() {
-		// envファイルの読み込み
-		envPath := fmt.Sprintf("./env/%s.env", os.Getenv("GO_ENV"))
-		err := godotenv.Load(envPath)
-		if err != nil {
-			log.Fatalf("Error loading .env file: %s (path: %s)", err, envPath)
+		if os.Getenv("GO_ENV") != "production" {
+			// envファイルの読み込み
+			envPath := fmt.Sprintf("./env/%s.env", os.Getenv("GO_ENV"))
+			err := godotenv.Load(envPath)
+			if err != nil {
+				log.Fatalf("Error loading .env file: %s (path: %s)", err, envPath)
+			}
 		}
 
 		if err := env.Parse(&cfg); err != nil {

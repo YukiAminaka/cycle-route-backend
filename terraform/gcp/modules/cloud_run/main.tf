@@ -549,6 +549,11 @@ resource "google_cloud_run_v2_service" "api" {
       }
 
       env {
+        name = "GO_ENV"
+        value = var.environment
+      }
+
+      env {
         name  = "DB_HOST"
         value = "/cloudsql/${var.db_connection_name}"
       }

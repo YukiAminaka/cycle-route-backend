@@ -12,29 +12,26 @@ import (
 )
 
 func Test_deleteRouteUsecase_DeleteRoute(t *testing.T) {
-	// gomockのコントローラーを作成
-	ctrl := gomock.NewController(t)
-	// IRouteRepositoryのモックを作成
-	mockRouteRepo := routeDomain.NewMockIRouteRepository(ctrl)
-	// IUserRepositoryのモックを作成
-	mockUserRepo := userDomain.NewMockIUserRepository(ctrl)
-	// TransactionManagerのモックを作成
-	mockTransactionManager := transactionApp.NewMockTransactionManager(ctrl)
-	// テスト対象のUsecaseを作成
-	uc := NewDeleteRouteUsecase(mockUserRepo, mockTransactionManager, mockRouteRepo)
-
 	tests := []struct {
 		name     string // description of this test case
 		routeID  string
 		kratosID string
-		mockFunc func()
-		wantErr  bool
+		mockFunc func(
+			mockRouteRepo *routeDomain.MockIRouteRepository,
+			mockUserRepo *userDomain.MockIUserRepository,
+			mockTransactionManager *transactionApp.MockTransactionManager,
+		)
+		wantErr bool
 	}{
 		{
 			name:     "正常系: ルート削除に成功する",
 			routeID:  "019b5a50-0000-7000-8000-000000000001",
 			kratosID: "2eb50f70-3a23-4067-99f6-9fd645686880",
-			mockFunc: func() {
+			mockFunc: func(
+				mockRouteRepo *routeDomain.MockIRouteRepository,
+				mockUserRepo *userDomain.MockIUserRepository,
+				mockTransactionManager *transactionApp.MockTransactionManager,
+			) {
 				// ユーザー取得のモック
 				user, _ := userDomain.ReconstructUser(
 					userDomain.UserID("019b5a8d-16a7-700a-be92-9ae11e7e5b9a"),
@@ -72,7 +69,11 @@ func Test_deleteRouteUsecase_DeleteRoute(t *testing.T) {
 			name:     "異常系: ユーザーが見つからない",
 			routeID:  "019b5a50-0000-7000-8000-000000000001",
 			kratosID: "invalid-kratos-id",
-			mockFunc: func() {
+			mockFunc: func(
+				mockRouteRepo *routeDomain.MockIRouteRepository,
+				mockUserRepo *userDomain.MockIUserRepository,
+				mockTransactionManager *transactionApp.MockTransactionManager,
+			) {
 				mockUserRepo.EXPECT().
 					GetUserByKratosID(gomock.Any(), "invalid-kratos-id").
 					Return(nil, errors.New("user not found"))
@@ -83,7 +84,11 @@ func Test_deleteRouteUsecase_DeleteRoute(t *testing.T) {
 			name:     "異常系: ルートが見つからない",
 			routeID:  "invalid-route-id",
 			kratosID: "2eb50f70-3a23-4067-99f6-9fd645686880",
-			mockFunc: func() {
+			mockFunc: func(
+				mockRouteRepo *routeDomain.MockIRouteRepository,
+				mockUserRepo *userDomain.MockIUserRepository,
+				mockTransactionManager *transactionApp.MockTransactionManager,
+			) {
 				user, _ := userDomain.ReconstructUser(
 					userDomain.UserID("019b5a8d-16a7-700a-be92-9ae11e7e5b9a"),
 					"2eb50f70-3a23-4067-99f6-9fd645686880",
@@ -104,7 +109,11 @@ func Test_deleteRouteUsecase_DeleteRoute(t *testing.T) {
 			name:     "異常系: ルートの所有者ではない（権限エラー）",
 			routeID:  "019b5a50-0000-7000-8000-000000000001",
 			kratosID: "2eb50f70-3a23-4067-99f6-9fd645686880",
-			mockFunc: func() {
+			mockFunc: func(
+				mockRouteRepo *routeDomain.MockIRouteRepository,
+				mockUserRepo *userDomain.MockIUserRepository,
+				mockTransactionManager *transactionApp.MockTransactionManager,
+			) {
 				user, _ := userDomain.ReconstructUser(
 					userDomain.UserID("019b5a8d-16a7-700a-be92-9ae11e7e5b9a"),
 					"2eb50f70-3a23-4067-99f6-9fd645686880",
@@ -136,7 +145,11 @@ func Test_deleteRouteUsecase_DeleteRoute(t *testing.T) {
 			name:     "異常系: トランザクション内での削除に失敗",
 			routeID:  "019b5a50-0000-7000-8000-000000000001",
 			kratosID: "2eb50f70-3a23-4067-99f6-9fd645686880",
-			mockFunc: func() {
+			mockFunc: func(
+				mockRouteRepo *routeDomain.MockIRouteRepository,
+				mockUserRepo *userDomain.MockIUserRepository,
+				mockTransactionManager *transactionApp.MockTransactionManager,
+			) {
 				user, _ := userDomain.ReconstructUser(
 					userDomain.UserID("019b5a8d-16a7-700a-be92-9ae11e7e5b9a"),
 					"2eb50f70-3a23-4067-99f6-9fd645686880",
@@ -170,9 +183,17 @@ func Test_deleteRouteUsecase_DeleteRoute(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tt := tt      // ループ変数をキャプチャ（並列実行時の変数共有を防ぐ）
-			t.Parallel()  // テストを並列実行
-			tt.mockFunc() // モックの振る舞いを設定
+			tt := tt     // ループ変数をキャプチャ（並列実行時の変数共有を防ぐ）
+			t.Parallel() // テストを並列実行
+
+			// モックをサブテストごとに作成（並列実行時の競合を防ぐ）
+			ctrl := gomock.NewController(t)
+			mockRouteRepo := routeDomain.NewMockIRouteRepository(ctrl)
+			mockUserRepo := userDomain.NewMockIUserRepository(ctrl)
+			mockTransactionManager := transactionApp.NewMockTransactionManager(ctrl)
+			uc := NewDeleteRouteUsecase(mockUserRepo, mockTransactionManager, mockRouteRepo)
+
+			tt.mockFunc(mockRouteRepo, mockUserRepo, mockTransactionManager)
 
 			gotErr := uc.DeleteRoute(context.Background(), tt.routeID, tt.kratosID)
 			if gotErr != nil {

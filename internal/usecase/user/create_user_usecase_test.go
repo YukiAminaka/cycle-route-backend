@@ -1,4 +1,4 @@
-package usecase
+package user
 
 import (
 	"context"
@@ -66,16 +66,16 @@ func Test_createUserUsecase_CreateUser(t *testing.T) {
 				Name:               "Test User",
 				FirstName:          new("Test"),
 				LastName:           new("User"),
-				Email:              new("test@example.com"), // 修正: 正しいメールアドレスに
+				Email:              new("test@example.com"),
 				HighlightedPhotoID: nil,
-				Locale:             new("ja"), // schema.sql: DEFAULT 'ja'
+				Locale:             new("ja"),
 				Description:        nil,
 				Locality:           nil,
 				AdministrativeArea: nil,
-				CountryCode:        new("JP"), // schema.sql: DEFAULT 'JP'
+				CountryCode:        new("JP"),
 				PostalCode:         nil,
 				Geom:               nil,
-				HasSetLocation:     false, // schema.sql: DEFAULT FALSE
+				HasSetLocation:     false, 
 			},
 			wantErr: false,
 		},

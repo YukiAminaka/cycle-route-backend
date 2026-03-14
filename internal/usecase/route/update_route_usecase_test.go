@@ -31,10 +31,6 @@ const (
 	testPolyline      = "aqtxEshssY]q@"
 )
 
-// ジェネリクスを使用したポインタヘルパー
-func ptr[T any](v T) *T {
-	return &v
-}
 
 // テスト用のデフォルトDTO作成ヘルパー
 func createDefaultUpdateDTO() UpdateRouteUseCaseInputDto {
@@ -57,28 +53,28 @@ func createDefaultUpdateDTO() UpdateRouteUseCaseInputDto {
 		Visibility: 1,
 		CoursePoints: []UpdatedCoursePointInput{
 			{
-				SegDistM:      ptr(100.0),
-				CumDistM:      ptr(100.0),
-				Duration:      ptr(600.0),
-				Instruction:   ptr("Turn right"),
-				RoadName:      ptr("Main St"),
-				ManeuverType:  ptr("turn"),
-				Modifier:      ptr("right"),
+				SegDistM:      new(100.0),
+				CumDistM:      new(100.0),
+				Duration:      new(600.0),
+				Instruction:   new("Turn right"),
+				RoadName:      new("Main St"),
+				ManeuverType:  new("turn"),
+				Modifier:      new("right"),
 				Location:      orb.Point{139.713592, 35.670692},
-				BearingBefore: ptr(int32(0)),
-				BearingAfter:  ptr(int32(326)),
+				BearingBefore: new(int32(0)),
+				BearingAfter:  new(int32(326)),
 			},
 			{
-				SegDistM:      ptr(100.0),
-				CumDistM:      ptr(200.0),
-				Duration:      ptr(600.0),
-				Instruction:   ptr("Turn left"),
-				RoadName:      ptr("Second St"),
-				ManeuverType:  ptr("turn"),
-				Modifier:      ptr("left"),
+				SegDistM:      new(100.0),
+				CumDistM:      new(200.0),
+				Duration:      new(600.0),
+				Instruction:   new("Turn left"),
+				RoadName:      new("Second St"),
+				ManeuverType:  new("turn"),
+				Modifier:      new("left"),
 				Location:      orb.Point{139.6917, 35.6895},
-				BearingBefore: ptr(int32(90)),
-				BearingAfter:  ptr(int32(180)),
+				BearingBefore: new(int32(90)),
+				BearingAfter:  new(int32(180)),
 			},
 		},
 		Waypoints: []UpdatedWaypointInput{

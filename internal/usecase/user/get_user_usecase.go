@@ -1,4 +1,4 @@
-package usecase
+package user
 
 import (
 	"context"
@@ -10,6 +10,7 @@ import (
 // IUserUsecase はユーザーユースケースのインターフェース
 type IGetUserByIDUsecase interface {
 	GetUserByID(ctx context.Context, id string) (*GetUserByIDUseCaseDto, error)
+	GetUserByKratosID(ctx context.Context, kratosID string) (*GetUserByKratosIDUsecaseDto, error)
 }
 
 type getUserByIDUsecase struct {
@@ -24,7 +25,7 @@ func NewGetUserByIDUsecase(userRepo userDomain.IUserRepository) IGetUserByIDUsec
 }
 
 // GetUserByIDUseCaseDto は GetUserByID ユースケースの出力DTO
-type GetUserByIDUseCaseDto struct {
+type GetUserByKratosIDUsecaseDto struct {
 	ID                 string
 	Name               string
 	HighlightedPhotoID *int64
@@ -41,12 +42,39 @@ type GetUserByIDUseCaseDto struct {
 	HasSetLocation     bool
 }
 
+type GetUserByIDUseCaseDto struct {
+	ID                 string
+	Name               string
+	HighlightedPhotoID *int64
+	Description        *string
+	Locality           *string
+	AdministrativeArea *string
+	CountryCode        *string
+}
+
 func (u *getUserByIDUsecase) GetUserByID(ctx context.Context, id string) (*GetUserByIDUseCaseDto, error) {
 	user, err := u.userRepo.GetUserByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
+
 	return &GetUserByIDUseCaseDto{
+		ID:                 user.ID().String(),
+		Name:               user.Name(),
+		HighlightedPhotoID: user.HighlightedPhotoID(),
+		Description:        user.Description(),
+		Locality:           user.Locality(),
+		AdministrativeArea: user.AdministrativeArea(),
+		CountryCode:        user.CountryCode(),
+	}, nil
+}
+
+func (u *getUserByIDUsecase) GetUserByKratosID(ctx context.Context, kratosID string) (*GetUserByKratosIDUsecaseDto, error) {
+	user, err := u.userRepo.GetUserByKratosID(ctx, kratosID)
+	if err != nil {
+		return nil, err
+	}
+	return &GetUserByKratosIDUsecaseDto{
 		ID:                 user.ID().String(),
 		Name:               user.Name(),
 		HighlightedPhotoID: user.HighlightedPhotoID(),
@@ -68,5 +96,5 @@ func (u *getUserByIDUsecase) GetUserByID(ctx context.Context, id string) (*GetUs
 		LastName:       user.LastName(),
 		Email:          user.Email(),
 		HasSetLocation: user.HasSetLocation(),
-	}, nil
+	}, nil	
 }

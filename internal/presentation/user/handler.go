@@ -1,6 +1,8 @@
 package user
 
 import (
+	"errors"
+
 	"github.com/YukiAminaka/cycle-route-backend/internal/pkg/geometry"
 	"github.com/YukiAminaka/cycle-route-backend/internal/presentation/response"
 	"github.com/YukiAminaka/cycle-route-backend/internal/presentation/validator"
@@ -26,22 +28,28 @@ func NewHandler(
 	}
 }
 
-// GetUserByID godoc
-//	@Summary	ユーザーを取得する
+// GetLoginUser godoc
+//	@Summary	ログインユーザーを取得する
 //	@Tags		users
 //	@Accept		json
 //	@Produce	json
 //	@Security	CookieAuth
-//	@Param		id	path		string	true	"User ID"
-//	@Success	200	{object}	UserResponse
-//	@Failure	400	{object}	response.ErrorResponse
-//	@Failure	404	{object}	response.ErrorResponse
+//	@Success	200	{object}	LoginUserResponse
+//	@Failure	401	{object}	response.ErrorResponse
 //	@Failure	500	{object}	response.ErrorResponse
-//	@Router		/users/{id} [get]
-func (h *Handler) GetUserByID(c *gin.Context) {
-	id := c.Param("id")
-
-	dto, err := h.getUserUsecase.GetUserByID(c.Request.Context(), id)
+//	@Router		/users/me [get]
+func (h *Handler) GetLoginUser(c *gin.Context) {
+	kratosIDValue, exists := c.Get("kratos_id")
+	if !exists {
+		response.ReturnStatusUnauthorized(c, errors.New("user not authenticated"))
+		return
+	}
+	kratosID, ok := kratosIDValue.(string)
+	if !ok {
+		response.ReturnStatusInternalServerError(c, errors.New("invalid kratos_id type"))
+		return
+	}
+	dto, err := h.getUserUsecase.GetUserByKratosID(c.Request.Context(), kratosID)
 	if err != nil {
 		response.ReturnStatusInternalServerError(c, err)
 		return
@@ -56,8 +64,8 @@ func (h *Handler) GetUserByID(c *gin.Context) {
 		rawJSON = string(b)
 	}
 
-	res := UserResponse{
-		User: UserResponseModel{
+	res := LoginUserResponse{
+		User: LoginUserResponseModel{
 			ID:                 dto.ID,
 			Name:               dto.Name,
 			HighlightedPhotoID: dto.HighlightedPhotoID,
@@ -75,6 +83,41 @@ func (h *Handler) GetUserByID(c *gin.Context) {
 		},
 	}
 
+	response.ReturnStatusOK(c, res)
+}
+
+// GetUserByID godoc
+//	@Summary	ユーザーの公開プロフィールを取得する
+//	@Tags		users
+//	@Accept		json
+//	@Produce	json
+//	@Param		id	path		string	true	"User ID"
+//	@Success	200	{object}	UserResponse
+//	@Failure	400	{object}	response.ErrorResponse
+//	@Failure	404	{object}	response.ErrorResponse
+//	@Failure	500	{object}	response.ErrorResponse
+//	@Router		/users/{id} [get]
+func (h *Handler) GetUserByID(c *gin.Context) {
+	id := c.Param("id")
+
+	dto, err := h.getUserUsecase.GetUserByID(c.Request.Context(), id)
+	if err != nil {
+		response.ReturnStatusInternalServerError(c, err)
+		return
+	}
+
+	res := UserResponse{
+		User: UserResponseModel{
+			ID:                 dto.ID,
+			Name:               dto.Name,
+			HighlightedPhotoID: dto.HighlightedPhotoID,
+			Description:        dto.Description,
+			Locality:           dto.Locality,
+			AdministrativeArea: dto.AdministrativeArea,
+			CountryCode:        dto.CountryCode,
+		},
+	}
+	
 	response.ReturnStatusOK(c, res)
 }
 
@@ -117,8 +160,8 @@ func (h *Handler) CreateUser(c *gin.Context) {
 	}
 
 
-	res := UserResponse{
-		User: UserResponseModel{
+	res := LoginUserResponse{
+		User: LoginUserResponseModel{
 			ID:                 dto.ID,
 			Name:               dto.Name,
 			HighlightedPhotoID: dto.HighlightedPhotoID,

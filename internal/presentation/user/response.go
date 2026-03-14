@@ -1,12 +1,10 @@
 package user
 
-// UserResponse はユーザー取得のレスポンス
-type UserResponse struct {
-	User UserResponseModel `json:"user"`
+type LoginUserResponse struct {
+	User LoginUserResponseModel `json:"user"`
 }
 
-// UserResponseModel はユーザー情報のレスポンスモデル
-type UserResponseModel struct {
+type LoginUserResponseModel struct {
 	ID                 string  `json:"id"`
 	Name               string  `json:"name"`
 	HighlightedPhotoID *int64  `json:"highlighted_photo_id,omitempty"`
@@ -21,4 +19,20 @@ type UserResponseModel struct {
 	LastName           *string `json:"last_name,omitempty"`
 	Email              *string `json:"email,omitempty"`
 	HasSetLocation     bool    `json:"has_set_location"`
+}
+
+// UserResponse はユーザー取得のレスポンス
+type UserResponse struct {
+	User UserResponseModel `json:"user"`
+}
+
+// UserResponseModel はユーザー情報のレスポンスモデル
+type UserResponseModel struct {
+	ID                 string  `json:"id"`
+	Name               string  `json:"name"`
+	HighlightedPhotoID *int64  `json:"highlighted_photo_id,omitempty"`
+	Description        *string `json:"description,omitempty"`
+	Locality           *string `json:"locality,omitempty"`
+	AdministrativeArea *string `json:"administrative_area,omitempty"`
+	CountryCode        *string `json:"country_code,omitempty"`
 }

@@ -36,7 +36,8 @@ func userRoute(r *gin.RouterGroup, q *dbgen.Queries, k *middleware.KratosMiddlew
 		userUsecase.NewGetUserByIDUsecase(userRepository),
 	)
 	group := r.Group("/users")
-	group.GET("/:id",k.Session(), h.GetUserByID)
+	group.GET("/me", k.Session(), h.GetLoginUser)
+	group.GET("/:id", h.GetUserByID)
 	group.POST("", h.CreateUser)
 }
 

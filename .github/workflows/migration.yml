@@ -3,11 +3,6 @@ name: DB Migration and Check
 on:
   push:
     branches: ["main"]
-    paths:
-      - "db/migrations/**"
-  pull_request:
-    paths:
-      - "db/migrations/**"
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   REGION: ${{ secrets.GCP_REGION }}

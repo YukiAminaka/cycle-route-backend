@@ -67,7 +67,7 @@ jobs:
         uses: ariga/atlas-action/migrate/apply@v1
         with:
           url: ${{ env.DATABASE_URL }}
-          dir: db/migrations
+          dir: file://db/migrations
       - name: Stop Cloud SQL Proxy
         if: always()
         run: pkill -f cloud-sql-proxy || true

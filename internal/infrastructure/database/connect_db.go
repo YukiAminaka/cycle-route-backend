@@ -2,7 +2,6 @@ package database
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"time"
 
@@ -22,14 +21,8 @@ func NewDB(cfg config.DBConfig) *pgxpool.Pool {
 	ctx, cancel := context.WithTimeout(context.Background(), connectionTimeout)
 	defer cancel()
 
-	// データベース接続用のURLを作成
-	databaseUrl := fmt.Sprintf(
-		"postgres://%s:%s@%s:%s/%s?sslmode=disable",
-		cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.Name,
-	)
-
 	// コネクションプール設定をパース
-	poolConfig, err := pgxpool.ParseConfig(databaseUrl)
+	poolConfig, err := pgxpool.ParseConfig(cfg.DatabaseUrl)
 	if err != nil {
 		log.Fatalf("Failed to parse database URL: %v", err)
 	}

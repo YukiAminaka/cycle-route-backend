@@ -13,6 +13,11 @@ output "terraform_service_account" {
   value       = module.workload_identity.terraform_service_account_email
 }
 
+output "db_migration_service_account" {
+  description = "Database Migration SA のメールアドレス (GitHub Secrets の MIGRATION_ACCOUNT に設定)"
+  value       = module.workload_identity.db_migration_service_account_email
+}
+
 output "artifact_registry_urls" {
   description = "Artifact Registry repository URLs (push images here)"
   value       = module.artifact_registry.repository_urls

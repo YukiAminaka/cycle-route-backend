@@ -17,3 +17,8 @@ output "db_user" {
   description = "Database user name"
   value       = google_sql_user.main.name
 }
+
+output "db_service_account_email" {
+  description = "Database service account email"
+  value       = google_service_account.database.email
+}

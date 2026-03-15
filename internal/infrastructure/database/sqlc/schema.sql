@@ -94,13 +94,13 @@ CREATE TABLE trips (
   visibility             SMALLINT NOT NULL DEFAULT 0 CHECK (visibility IN (0,1,2)),
   highlighted_photo_id   BIGINT NOT NULL DEFAULT 0,
   
-  -- 位置情報（PostGIS を使うなら Point/Polygon で保持）
+  -- 位置情報
   path_geom              geometry(LineString, 4326),
   first_point            geometry(Point, 4326),                -- ST_SetSRID(ST_MakePoint(lng,lat),4326)
   last_point             geometry(Point, 4326),
-  bbox_geom              geometry(Polygon, 4326),              -- NE/SW から生成して保存も可
+  bbox_geom              geometry(Polygon, 4326),              
 
-  -- 計測系（距離[m]、時間[秒]、速度[m/s] など）
+  -- 計測系
   distance               DOUBLE PRECISION CHECK (distance IS NULL OR distance >= 0),                     
   duration               INTEGER CHECK (duration IS NULL OR duration >= 0),                              
   moving_time            INTEGER CHECK (moving_time IS NULL OR moving_time >= 0),                              

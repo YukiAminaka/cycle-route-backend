@@ -153,7 +153,7 @@ resource "google_cloud_run_v2_service" "kratos_public" {
       }
 
       env {
-        name = "KRATOS_DSN"
+        name = "DSN"
         value_source {
           secret_key_ref {
             secret  = google_secret_manager_secret.kratos_dsn.secret_id
@@ -163,7 +163,7 @@ resource "google_cloud_run_v2_service" "kratos_public" {
       }
 
       env {
-        name = "KRATOS_COOKIE_SECRET"
+        name = "SECRETS_COOKIE_0"
         value_source {
           secret_key_ref {
             secret  = var.kratos_cookie_secret_id
@@ -173,7 +173,7 @@ resource "google_cloud_run_v2_service" "kratos_public" {
       }
 
       env {
-        name = "KRATOS_CIPHER_SECRET"
+        name = "SECRETS_CIPHER_0"
         value_source {
           secret_key_ref {
             secret  = var.kratos_cipher_secret_id
@@ -183,7 +183,7 @@ resource "google_cloud_run_v2_service" "kratos_public" {
       }
 
       env {
-        name = "KRATOS_SMTP_CONNECTION_URI"
+        name = "COURIER_SMTP_CONNECTION_URI"
         value_source {
           secret_key_ref {
             secret  = var.kratos_smtp_secret_id
@@ -193,7 +193,7 @@ resource "google_cloud_run_v2_service" "kratos_public" {
       }
 
       env {
-        name = "KRATOS_SMTP_FROM_ADDRESS"
+        name = "COURIER_SMTP_FROM_ADDRESS"
         value_source {
           secret_key_ref {
             secret  = var.kratos_smtp_from_address_secret_id
@@ -203,23 +203,73 @@ resource "google_cloud_run_v2_service" "kratos_public" {
       }
 
       env {
-        name  = "KRATOS_PUBLIC_BASE_URL"
+        name  = "SERVE_PUBLIC_BASE_URL"
         value = var.kratos_public_base_url
       }
 
       env {
-        name  = "KRATOS_ADMIN_BASE_URL"
+        name  = "SERVE_ADMIN_BASE_URL"
         value = var.kratos_admin_base_url
       }
 
       env {
-        name  = "FRONTEND_URL"
+        name  = "SERVE_PUBLIC_CORS_ALLOWED_ORIGINS_0"
         value = var.frontend_url
       }
 
       env {
-        name  = "BACKEND_URL"
-        value = var.backend_url
+        name  = "SELFSERVICE_DEFAULT_BROWSER_RETURN_URL"
+        value = "${var.frontend_url}/"
+      }
+
+      env {
+        name  = "SELFSERVICE_ALLOWED_RETURN_URLS_0"
+        value = var.frontend_url
+      }
+
+      env {
+        name  = "SELFSERVICE_FLOWS_ERROR_UI_URL"
+        value = "${var.frontend_url}/error"
+      }
+
+      env {
+        name  = "SELFSERVICE_FLOWS_SETTINGS_UI_URL"
+        value = "${var.frontend_url}/settings"
+      }
+
+      env {
+        name  = "SELFSERVICE_FLOWS_RECOVERY_UI_URL"
+        value = "${var.frontend_url}/recovery"
+      }
+
+      env {
+        name  = "SELFSERVICE_FLOWS_VERIFICATION_UI_URL"
+        value = "${var.frontend_url}/verification"
+      }
+
+      env {
+        name  = "SELFSERVICE_FLOWS_VERIFICATION_AFTER_DEFAULT_BROWSER_RETURN_URL"
+        value = "${var.frontend_url}/"
+      }
+
+      env {
+        name  = "SELFSERVICE_FLOWS_LOGOUT_AFTER_DEFAULT_BROWSER_RETURN_URL"
+        value = "${var.frontend_url}/login"
+      }
+
+      env {
+        name  = "SELFSERVICE_FLOWS_LOGIN_UI_URL"
+        value = "${var.frontend_url}/login"
+      }
+
+      env {
+        name  = "SELFSERVICE_FLOWS_REGISTRATION_UI_URL"
+        value = "${var.frontend_url}/register"
+      }
+
+      env {
+        name  = "SELFSERVICE_FLOWS_REGISTRATION_AFTER_PASSWORD_HOOKS_2_CONFIG_URL"
+        value = "${var.backend_url}/api/v1/users"
       }
     }
   }
@@ -293,7 +343,7 @@ resource "google_cloud_run_v2_service" "kratos_admin" {
       }
 
       env {
-        name = "KRATOS_DSN"
+        name = "DSN"
         value_source {
           secret_key_ref {
             secret  = google_secret_manager_secret.kratos_dsn.secret_id
@@ -303,7 +353,7 @@ resource "google_cloud_run_v2_service" "kratos_admin" {
       }
 
       env {
-        name = "KRATOS_COOKIE_SECRET"
+        name = "SECRETS_COOKIE_0"
         value_source {
           secret_key_ref {
             secret  = var.kratos_cookie_secret_id
@@ -313,7 +363,7 @@ resource "google_cloud_run_v2_service" "kratos_admin" {
       }
 
       env {
-        name = "KRATOS_CIPHER_SECRET"
+        name = "SECRETS_CIPHER_0"
         value_source {
           secret_key_ref {
             secret  = var.kratos_cipher_secret_id
@@ -323,7 +373,7 @@ resource "google_cloud_run_v2_service" "kratos_admin" {
       }
 
       env {
-        name = "KRATOS_SMTP_CONNECTION_URI"
+        name = "COURIER_SMTP_CONNECTION_URI"
         value_source {
           secret_key_ref {
             secret  = var.kratos_smtp_secret_id
@@ -333,7 +383,7 @@ resource "google_cloud_run_v2_service" "kratos_admin" {
       }
 
       env {
-        name = "KRATOS_SMTP_FROM_ADDRESS"
+        name = "COURIER_SMTP_FROM_ADDRESS"
         value_source {
           secret_key_ref {
             secret  = var.kratos_smtp_from_address_secret_id
@@ -343,23 +393,73 @@ resource "google_cloud_run_v2_service" "kratos_admin" {
       }
 
       env {
-        name  = "KRATOS_PUBLIC_BASE_URL"
+        name  = "SERVE_PUBLIC_BASE_URL"
         value = var.kratos_public_base_url
       }
 
       env {
-        name  = "KRATOS_ADMIN_BASE_URL"
+        name  = "SERVE_ADMIN_BASE_URL"
         value = var.kratos_admin_base_url
       }
 
       env {
-        name  = "FRONTEND_URL"
+        name  = "SERVE_PUBLIC_CORS_ALLOWED_ORIGINS_0"
         value = var.frontend_url
       }
 
       env {
-        name  = "BACKEND_URL"
-        value = var.backend_url
+        name  = "SELFSERVICE_DEFAULT_BROWSER_RETURN_URL"
+        value = "${var.frontend_url}/"
+      }
+
+      env {
+        name  = "SELFSERVICE_ALLOWED_RETURN_URLS_0"
+        value = var.frontend_url
+      }
+
+      env {
+        name  = "SELFSERVICE_FLOWS_ERROR_UI_URL"
+        value = "${var.frontend_url}/error"
+      }
+
+      env {
+        name  = "SELFSERVICE_FLOWS_SETTINGS_UI_URL"
+        value = "${var.frontend_url}/settings"
+      }
+
+      env {
+        name  = "SELFSERVICE_FLOWS_RECOVERY_UI_URL"
+        value = "${var.frontend_url}/recovery"
+      }
+
+      env {
+        name  = "SELFSERVICE_FLOWS_VERIFICATION_UI_URL"
+        value = "${var.frontend_url}/verification"
+      }
+
+      env {
+        name  = "SELFSERVICE_FLOWS_VERIFICATION_AFTER_DEFAULT_BROWSER_RETURN_URL"
+        value = "${var.frontend_url}/"
+      }
+
+      env {
+        name  = "SELFSERVICE_FLOWS_LOGOUT_AFTER_DEFAULT_BROWSER_RETURN_URL"
+        value = "${var.frontend_url}/login"
+      }
+
+      env {
+        name  = "SELFSERVICE_FLOWS_LOGIN_UI_URL"
+        value = "${var.frontend_url}/login"
+      }
+
+      env {
+        name  = "SELFSERVICE_FLOWS_REGISTRATION_UI_URL"
+        value = "${var.frontend_url}/register"
+      }
+
+      env {
+        name  = "SELFSERVICE_FLOWS_REGISTRATION_AFTER_PASSWORD_HOOKS_2_CONFIG_URL"
+        value = "${var.backend_url}/api/v1/users"
       }
     }
   }
@@ -417,7 +517,7 @@ resource "google_cloud_run_v2_job" "kratos_migrate" {
         }
 
         env {
-          name = "KRATOS_DSN"
+          name = "DSN"
           value_source {
             secret_key_ref {
               secret  = google_secret_manager_secret.kratos_dsn.secret_id
@@ -427,7 +527,7 @@ resource "google_cloud_run_v2_job" "kratos_migrate" {
         }
 
         env {
-          name = "KRATOS_COOKIE_SECRET"
+          name = "SECRETS_COOKIE_0"
           value_source {
             secret_key_ref {
               secret  = var.kratos_cookie_secret_id
@@ -437,7 +537,7 @@ resource "google_cloud_run_v2_job" "kratos_migrate" {
         }
 
         env {
-          name = "KRATOS_CIPHER_SECRET"
+          name = "SECRETS_CIPHER_0"
           value_source {
             secret_key_ref {
               secret  = var.kratos_cipher_secret_id
@@ -447,7 +547,7 @@ resource "google_cloud_run_v2_job" "kratos_migrate" {
         }
 
         env {
-          name = "KRATOS_SMTP_CONNECTION_URI"
+          name = "COURIER_SMTP_CONNECTION_URI"
           value_source {
             secret_key_ref {
               secret  = var.kratos_smtp_secret_id
@@ -457,7 +557,7 @@ resource "google_cloud_run_v2_job" "kratos_migrate" {
         }
 
         env {
-          name = "KRATOS_SMTP_FROM_ADDRESS"
+          name = "COURIER_SMTP_FROM_ADDRESS"
           value_source {
             secret_key_ref {
               secret  = var.kratos_smtp_from_address_secret_id
@@ -467,23 +567,18 @@ resource "google_cloud_run_v2_job" "kratos_migrate" {
         }
 
         env {
-          name  = "KRATOS_PUBLIC_BASE_URL"
+          name  = "SERVE_PUBLIC_BASE_URL"
           value = var.kratos_public_base_url
         }
 
         env {
-          name  = "KRATOS_ADMIN_BASE_URL"
+          name  = "SERVE_ADMIN_BASE_URL"
           value = var.kratos_admin_base_url
         }
 
         env {
-          name  = "FRONTEND_URL"
-          value = var.frontend_url
-        }
-
-        env {
-          name  = "BACKEND_URL"
-          value = var.backend_url
+          name  = "SELFSERVICE_FLOWS_REGISTRATION_AFTER_PASSWORD_HOOKS_2_CONFIG_URL"
+          value = "${var.backend_url}/api/v1/users"
         }
       }
     }

@@ -1,15 +1,14 @@
 version: v0.13.0
 
-dsn: ${KRATOS_DSN}
+# dsn: DSN env var で設定
 
 serve:
   public:
-    base_url: ${KRATOS_PUBLIC_BASE_URL}
+    # base_url: SERVE_PUBLIC_BASE_URL env var で設定
     cors:
       enabled: true
       allow_credentials: true
-      allowed_origins:
-        - ${FRONTEND_URL}
+      # allowed_origins: SERVE_PUBLIC_CORS_ALLOWED_ORIGINS_0 env var で設定
       allowed_methods:
         - POST
         - GET
@@ -20,12 +19,11 @@ serve:
         - Content-Type
         - Authorization
   admin:
-    base_url: ${KRATOS_ADMIN_BASE_URL}
+    # base_url: SERVE_ADMIN_BASE_URL env var で設定
 
 selfservice:
-  default_browser_return_url: ${FRONTEND_URL}/
-  allowed_return_urls:
-    - ${FRONTEND_URL}
+  # default_browser_return_url: SELFSERVICE_DEFAULT_BROWSER_RETURN_URL env var で設定
+  # allowed_return_urls: SELFSERVICE_ALLOWED_RETURN_URLS_0 env var で設定
 
   methods:
     password:
@@ -43,36 +41,36 @@ selfservice:
 
   flows:
     error:
-      ui_url: ${FRONTEND_URL}/error
+      # ui_url: SELFSERVICE_FLOWS_ERROR_UI_URL env var で設定
 
     settings:
-      ui_url: ${FRONTEND_URL}/settings
+      # ui_url: SELFSERVICE_FLOWS_SETTINGS_UI_URL env var で設定
       privileged_session_max_age: 15m
       required_aal: highest_available
 
     recovery:
       enabled: true
-      ui_url: ${FRONTEND_URL}/recovery
+      # ui_url: SELFSERVICE_FLOWS_RECOVERY_UI_URL env var で設定
       use: code
 
     verification:
       enabled: true
-      ui_url: ${FRONTEND_URL}/verification
+      # ui_url: SELFSERVICE_FLOWS_VERIFICATION_UI_URL env var で設定
       use: code
       after:
-        default_browser_return_url: ${FRONTEND_URL}/
+        # default_browser_return_url: SELFSERVICE_FLOWS_VERIFICATION_AFTER_DEFAULT_BROWSER_RETURN_URL env var で設定
 
     logout:
       after:
-        default_browser_return_url: ${FRONTEND_URL}/login
+        # default_browser_return_url: SELFSERVICE_FLOWS_LOGOUT_AFTER_DEFAULT_BROWSER_RETURN_URL env var で設定
 
     login:
-      ui_url: ${FRONTEND_URL}/login
+      # ui_url: SELFSERVICE_FLOWS_LOGIN_UI_URL env var で設定
       lifespan: 10m
 
     registration:
       lifespan: 10m
-      ui_url: ${FRONTEND_URL}/register
+      # ui_url: SELFSERVICE_FLOWS_REGISTRATION_UI_URL env var で設定
       after:
         password:
           hooks:
@@ -80,7 +78,7 @@ selfservice:
             - hook: show_verification_ui
             - hook: web_hook
               config:
-                url: ${BACKEND_URL}/api/v1/users
+                # url: SELFSERVICE_FLOWS_REGISTRATION_AFTER_PASSWORD_HOOKS_2_CONFIG_URL env var で設定
                 method: POST
                 body: file:///etc/config/kratos/hooks/create-profile.jsonnet
 
@@ -89,11 +87,8 @@ log:
   format: json
   leak_sensitive_values: false
 
-secrets:
-  cookie:
-    - ${KRATOS_COOKIE_SECRET}
-  cipher:
-    - ${KRATOS_CIPHER_SECRET}
+# secrets.cookie: SECRETS_COOKIE_0 env var で設定
+# secrets.cipher: SECRETS_CIPHER_0 env var で設定
 
 ciphers:
   algorithm: xchacha20-poly1305
@@ -111,8 +106,8 @@ identity:
 
 courier:
   smtp:
-    connection_uri: ${KRATOS_SMTP_CONNECTION_URI}
-    from_address: ${KRATOS_SMTP_FROM_ADDRESS}
+    # connection_uri: COURIER_SMTP_CONNECTION_URI env var で設定
+    # from_address: COURIER_SMTP_FROM_ADDRESS env var で設定
     from_name: Rideline
 
 feature_flags:

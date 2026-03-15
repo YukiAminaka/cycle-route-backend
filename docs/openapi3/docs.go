@@ -377,15 +377,15 @@ const docTemplate = `{
                 ],
                 "type": "object"
             },
-            "user.UserResponse": {
+            "user.LoginUserResponse": {
                 "properties": {
                     "user": {
-                        "$ref": "#/components/schemas/user.UserResponseModel"
+                        "$ref": "#/components/schemas/user.LoginUserResponseModel"
                     }
                 },
                 "type": "object"
             },
-            "user.UserResponseModel": {
+            "user.LoginUserResponseModel": {
                 "properties": {
                     "administrative_area": {
                         "type": "string"
@@ -427,6 +427,40 @@ const docTemplate = `{
                         "type": "string"
                     },
                     "postal_code": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "user.UserResponse": {
+                "properties": {
+                    "user": {
+                        "$ref": "#/components/schemas/user.UserResponseModel"
+                    }
+                },
+                "type": "object"
+            },
+            "user.UserResponseModel": {
+                "properties": {
+                    "administrative_area": {
+                        "type": "string"
+                    },
+                    "country_code": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "highlighted_photo_id": {
+                        "type": "integer"
+                    },
+                    "id": {
+                        "type": "string"
+                    },
+                    "locality": {
+                        "type": "string"
+                    },
+                    "name": {
                         "type": "string"
                     }
                 },
@@ -934,6 +968,60 @@ const docTemplate = `{
                 ]
             }
         },
+        "/users/me": {
+            "get": {
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/user.LoginUserResponse"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "401": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/response.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/response.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Internal Server Error"
+                    }
+                },
+                "security": [
+                    {
+                        "CookieAuth": []
+                    }
+                ],
+                "summary": "ログインユーザーを取得する",
+                "tags": [
+                    "users"
+                ]
+            }
+        },
         "/users/{id}": {
             "get": {
                 "parameters": [
@@ -998,12 +1086,7 @@ const docTemplate = `{
                         "description": "Internal Server Error"
                     }
                 },
-                "security": [
-                    {
-                        "CookieAuth": []
-                    }
-                ],
-                "summary": "ユーザーを取得する",
+                "summary": "ユーザーの公開プロフィールを取得する",
                 "tags": [
                     "users"
                 ]

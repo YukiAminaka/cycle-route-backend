@@ -248,12 +248,12 @@ definitions:
     - kratos_id
     - name
     type: object
-  user.UserResponse:
+  user.LoginUserResponse:
     properties:
       user:
-        $ref: '#/definitions/user.UserResponseModel'
+        $ref: '#/definitions/user.LoginUserResponseModel'
     type: object
-  user.UserResponseModel:
+  user.LoginUserResponseModel:
     properties:
       administrative_area:
         type: string
@@ -282,6 +282,28 @@ definitions:
       name:
         type: string
       postal_code:
+        type: string
+    type: object
+  user.UserResponse:
+    properties:
+      user:
+        $ref: '#/definitions/user.UserResponseModel'
+    type: object
+  user.UserResponseModel:
+    properties:
+      administrative_area:
+        type: string
+      country_code:
+        type: string
+      description:
+        type: string
+      highlighted_photo_id:
+        type: integer
+      id:
+        type: string
+      locality:
+        type: string
+      name:
         type: string
     type: object
 host: localhost:8080
@@ -546,9 +568,31 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.ErrorResponse'
+      summary: ユーザーの公開プロフィールを取得する
+      tags:
+      - users
+  /users/me:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.LoginUserResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
       security:
       - CookieAuth: []
-      summary: ユーザーを取得する
+      summary: ログインユーザーを取得する
       tags:
       - users
 securityDefinitions:

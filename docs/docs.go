@@ -367,7 +367,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/users/{id}": {
+        "/users/me": {
             "get": {
                 "security": [
                     {
@@ -383,7 +383,41 @@ const docTemplate = `{
                 "tags": [
                     "users"
                 ],
-                "summary": "ユーザーを取得する",
+                "summary": "ログインユーザーを取得する",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/user.LoginUserResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/{id}": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "ユーザーの公開プロフィールを取得する",
                 "parameters": [
                     {
                         "type": "string",
@@ -785,15 +819,15 @@ const docTemplate = `{
                 }
             }
         },
-        "user.UserResponse": {
+        "user.LoginUserResponse": {
             "type": "object",
             "properties": {
                 "user": {
-                    "$ref": "#/definitions/user.UserResponseModel"
+                    "$ref": "#/definitions/user.LoginUserResponseModel"
                 }
             }
         },
-        "user.UserResponseModel": {
+        "user.LoginUserResponseModel": {
             "type": "object",
             "properties": {
                 "administrative_area": {
@@ -836,6 +870,40 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "postal_code": {
+                    "type": "string"
+                }
+            }
+        },
+        "user.UserResponse": {
+            "type": "object",
+            "properties": {
+                "user": {
+                    "$ref": "#/definitions/user.UserResponseModel"
+                }
+            }
+        },
+        "user.UserResponseModel": {
+            "type": "object",
+            "properties": {
+                "administrative_area": {
+                    "type": "string"
+                },
+                "country_code": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "highlighted_photo_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "locality": {
+                    "type": "string"
+                },
+                "name": {
                     "type": "string"
                 }
             }

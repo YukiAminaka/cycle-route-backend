@@ -17,7 +17,7 @@ resource "google_secret_manager_secret" "kratos_dsn" {
 
 resource "google_secret_manager_secret_version" "kratos_dsn" {
   secret      = google_secret_manager_secret.kratos_dsn.id
-  secret_data = "postgres://${var.db_user}:${var.db_password}@127.0.0.1:5432/${var.db_name}?sslmode=disable&max_conns=20&max_idle_conns=4"
+  secret_data = "postgres://${var.db_user}:${var.db_password}@/${var.db_name}?host=/cloudsql/${var.db_connection_name}&sslmode=disable&max_conns=20&max_idle_conns=4"
 }
 
 # ============================================================

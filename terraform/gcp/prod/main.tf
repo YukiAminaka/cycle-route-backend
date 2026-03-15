@@ -75,8 +75,8 @@ module "artifact_registry" {
 module "workload_identity" {
   source = "../modules/workload_identity"
 
-  project_id   = var.project_id
-  project_name = var.project_name
+  project_id        = var.project_id
+  project_name      = var.project_name
   github_repository = var.github_repository
 
   cloud_run_service_account_emails = [

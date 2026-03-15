@@ -19,6 +19,11 @@ variable "cloud_run_service_account_emails" {
   default     = []
 }
 
+variable "db_service_account_email" {
+  description = "Email of database service account for migration"
+  type        = string
+}
+
 variable "terraform_state_bucket" {
   description = "Terraform state を保存する GCS バケット名"
   type        = string

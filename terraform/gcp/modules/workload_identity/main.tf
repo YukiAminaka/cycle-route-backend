@@ -59,6 +59,16 @@ resource "google_service_account_iam_member" "workload_identity_binding" {
 }
 
 # ============================================================
+# Allow GitHub Actions (WIF) to impersonate the Database SA for migration
+# ============================================================
+
+resource "google_service_account_iam_member" "db_workload_identity_binding" {
+  service_account_id = "projects/${var.project_id}/serviceAccounts/${var.db_service_account_email}"
+  role               = "roles/iam.workloadIdentityUser"
+  member             = "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github.name}/attribute.repository/${var.github_repository}"
+}
+
+# ============================================================
 # IAM: Artifact Registry への push 権限
 # ============================================================
 

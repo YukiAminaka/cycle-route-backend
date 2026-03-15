@@ -21,6 +21,28 @@ resource "google_secret_manager_secret_version" "kratos_dsn" {
 }
 
 # ============================================================
+# API DSN secret
+# ============================================================
+
+resource "google_secret_manager_secret" "api_dsn" {
+  secret_id = "${var.project_name}-${var.environment}-api-dsn"
+
+  replication {
+    auto {}
+  }
+
+  labels = {
+    project     = var.project_name
+    environment = var.environment
+  }
+}
+
+resource "google_secret_manager_secret_version" "api_dsn" {
+  secret      = google_secret_manager_secret.api_dsn.id
+  secret_data = "postgres://${var.db_user}:${var.db_password}@/${var.db_name}?host=/cloudsql/${var.db_connection_name}&sslmode=disable"
+}
+
+# ============================================================
 # Service Accounts
 # ============================================================
 
@@ -62,9 +84,9 @@ resource "google_project_iam_member" "kratos_cloudsql_client" {
 # ============================================================
 
 # Secret ManagerにアクセスできるIAMの設定
-resource "google_secret_manager_secret_iam_member" "api_db_password" {
-  secret_id = var.db_password_secret_id
-  role      = "roles/secretmanager.secretAccessor" # シークレット値の取得を許可する最小限のロール
+resource "google_secret_manager_secret_iam_member" "api_dsn" {
+  secret_id = google_secret_manager_secret.api_dsn.secret_id
+  role      = "roles/secretmanager.secretAccessor"
   member    = "serviceAccount:${google_service_account.api.email}"
 }
 
@@ -649,21 +671,6 @@ resource "google_cloud_run_v2_service" "api" {
       }
 
       env {
-        name  = "DB_HOST"
-        value = "/cloudsql/${var.db_connection_name}"
-      }
-
-      env {
-        name  = "DB_NAME"
-        value = var.db_name
-      }
-
-      env {
-        name  = "DB_USER"
-        value = var.db_user
-      }
-
-      env {
         name  = "KRATOS_ADMIN_URL"
         value = google_cloud_run_v2_service.kratos_admin.uri
       }
@@ -674,10 +681,10 @@ resource "google_cloud_run_v2_service" "api" {
       }
 
       env {
-        name = "DB_PASSWORD"
+        name = "DATABASE_URL"
         value_source {
           secret_key_ref {
-            secret  = var.db_password_secret_id
+            secret  = google_secret_manager_secret.api_dsn.secret_id
             version = "latest"
           }
         }
@@ -686,7 +693,8 @@ resource "google_cloud_run_v2_service" "api" {
   }
 
   depends_on = [
-    google_secret_manager_secret_iam_member.api_db_password,
+    google_secret_manager_secret_iam_member.api_dsn,
+    google_secret_manager_secret_version.api_dsn,
     google_project_iam_member.api_cloudsql_client,
   ]
 }

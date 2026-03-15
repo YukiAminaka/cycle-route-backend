@@ -1,6 +1,7 @@
 resource "random_password" "db_password" {
   length  = 32
   special = true
+  override_special = "?$"
 }
 
 resource "google_secret_manager_secret" "db_password" {

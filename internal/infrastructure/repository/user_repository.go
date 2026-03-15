@@ -185,7 +185,7 @@ func (r *userRepositoryImpl) UpdateUser(ctx context.Context, userDomain *user.Us
 
 	u, err := r.queries.UpdateUser(ctx, dbgen.UpdateUserParams{
 		Name:               userDomain.Name(),
-		Email:          userDomain.Email(),
+		Email:              userDomain.Email(),
 		HighlightedPhotoID: userDomain.HighlightedPhotoID(),
 		Locale:             userDomain.Locale(),
 		Description:        userDomain.Description(),
@@ -202,7 +202,7 @@ func (r *userRepositoryImpl) UpdateUser(ctx context.Context, userDomain *user.Us
 		FirstName:      userDomain.FirstName(),
 		LastName:       userDomain.LastName(),
 		HasSetLocation: userDomain.HasSetLocation(),
-		ID:            id,
+		ID:             id,
 	})
 
 	if err != nil {

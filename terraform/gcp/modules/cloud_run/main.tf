@@ -502,7 +502,7 @@ resource "google_cloud_run_v2_job" "kratos_migrate" {
 
       containers {
         image = var.kratos_image
-        args  = ["-c", "/etc/config/kratos/kratos.prod.yml", "migrate", "sql", "-e", "--yes"]
+        args  = ["-c", "/etc/config/kratos/kratos.prod.yml", "migrate", "sql", "up", "-e", "--yes"]
 
         resources {
           limits = {

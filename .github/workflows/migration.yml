@@ -67,7 +67,7 @@ jobs:
 
       - name: Wait for Cloud SQL Proxy to Start
         run: |
-          ./wait-for-it.sh $DB_HOST:$DB_PORT -s -t 10 -- echo "Cloud SQL Proxy is running"
+          ./wait-for-it.sh "$DB_HOST:$DB_PORT" -s -t 10 -- echo "Cloud SQL Proxy is running"
 
       - name: Deploy Atlas Migrations
         uses: ariga/atlas-action/migrate/apply@v1

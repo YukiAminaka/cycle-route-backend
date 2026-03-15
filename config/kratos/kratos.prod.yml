@@ -74,13 +74,13 @@ selfservice:
       after:
         password:
           hooks:
-            - hook: session
             - hook: show_verification_ui
             - hook: web_hook
               config:
-                # url: SELFSERVICE_FLOWS_REGISTRATION_AFTER_PASSWORD_HOOKS_2_CONFIG_URL env var で設定
+                # url: SELFSERVICE_FLOWS_REGISTRATION_AFTER_PASSWORD_HOOKS_1_CONFIG_URL env var で設定
                 method: POST
                 body: file:///etc/config/kratos/hooks/create-profile.jsonnet
+            - hook: session
 
 log:
   level: info

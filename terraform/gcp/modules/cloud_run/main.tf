@@ -290,7 +290,7 @@ resource "google_cloud_run_v2_service" "kratos_public" {
       }
 
       env {
-        name  = "SELFSERVICE_FLOWS_REGISTRATION_AFTER_PASSWORD_HOOKS_1_CONFIG_URL"
+        name  = "SELFSERVICE_FLOWS_REGISTRATION_AFTER_PASSWORD_HOOKS_0_CONFIG_URL"
         value = "${var.backend_url}/api/v1/users"
       }
     }

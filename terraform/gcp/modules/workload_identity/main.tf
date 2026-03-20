@@ -32,8 +32,8 @@ resource "google_iam_workload_identity_pool_provider" "github" {
     "attribute.ref"        = "assertion.ref"
   }
 
-  # このリポジトリからのリクエストのみ許可
-  attribute_condition = "attribute.repository == '${var.github_repository}'"
+  # これらのリポジトリからのリクエストのみ許可
+  attribute_condition = "attribute.repository in ['${var.github_repository}', '${var.frontend_github_repository}']"
 }
 
 # ============================================================
@@ -69,6 +69,36 @@ resource "google_service_account_iam_member" "db_workload_identity_binding" {
 }
 
 # ============================================================
+# Service Account for Frontend GitHub Actions
+# ============================================================
+
+resource "google_service_account" "github_actions_frontend" {
+  account_id   = "${var.project_name}-github-actions-fe"
+  display_name = "${var.project_name} GitHub Actions Frontend Service Account"
+  description  = "Service Account used by Frontend GitHub Actions for CI/CD"
+}
+
+# ============================================================
+# Allow Frontend GitHub Actions (WIF) to impersonate the Frontend SA
+# ============================================================
+
+resource "google_service_account_iam_member" "workload_identity_binding_frontend" {
+  service_account_id = google_service_account.github_actions_frontend.name
+  role               = "roles/iam.workloadIdentityUser"
+  member             = "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github.name}/attribute.repository/${var.frontend_github_repository}"
+}
+
+# ============================================================
+# IAM: Frontend SA → Frontend Cloud Run SA として動作する権限
+# ============================================================
+
+resource "google_service_account_iam_member" "github_actions_frontend_sa_user" {
+  service_account_id = "projects/${var.project_id}/serviceAccounts/${var.frontend_cloud_run_service_account_email}"
+  role               = "roles/iam.serviceAccountUser"
+  member             = "serviceAccount:${google_service_account.github_actions_frontend.email}"
+}
+
+# ============================================================
 # IAM: Artifact Registry への push 権限
 # ============================================================
 
@@ -88,6 +118,22 @@ resource "google_project_iam_member" "github_actions_run_developer" {
   project = var.project_id
   role    = "roles/run.developer"
   member  = "serviceAccount:${google_service_account.github_actions.email}"
+}
+
+# ============================================================
+# IAM: Frontend SA の Artifact Registry push 権限 / Cloud Run デプロイ権限
+# ============================================================
+
+resource "google_project_iam_member" "github_actions_frontend_ar_writer" {
+  project = var.project_id
+  role    = "roles/artifactregistry.repoAdmin"
+  member  = "serviceAccount:${google_service_account.github_actions_frontend.email}"
+}
+
+resource "google_project_iam_member" "github_actions_frontend_run_developer" {
+  project = var.project_id
+  role    = "roles/run.developer"
+  member  = "serviceAccount:${google_service_account.github_actions_frontend.email}"
 }
 
 # ============================================================

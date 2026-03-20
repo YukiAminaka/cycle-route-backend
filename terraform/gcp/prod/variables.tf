@@ -25,6 +25,11 @@ variable "github_repository" {
   type        = string
 }
 
+variable "frontend_github_repository" {
+  description = "Frontend GitHub repository in 'org/repo' format (e.g. 'myorg/myrepo-frontend')"
+  type        = string
+}
+
 variable "kratos_smtp_connection_uri" {
   description = "SMTP connection URI for Kratos courier (e.g. smtps://user:password@smtp.example.com:465)"
   type        = string

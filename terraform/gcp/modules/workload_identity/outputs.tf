@@ -17,3 +17,8 @@ output "workload_identity_provider" {
   description = "Workload Identity Pool Provider のリソース名 (GitHub Secrets の WORKLOAD_IDENTITY_PROVIDER に設定)"
   value       = google_iam_workload_identity_pool_provider.github.name
 }
+
+output "frontend_service_account_email" {
+  description = "Frontend GitHub Actions Service Account のメールアドレス (フロントエンドリポジトリの GitHub Secrets に設定)"
+  value       = google_service_account.github_actions_frontend.email
+}

@@ -75,15 +75,17 @@ module "artifact_registry" {
 module "workload_identity" {
   source = "../modules/workload_identity"
 
-  project_id        = var.project_id
-  project_name      = var.project_name
-  github_repository = var.github_repository
+  project_id                 = var.project_id
+  project_name               = var.project_name
+  github_repository          = var.github_repository
+  frontend_github_repository = var.frontend_github_repository
 
   cloud_run_service_account_emails = [
-    module.cloud_run.frontend_service_account_email,
     module.cloud_run.api_service_account_email,
     module.cloud_run.kratos_service_account_email,
   ]
+
+  frontend_cloud_run_service_account_email = module.cloud_run.frontend_service_account_email
 
   db_service_account_email = module.database.db_service_account_email
 

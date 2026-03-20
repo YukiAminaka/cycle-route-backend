@@ -13,10 +13,20 @@ variable "github_repository" {
   type        = string
 }
 
+variable "frontend_github_repository" {
+  description = "Frontend GitHub repository in 'org/repo' format (e.g. 'myorg/myrepo-frontend')"
+  type        = string
+}
+
 variable "cloud_run_service_account_emails" {
-  description = "Emails of Cloud Run service accounts that GitHub Actions needs to act as"
+  description = "Emails of Cloud Run service accounts that GitHub Actions (backend) needs to act as"
   type        = list(string)
   default     = []
+}
+
+variable "frontend_cloud_run_service_account_email" {
+  description = "Email of the frontend Cloud Run service account that GitHub Actions (frontend) needs to act as"
+  type        = string
 }
 
 variable "db_service_account_email" {

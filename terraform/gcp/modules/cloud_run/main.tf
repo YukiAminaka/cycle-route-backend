@@ -750,7 +750,7 @@ resource "google_cloud_run_v2_service" "frontend" {
       }
 
       env {
-        name  = "KRATOS_PUBLIC_URL"
+        name  = "ORY_SDK_URL"
         value = google_cloud_run_v2_service.kratos_public.uri
       }
     }

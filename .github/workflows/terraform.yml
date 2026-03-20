@@ -27,6 +27,7 @@ env:
   WORKLOAD_IDENTITY_PROVIDER_NAME: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
   ROOT_PATH_IAC_APPLICATION: ./terraform/gcp/prod
   ROOT_PATH_IAC_ROOT: ./terraform/gcp
+  FRONTEND_GITHUB_REPOSITORY: ${{ secrets.FRONTEND_GITHUB_REPOSITORY }}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -91,6 +92,7 @@ jobs:
           TF_VAR_project_name: ${{ env.PROJECT_NAME }}
           TF_VAR_environment: ${{ env.ENVIRONMENT }}
           TF_VAR_github_repository: ${{ github.repository }}
+          TF_VAR_frontend_github_repository: ${{ env.FRONTEND_GITHUB_REPOSITORY }}
           TF_VAR_kratos_smtp_connection_uri: ${{ env.KRATOS_SMTP_CONNECTION_URI }}
           TF_VAR_kratos_smtp_from_address: ${{ env.KRATOS_SMTP_FROM_ADDRESS }}
           TF_VAR_kratos_public_base_url: ${{ env.KRATOS_PUBLIC_BASE_URL }}

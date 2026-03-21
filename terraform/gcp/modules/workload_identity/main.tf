@@ -138,7 +138,6 @@ resource "google_project_iam_member" "github_actions_frontend_run_developer" {
 
 # ============================================================
 # IAM: Cloud Run SA として動作する権限
-# (gcloud run deploy --service-account 指定時に必要)
 # ============================================================
 
 resource "google_service_account_iam_member" "github_actions_sa_user" {

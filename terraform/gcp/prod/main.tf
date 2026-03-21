@@ -81,6 +81,7 @@ module "workload_identity" {
   frontend_github_repository = var.frontend_github_repository
 
   cloud_run_service_account_emails = [
+    module.cloud_run.frontend_service_account_email,
     module.cloud_run.api_service_account_email,
     module.cloud_run.kratos_service_account_email,
   ]

@@ -2,6 +2,8 @@ package route
 
 import (
 	"errors"
+	"fmt"
+	"net/http"
 
 	"github.com/YukiAminaka/cycle-route-backend/internal/pkg/geojson"
 	"github.com/YukiAminaka/cycle-route-backend/internal/pkg/geometry"
@@ -15,24 +17,27 @@ type Handler struct {
 	getRouteUsecase    routeUsecase.IGetRouteUsecase
 	updateRouteUsecase routeUsecase.IUpdateRouteUsecase
 	deleteRouteUsecase routeUsecase.IDeleteRouteUsecase
+	exportGPXUsecase   routeUsecase.IExportGPXUsecase
 }
-
 
 func NewHandler(
 	createRouteUsecase routeUsecase.ICreateRouteUsecase,
-	getRouteUsecase    routeUsecase.IGetRouteUsecase,
+	getRouteUsecase routeUsecase.IGetRouteUsecase,
 	updateRouteUsecase routeUsecase.IUpdateRouteUsecase,
 	deleteRouteUsecase routeUsecase.IDeleteRouteUsecase,
+	exportGPXUsecase routeUsecase.IExportGPXUsecase,
 ) *Handler {
 	return &Handler{
 		createRouteUsecase: createRouteUsecase,
 		getRouteUsecase:    getRouteUsecase,
 		updateRouteUsecase: updateRouteUsecase,
 		deleteRouteUsecase: deleteRouteUsecase,
+		exportGPXUsecase:   exportGPXUsecase,
 	}
 }
 
 // CreateRoute godoc
+//
 //	@Summary	ルートを作成する
 //	@Tags		routes
 //	@Accept		json
@@ -164,6 +169,7 @@ func (h *Handler) CreateRoute(c *gin.Context) {
 }
 
 // GetRouteByID godoc
+//
 //	@Summary	ルートを取得する
 //	@Tags		routes
 //	@Accept		json
@@ -240,6 +246,7 @@ func (h *Handler) GetRouteByID(c *gin.Context) {
 }
 
 // UpdateRoute godoc
+//
 //	@Summary	ルートを更新する
 //	@Tags		routes
 //	@Accept		json
@@ -355,6 +362,7 @@ func (h *Handler) UpdateRoute(c *gin.Context) {
 }
 
 // DeleteRoute godoc
+//
 //	@Summary	ルートを削除する
 //	@Tags		routes
 //	@Accept		json
@@ -391,6 +399,7 @@ func (h *Handler) DeleteRoute(c *gin.Context) {
 }
 
 // GetRoutesByUserID godoc
+//
 //	@Summary	ユーザーのルート一覧を取得する
 //	@Tags		routes
 //	@Accept		json
@@ -446,7 +455,7 @@ func (h *Handler) GetRoutesByUserID(c *gin.Context) {
 			ElevationGain:      dto.ElevationGain,
 			ElevationLoss:      dto.ElevationLoss,
 			Visibility:         dto.Visibility,
-			Polyline: 		 	dto.Polyline,
+			Polyline:           dto.Polyline,
 			CreatedAt:          dto.CreatedAt,
 			UpdatedAt:          dto.UpdatedAt,
 		}
@@ -457,4 +466,15 @@ func (h *Handler) GetRoutesByUserID(c *gin.Context) {
 	}
 
 	response.ReturnStatusOK(c, res)
+}
+
+func (h *Handler) ExportRouteGPX(c *gin.Context) {
+	routeID := c.Param("route_id")
+	xmlBytes, err := h.exportGPXUsecase.ExportGPX(c.Request.Context(), routeID)
+	if err != nil {
+		return
+	}
+
+	c.Header("Content-Disposition", fmt.Sprintf(`attachment; filename="route-%s.gpx"`, routeID))
+	c.Data(http.StatusOK, "application/gpx+xml", xmlBytes)
 }

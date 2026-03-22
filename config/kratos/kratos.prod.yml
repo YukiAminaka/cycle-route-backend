@@ -113,6 +113,10 @@ courier:
 feature_flags:
   use_continue_with_transitions: true
 
+cookies:
+  domain: ride-line.net
+  same_site: Lax
+
 session:
   cookie:
     domain: ride-line.net

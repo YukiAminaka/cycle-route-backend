@@ -475,17 +475,22 @@ func (h *Handler) GetRoutesByUserID(c *gin.Context) {
 //	@Accept		json
 //	@Produce	application/gpx+xml
 //	@Security	CookieAuth
-//	@Param		route_id	path	string	true	"Route ID"
-//	@Success	200
-//	@Failure	400	{object}	response.ErrorResponse
-//	@Failure	401	{object}	response.ErrorResponse
-//	@Failure	404	{object}	response.ErrorResponse
-//	@Failure	500	{object}	response.ErrorResponse
+//	@Param		route_id	path		string	true	"Route ID"
+//	@Success	200			{string}	string	"GPX XML"
+//	@Failure	400			{object}	response.ErrorResponse
+//	@Failure	401			{object}	response.ErrorResponse
+//	@Failure	404			{object}	response.ErrorResponse
+//	@Failure	500			{object}	response.ErrorResponse
 //	@Router		/routes/{route_id}/gpx [get]
 func (h *Handler) ExportRouteGPX(c *gin.Context) {
 	routeID := c.Param("route_id")
+	if routeID == "" {
+		response.ReturnBadRequest(c, errors.New("route_id is required"))
+		return
+	}
 	xmlBytes, err := h.exportGPXUsecase.ExportGPX(c.Request.Context(), routeID)
 	if err != nil {
+		response.ReturnStatusInternalServerError(c, err)
 		return
 	}
 

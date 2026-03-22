@@ -578,6 +578,56 @@ paths:
       summary: ルートを更新する
       tags:
       - routes
+  /routes/{route_id}/gpx:
+    get:
+      parameters:
+      - description: Route ID
+        in: path
+        name: route_id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          content:
+            application/gpx+xml:
+              schema:
+                type: string
+          description: GPX XML
+        "400":
+          content:
+            application/gpx+xml:
+              schema:
+                $ref: '#/components/schemas/response.ErrorResponse'
+          description: Bad Request
+        "401":
+          content:
+            application/gpx+xml:
+              schema:
+                $ref: '#/components/schemas/response.ErrorResponse'
+          description: Unauthorized
+        "404":
+          content:
+            application/gpx+xml:
+              schema:
+                $ref: '#/components/schemas/response.ErrorResponse'
+          description: Not Found
+        "500":
+          content:
+            application/gpx+xml:
+              schema:
+                $ref: '#/components/schemas/response.ErrorResponse'
+          description: Internal Server Error
+      security:
+      - CookieAuth: []
+      summary: ルートをGPX形式でエクスポートする
+      tags:
+      - routes
   /users:
     post:
       requestBody:

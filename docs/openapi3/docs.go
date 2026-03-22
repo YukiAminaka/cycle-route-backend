@@ -939,7 +939,7 @@ const docTemplate = `{
                                 }
                             }
                         },
-                        "description": "OK"
+                        "description": "GPX XML"
                     },
                     "400": {
                         "content": {

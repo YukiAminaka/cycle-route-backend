@@ -598,7 +598,7 @@ paths:
             application/gpx+xml:
               schema:
                 type: string
-          description: OK
+          description: GPX XML
         "400":
           content:
             application/gpx+xml:

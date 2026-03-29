@@ -701,11 +701,11 @@ resource "google_cloud_run_v2_service" "api" {
 
 # apiからkratos publicのcloud runサービスを呼び出すためのロールを付与
 resource "google_cloud_run_v2_service_iam_member" "api_invokes_kratos_public" {
-  project = google_cloud_run_v2_service.kratos_public.project
+  project  = google_cloud_run_v2_service.kratos_public.project
   location = google_cloud_run_v2_service.kratos_public.location
-  name = google_cloud_run_v2_service.kratos_public.name
-  role = "roles/run.invoker"
-  member = "serviceAccount:${google_service_account.api.email}"
+  name     = google_cloud_run_v2_service.kratos_public.name
+  role     = "roles/run.invoker"
+  member   = "serviceAccount:${google_service_account.api.email}"
 }
 
 # IAM: Allow API service to invoke Kratos admin

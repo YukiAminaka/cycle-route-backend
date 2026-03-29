@@ -3,6 +3,14 @@ name: DB Migration and Check
 on:
   push:
     branches: ["main"]
+    paths:
+      - "db/migrations/**"
+      - ".github/workflows/migration.yml"
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "db/migrations/**"
+      - ".github/workflows/migration.yml"
 
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}

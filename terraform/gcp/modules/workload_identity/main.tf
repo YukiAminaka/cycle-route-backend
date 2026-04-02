@@ -187,6 +187,7 @@ locals {
     "roles/iam.serviceAccountAdmin",         # サービスアカウントの作成・管理
     "roles/iam.workloadIdentityPoolAdmin",   # google_iam_workload_identity_pool の管理
     "roles/resourcemanager.projectIamAdmin", # google_project_iam_member の設定
+    "roles/compute.networkAdmin",            # ネットワーキングリソースを作成、変更、削除する権限
     "roles/run.admin",                       # Cloud Run サービス作成・IAM設定
     "roles/storage.admin",                   # google_storage_bucket の管理
     "roles/secretmanager.admin",             # google_secret_manager_secret の管理

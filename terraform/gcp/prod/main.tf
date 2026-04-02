@@ -30,6 +30,7 @@ resource "google_project_service" "apis" {
     "secretmanager.googleapis.com",    # Secret Manager API を有効にする
     "artifactregistry.googleapis.com", # Artifact Registry API を有効にする
     "compute.googleapis.com",
+    "dns.googleapis.com",
     "cloudresourcemanager.googleapis.com",
     "iam.googleapis.com",
     "iamcredentials.googleapis.com",
@@ -37,6 +38,16 @@ resource "google_project_service" "apis" {
 
   service            = each.value # 有効にするサービス
   disable_on_destroy = false      # Terraformリソースが破棄されたときにサービスを無効にするか
+}
+
+module "vpc" {
+  source = "../modules/vpc"
+
+  project_name = var.project_name
+  environment  = var.environment
+  region       = var.region
+
+  depends_on = [google_project_service.apis]
 }
 
 module "secrets" {
@@ -122,4 +133,7 @@ module "cloud_run" {
   frontend_image = "${module.artifact_registry.repository_urls["frontend"]}:latest"
   api_image      = "${module.artifact_registry.repository_urls["api"]}:latest"
   kratos_image   = "${module.artifact_registry.repository_urls["kratos"]}:latest"
+
+  vpc_network_id    = module.vpc.network_id
+  vpc_subnetwork_id = module.vpc.subnetwork_id
 }

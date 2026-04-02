@@ -102,3 +102,13 @@ variable "kratos_image" {
   description = "Kratos container image (including tag)"
   type        = string
 }
+
+variable "vpc_network_id" {
+  description = "VPC network ID for Direct VPC Egress"
+  type        = string
+}
+
+variable "vpc_subnetwork_id" {
+  description = "VPC subnetwork ID for Direct VPC Egress"
+  type        = string
+}

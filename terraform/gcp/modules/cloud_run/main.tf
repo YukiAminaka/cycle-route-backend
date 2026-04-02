@@ -148,6 +148,14 @@ resource "google_cloud_run_v2_service" "kratos_public" {
       max_instance_count = 2
     }
 
+    vpc_access {
+      network_interfaces {
+        network    = var.vpc_network_id
+        subnetwork = var.vpc_subnetwork_id
+      }
+      egress = "ALL_TRAFFIC"
+    }
+
     volumes {
       name = "cloudsql"
       cloud_sql_instance {
@@ -346,6 +354,14 @@ resource "google_cloud_run_v2_service" "kratos_admin" {
     scaling {
       min_instance_count = 0
       max_instance_count = 2
+    }
+
+    vpc_access {
+      network_interfaces {
+        network    = var.vpc_network_id
+        subnetwork = var.vpc_subnetwork_id
+      }
+      egress = "ALL_TRAFFIC"
     }
 
     volumes {
@@ -649,6 +665,14 @@ resource "google_cloud_run_v2_service" "api" {
       max_instance_count = 2
     }
 
+    vpc_access {
+      network_interfaces {
+        network    = var.vpc_network_id
+        subnetwork = var.vpc_subnetwork_id
+      }
+      egress = "ALL_TRAFFIC"
+    }
+
     volumes {
       name = "cloudsql"
       cloud_sql_instance {
@@ -739,6 +763,14 @@ resource "google_cloud_run_v2_service" "frontend" {
     scaling {
       min_instance_count = 0
       max_instance_count = 2
+    }
+
+    vpc_access {
+      network_interfaces {
+        network    = var.vpc_network_id
+        subnetwork = var.vpc_subnetwork_id
+      }
+      egress = "ALL_TRAFFIC"
     }
 
     containers {

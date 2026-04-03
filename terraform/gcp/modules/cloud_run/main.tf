@@ -153,7 +153,7 @@ resource "google_cloud_run_v2_service" "kratos_public" {
         network    = var.vpc_network_id
         subnetwork = var.vpc_subnetwork_id
       }
-      egress = "ALL_TRAFFIC"
+      egress = "PRIVATE_RANGES_ONLY"
     }
 
     volumes {

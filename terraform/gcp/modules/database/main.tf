@@ -9,8 +9,9 @@ resource "google_sql_database_instance" "main" {
 
     # trivy:ignore:GCP-0017
     ip_configuration {
-      ipv4_enabled = true # このCloud SQLインスタンスにパブリックIPv4アドレスを割り当てるかどうか
-      ssl_mode     = "ENCRYPTED_ONLY"
+      ipv4_enabled    = false                # パブリックIPを無効化
+      private_network = var.vpc_network_id   # Private Services Access経由でVPCに接続
+      ssl_mode        = "ENCRYPTED_ONLY"
     }
 
     database_flags {
@@ -41,6 +42,9 @@ resource "google_sql_database_instance" "main" {
   }
 
   deletion_protection = true
+
+  # VPCピアリング（Private Services Access）が確立されてからCloud SQLを作成する
+  depends_on = [var.private_vpc_connection_id]
 }
 
 resource "google_sql_database" "main" {

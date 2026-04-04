@@ -8,11 +8,6 @@ output "terraform_service_account_email" {
   value       = google_service_account.terraform.email
 }
 
-output "db_migration_service_account_email" {
-  description = "Database Migration Service Account のメールアドレス (GitHub Secrets の MIGRATION_ACCOUNT に設定)"
-  value       = var.db_service_account_email
-}
-
 output "workload_identity_provider" {
   description = "Workload Identity Pool Provider のリソース名 (GitHub Secrets の WORKLOAD_IDENTITY_PROVIDER に設定)"
   value       = google_iam_workload_identity_pool_provider.github.name

@@ -29,3 +29,13 @@ variable "instance_tier" {
   type        = string
   default     = "db-f1-micro"
 }
+
+variable "vpc_network_id" {
+  description = "VPC network ID (Cloud SQL Private IP用)"
+  type        = string
+}
+
+variable "private_vpc_connection_id" {
+  description = "Private Services Access connection ID (depends_on用)"
+  type        = string
+}

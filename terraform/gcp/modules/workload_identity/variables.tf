@@ -29,11 +29,6 @@ variable "frontend_cloud_run_service_account_email" {
   type        = string
 }
 
-variable "db_service_account_email" {
-  description = "Email of database service account for migration"
-  type        = string
-}
-
 variable "terraform_state_bucket" {
   description = "Terraform state を保存する GCS バケット名"
   type        = string

@@ -17,7 +17,7 @@ resource "google_secret_manager_secret" "kratos_dsn" {
 
 resource "google_secret_manager_secret_version" "kratos_dsn" {
   secret      = google_secret_manager_secret.kratos_dsn.id
-  secret_data = "postgres://${var.db_user}:${var.db_password}@/${var.db_name}?host=/cloudsql/${var.db_connection_name}&sslmode=disable&max_conns=20&max_idle_conns=4"
+  secret_data = "postgres://${var.db_user}:${var.db_password}@${var.db_private_ip}:5432/${var.db_name}?sslmode=require&max_conns=20&max_idle_conns=4"
 }
 
 # ============================================================
@@ -39,7 +39,7 @@ resource "google_secret_manager_secret" "api_dsn" {
 
 resource "google_secret_manager_secret_version" "api_dsn" {
   secret      = google_secret_manager_secret.api_dsn.id
-  secret_data = "postgres://${var.db_user}:${var.db_password}@/${var.db_name}?host=/cloudsql/${var.db_connection_name}&sslmode=disable"
+  secret_data = "postgres://${var.db_user}:${var.db_password}@${var.db_private_ip}:5432/${var.db_name}?sslmode=require"
 }
 
 # ============================================================
@@ -63,7 +63,7 @@ resource "google_service_account" "kratos" {
 }
 
 # ============================================================
-# Cloud SQL IAM (Cloud SQL Auth Proxy via volume mount)
+# Cloud SQL IAM
 # ============================================================
 
 # Cloud SQL インスタンスに接続する場合はroles/cloudsql.clientが必要
@@ -153,14 +153,7 @@ resource "google_cloud_run_v2_service" "kratos_public" {
         network    = var.vpc_network_id
         subnetwork = var.vpc_subnetwork_id
       }
-      egress = "ALL_TRAFFIC"
-    }
-
-    volumes {
-      name = "cloudsql"
-      cloud_sql_instance {
-        instances = [var.db_connection_name]
-      }
+      egress = "PRIVATE_RANGES_ONLY"
     }
 
     containers {
@@ -175,11 +168,6 @@ resource "google_cloud_run_v2_service" "kratos_public" {
           cpu    = "1"
           memory = "512Mi"
         }
-      }
-
-      volume_mounts {
-        name       = "cloudsql"
-        mount_path = "/cloudsql"
       }
 
       env {
@@ -364,13 +352,6 @@ resource "google_cloud_run_v2_service" "kratos_admin" {
       egress = "ALL_TRAFFIC"
     }
 
-    volumes {
-      name = "cloudsql"
-      cloud_sql_instance {
-        instances = [var.db_connection_name]
-      }
-    }
-
     containers {
       image = var.kratos_image
 
@@ -383,11 +364,6 @@ resource "google_cloud_run_v2_service" "kratos_admin" {
           cpu    = "1"
           memory = "512Mi"
         }
-      }
-
-      volume_mounts {
-        name       = "cloudsql"
-        mount_path = "/cloudsql"
       }
 
       env {
@@ -541,13 +517,6 @@ resource "google_cloud_run_v2_job" "kratos_migrate" {
 
       max_retries = 1
 
-      volumes {
-        name = "cloudsql"
-        cloud_sql_instance {
-          instances = [var.db_connection_name]
-        }
-      }
-
       containers {
         image = var.kratos_image
         args  = ["-c", "/etc/config/kratos/kratos.prod.yml", "migrate", "sql", "up", "-e", "--yes"]
@@ -557,11 +526,6 @@ resource "google_cloud_run_v2_job" "kratos_migrate" {
             cpu    = "1"
             memory = "512Mi"
           }
-        }
-
-        volume_mounts {
-          name       = "cloudsql"
-          mount_path = "/cloudsql"
         }
 
         env {
@@ -644,6 +608,80 @@ resource "google_cloud_run_v2_job" "kratos_migrate" {
 }
 
 # ============================================================
+# Atlas Migration Service Account
+# ============================================================
+
+resource "google_service_account" "migration" {
+  account_id   = "${var.project_name}-${var.environment}-migration"
+  display_name = "${var.project_name} Migration Service Account"
+}
+
+resource "google_project_iam_member" "migration_cloudsql_client" {
+  project = var.project_id
+  role    = "roles/cloudsql.client"
+  member  = "serviceAccount:${google_service_account.migration.email}"
+}
+
+resource "google_secret_manager_secret_iam_member" "migration_dsn" {
+  secret_id = google_secret_manager_secret.api_dsn.secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.migration.email}"
+}
+
+# ============================================================
+# Atlas Migration Job
+# ============================================================
+
+resource "google_cloud_run_v2_job" "atlas_migrate" {
+  name     = "${var.project_name}-${var.environment}-atlas-migrate"
+  location = var.region
+
+  lifecycle {
+    ignore_changes = [template[0].template[0].containers[0].image]
+  }
+
+  template {
+    template {
+      service_account = google_service_account.migration.email
+      max_retries     = 0
+
+      vpc_access {
+        network_interfaces {
+          network    = var.vpc_network_id
+          subnetwork = var.vpc_subnetwork_id
+        }
+        egress = "ALL_TRAFFIC"
+      }
+
+      containers {
+        image = "arigaio/atlas:latest-alpine"
+
+        resources {
+          limits = {
+            cpu    = "1"
+            memory = "512Mi"
+          }
+        }
+        env {
+          name = "DATABASE_URL"
+          value_source {
+            secret_key_ref {
+              secret  = google_secret_manager_secret.api_dsn.secret_id
+              version = "latest"
+            }
+          }
+        }
+      }
+    }
+  }
+
+  depends_on = [
+    google_project_iam_member.migration_cloudsql_client,
+    google_secret_manager_secret_iam_member.migration_dsn,
+  ]
+}
+
+# ============================================================
 # API Service (port 8080) — internal only
 # ============================================================
 
@@ -673,13 +711,6 @@ resource "google_cloud_run_v2_service" "api" {
       egress = "ALL_TRAFFIC"
     }
 
-    volumes {
-      name = "cloudsql"
-      cloud_sql_instance {
-        instances = [var.db_connection_name]
-      }
-    }
-
     containers {
       image = var.api_image
 
@@ -692,11 +723,6 @@ resource "google_cloud_run_v2_service" "api" {
           cpu    = "1"
           memory = "512Mi"
         }
-      }
-
-      volume_mounts {
-        name       = "cloudsql"
-        mount_path = "/cloudsql"
       }
 
       env {

@@ -15,18 +15,18 @@ on:
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   REGION: ${{ secrets.GCP_REGION }}
-  MIGRATION_ACCOUNT_EMAIL: ${{ secrets.MIGRATION_ACCOUNT }}
+  BUILD_ACCOUNT_EMAIL: ${{ secrets.BUILD_ACCOUNT }}
   WORKLOAD_IDENTITY_PROVIDER_NAME: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
-  INSTANCE_CONNECTION_NAME: ${{ secrets.CLOUD_SQL_INSTANCE_CONNECTION_NAME }}
-  DB_HOST: 127.0.0.1
-  DB_PORT: 5432
-  DB_NAME: rideline
-  DB_USER: rideline
-  DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+  ARTIFACT_REPO_ATLAS: ${{ secrets.ARTIFACT_REPO_ATLAS }}
+  IMAGE_NAME_ATLAS: atlas
+  CLOUD_RUN_ATLAS_MIGRATE_JOB: rideline-production-atlas-migrate
+  ROOT_PATH_ATLAS: db
+  DOCKERFILE_ATLAS: db/Dockerfile
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name != 'pull_request' }}
+
 jobs:
   sqlc-check:
     runs-on: ubuntu-latest
@@ -41,11 +41,46 @@ jobs:
       - name: SQLC Compile
         run: sqlc compile
 
-  migrate-deploy:
-    if: github.ref == 'refs/heads/main' # メインブランチ時のみ実行
+  build-atlas:
+    name: Docker Build Atlas
     runs-on: ubuntu-latest
     environment: prod
-    timeout-minutes: 10
+    timeout-minutes: 15
+    if: (github.event_name == 'pull_request' && github.base_ref == 'main') || github.ref == 'refs/heads/main'
+    permissions:
+      contents: "read"
+      id-token: "write"
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v4
+      - name: "Authenticate to Google Cloud"
+        id: "auth"
+        uses: "google-github-actions/auth@v3"
+        with:
+          token_format: "access_token"
+          service_account: ${{ env.BUILD_ACCOUNT_EMAIL }}
+          workload_identity_provider: "${{ env.WORKLOAD_IDENTITY_PROVIDER_NAME }}"
+      - name: Authorize Docker
+        uses: "docker/login-action@v3"
+        with:
+          username: "oauth2accesstoken"
+          password: "${{ steps.auth.outputs.access_token }}"
+          registry: "${{ env.REGION }}-docker.pkg.dev"
+      - name: Handle Docker Image for Atlas
+        uses: ./.github/actions/docker-image-build-and-rotate
+        with:
+          context: "${{ env.ROOT_PATH_ATLAS }}"
+          dockerfile: "${{ env.DOCKERFILE_ATLAS }}"
+          image_name: ${{ env.IMAGE_NAME_ATLAS }}
+          artifact_repo: "${{ env.ARTIFACT_REPO_ATLAS }}"
+          push_image: ${{ github.event_name != 'pull_request' }} # PRのときはイメージをビルドするだけでpushしない
+
+  migrate-deploy:
+    name: Run Atlas Migration
+    runs-on: ubuntu-latest
+    environment: prod
+    timeout-minutes: 15
+    if: github.ref == 'refs/heads/main' # メインブランチ時のみ実行
     permissions:
       id-token: write
       contents: read
@@ -53,41 +88,21 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-      - uses: ariga/setup-atlas@v0
-      - name: "Authenticate to Google Cloud"
-        id: "auth"
-        uses: "google-github-actions/auth@v3"
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v3
         with:
-          token_format: "access_token"
-          service_account: ${{ env.MIGRATION_ACCOUNT_EMAIL }} # 利用したいサービスアカウント
-          workload_identity_provider: "${{ env.WORKLOAD_IDENTITY_PROVIDER_NAME }}"
-      - name: Download Cloud SQL Proxy
+          token_format: access_token
+          service_account: ${{ env.BUILD_ACCOUNT_EMAIL }}
+          workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER_NAME }}
+      - name: Update Atlas Migration Job image
         run: |
-          wget "https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.20.0/cloud-sql-proxy.linux.amd64" -O cloud-sql-proxy
-          chmod +x cloud-sql-proxy
-
-      - name: Start Cloud SQL Proxy
-        run: ./cloud-sql-proxy --port 5432 ${{ env.INSTANCE_CONNECTION_NAME }} > /tmp/cloud-sql-proxy.log 2>&1 &
-
-      - name: Wait for Cloud SQL Proxy to Start
+          gcloud run jobs update ${{ env.CLOUD_RUN_ATLAS_MIGRATE_JOB }} \
+            --image "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO_ATLAS }}/${{ env.IMAGE_NAME_ATLAS }}:${{ github.sha }}" \
+            --region ${{ env.REGION }}
+      - name: Run Atlas Migration
         run: |
-          ./scripts/wait-for-it.sh "$DB_HOST:$DB_PORT" -s -t 30 -- echo "Cloud SQL Proxy port is open"
-          for i in $(seq 1 15); do
-            if PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -c "SELECT 1" > /dev/null 2>&1; then
-              echo "Postgres is accepting connections"
-              break
-            fi
-            echo "Waiting for Postgres to accept connections... ($i/15)"
-            sleep 2
-          done
-          echo "=== Cloud SQL Proxy logs ==="
-          cat /tmp/cloud-sql-proxy.log
-
-      - name: Deploy Atlas Migrations
-        uses: ariga/atlas-action/migrate/apply@v1
-        with:
-          url: "postgresql://${{ env.DB_USER }}:${{ env.DB_PASSWORD }}@${{ env.DB_HOST }}:${{ env.DB_PORT }}/${{ env.DB_NAME }}?sslmode=disable"
-          dir: file://db/migrations
-      - name: Stop Cloud SQL Proxy
-        if: always()
-        run: pkill -f cloud-sql-proxy || true
+          gcloud run jobs execute ${{ env.CLOUD_RUN_ATLAS_MIGRATE_JOB }} \
+            --region ${{ env.REGION }} \
+            --wait

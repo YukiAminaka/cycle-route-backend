@@ -13,11 +13,6 @@ output "terraform_service_account" {
   value       = module.workload_identity.terraform_service_account_email
 }
 
-output "db_migration_service_account" {
-  description = "Database Migration SA のメールアドレス (GitHub Secrets の MIGRATION_ACCOUNT に設定)"
-  value       = module.workload_identity.db_migration_service_account_email
-}
-
 output "frontend_github_actions_service_account" {
   description = "Frontend GitHub Actions SA のメールアドレス (フロントエンドリポジトリの GitHub Secrets の BUILD_ACCOUNT に設定)"
   value       = module.workload_identity.frontend_service_account_email
@@ -29,7 +24,7 @@ output "artifact_registry_urls" {
 }
 
 output "db_connection_name" {
-  description = "Cloud SQL connection name (for Cloud SQL Auth Proxy)"
+  description = "Cloud SQL connection name"
   value       = module.database.db_connection_name
 }
 

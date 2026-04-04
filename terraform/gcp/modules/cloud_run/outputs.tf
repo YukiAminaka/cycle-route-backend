@@ -52,3 +52,13 @@ output "kratos_migrate_job_name" {
   description = "Kratos migration Cloud Run Job name"
   value       = google_cloud_run_v2_job.kratos_migrate.name
 }
+
+output "migration_service_account_email" {
+  description = "Atlas migration service account email"
+  value       = google_service_account.migration.email
+}
+
+output "atlas_migrate_job_name" {
+  description = "Atlas migration Cloud Run Job name"
+  value       = google_cloud_run_v2_job.atlas_migrate.name
+}

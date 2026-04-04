@@ -9,8 +9,8 @@ resource "google_sql_database_instance" "main" {
 
     # trivy:ignore:GCP-0017
     ip_configuration {
-      ipv4_enabled    = false                # パブリックIPを無効化
-      private_network = var.vpc_network_id   # Private Services Access経由でVPCに接続
+      ipv4_enabled    = false              # パブリックIPを無効化
+      private_network = var.vpc_network_id # Private Services Access経由でVPCに接続
       ssl_mode        = "ENCRYPTED_ONLY"
     }
 
@@ -58,13 +58,3 @@ resource "google_sql_user" "main" {
   password = var.db_password
 }
 
-resource "google_service_account" "database" {
-  account_id   = "${var.project_name}-${var.environment}-db-sa"
-  display_name = "${var.project_name} Database Service Account"
-}
-
-resource "google_project_iam_member" "database_sa" {
-  project = var.project_id
-  role    = "roles/cloudsql.client"
-  member  = "serviceAccount:${google_service_account.database.email}"
-}

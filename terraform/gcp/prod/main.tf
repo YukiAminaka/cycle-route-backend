@@ -81,7 +81,7 @@ module "artifact_registry" {
 
   project_name = var.project_name
   region       = var.region
-  repositories = ["frontend", "api", "kratos"]
+  repositories = ["frontend", "api", "kratos", "atlas"]
 
   depends_on = [google_project_service.apis]
 }
@@ -98,11 +98,10 @@ module "workload_identity" {
     module.cloud_run.frontend_service_account_email,
     module.cloud_run.api_service_account_email,
     module.cloud_run.kratos_service_account_email,
+    module.cloud_run.migration_service_account_email,
   ]
 
   frontend_cloud_run_service_account_email = module.cloud_run.frontend_service_account_email
-
-  db_service_account_email = module.database.db_service_account_email
 
   terraform_state_bucket = "rideline-489422-terraform-state"
 
@@ -117,7 +116,7 @@ module "cloud_run" {
   environment  = var.environment
   region       = var.region
 
-  db_connection_name    = module.database.db_connection_name
+  db_private_ip         = module.database.db_private_ip
   db_name               = module.database.db_name
   db_user               = module.database.db_user
   db_password           = module.secrets.db_password

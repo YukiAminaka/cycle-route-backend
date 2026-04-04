@@ -18,8 +18,8 @@ variable "region" {
   type        = string
 }
 
-variable "db_connection_name" {
-  description = "Cloud SQL connection name (project:region:instance)"
+variable "db_private_ip" {
+  description = "Cloud SQL instance private IP address"
   type        = string
 }
 

@@ -84,7 +84,7 @@ jobs:
     permissions:
       id-token: write
       contents: read
-    needs: sqlc-check
+    needs: [sqlc-check, build-atlas]
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4

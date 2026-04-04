@@ -504,8 +504,9 @@ resource "google_cloud_run_v2_service" "kratos_admin" {
 # ============================================================
 
 resource "google_cloud_run_v2_job" "kratos_migrate" {
-  name     = "${var.project_name}-${var.environment}-kratos-migrate"
-  location = var.region
+  name                = "${var.project_name}-${var.environment}-kratos-migrate"
+  location            = var.region
+  deletion_protection = false
 
   lifecycle {
     ignore_changes = [template[0].template[0].containers[0].image]
@@ -633,9 +634,9 @@ resource "google_secret_manager_secret_iam_member" "migration_dsn" {
 # ============================================================
 
 resource "google_cloud_run_v2_job" "atlas_migrate" {
-  name     = "${var.project_name}-${var.environment}-atlas-migrate"
-  location = var.region
-
+  name                = "${var.project_name}-${var.environment}-atlas-migrate"
+  location            = var.region
+  deletion_protection = false # Terraform がジョブを削除できないようにするか。デフォルトは true
   lifecycle {
     ignore_changes = [template[0].template[0].containers[0].image]
   }

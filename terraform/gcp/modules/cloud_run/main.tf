@@ -677,7 +677,7 @@ resource "google_cloud_run_v2_job" "atlas_migrate" {
 
   depends_on = [
     google_project_iam_member.migration_cloudsql_client,
-    google_secret_manager_secret_iam_member.migration_api_dsn,
+    google_secret_manager_secret_iam_member.migration_dsn,
   ]
 }
 

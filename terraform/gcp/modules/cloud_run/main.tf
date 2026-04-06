@@ -312,15 +312,6 @@ resource "google_cloud_run_v2_service_iam_member" "kratos_public_invoker" {
   member   = "allUsers"
 }
 
-# kratosからapiのcloud runサービスを呼び出すためのロールを付与
-resource "google_cloud_run_v2_service_iam_member" "kratos_invokes_api" {
-  project  = google_cloud_run_v2_service.api.project
-  location = google_cloud_run_v2_service.api.location
-  name     = google_cloud_run_v2_service.api.name
-  role     = "roles/run.invoker"
-  member   = "serviceAccount:${google_service_account.kratos.email}"
-}
-
 
 # ============================================================
 # Kratos Admin (port 4434) — internal only
@@ -760,6 +751,15 @@ resource "google_cloud_run_v2_service" "api" {
   ]
 }
 
+# kratosが動的なIDトークンの取得に対応してないため、IAMトークン不要でアクセス可能にする(VPCを経由した通信のみ許可し、外部からのアクセスは拒否している)
+resource "google_cloud_run_v2_service_iam_member" "api_invoker" {
+  project  = google_cloud_run_v2_service.api.project
+  location = google_cloud_run_v2_service.api.location
+  name     = google_cloud_run_v2_service.api.name
+  role     = "roles/run.invoker"
+  member   = "allUsers"
+}
+
 
 # IAM: Allow API service to invoke Kratos admin
 resource "google_cloud_run_v2_service_iam_member" "api_invokes_kratos_admin" {
@@ -825,15 +825,6 @@ resource "google_cloud_run_v2_service" "frontend" {
       }
     }
   }
-}
-
-# IAM: Allow Frontend to invoke API
-resource "google_cloud_run_v2_service_iam_member" "frontend_invokes_api" {
-  project  = google_cloud_run_v2_service.api.project
-  location = google_cloud_run_v2_service.api.location
-  name     = google_cloud_run_v2_service.api.name
-  role     = "roles/run.invoker"
-  member   = "serviceAccount:${google_service_account.frontend.email}"
 }
 
 # IAM: Allow public access to Frontend

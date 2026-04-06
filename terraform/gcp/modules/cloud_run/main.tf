@@ -723,8 +723,8 @@ resource "google_cloud_run_v2_service" "api" {
       }
 
       env {
-        name  = "KRATOS_ADMIN_URL"
-        value = google_cloud_run_v2_service.kratos_admin.uri
+        name  = "KRATOS_PUBLIC_URL"
+        value = google_cloud_run_v2_service.kratos_public.uri
       }
 
       env {

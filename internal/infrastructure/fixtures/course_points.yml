@@ -225,3 +225,117 @@
   location: "SRID=4326;POINT(139.3750 35.4750)"
   bearing_before: 45
   bearing_after: null
+
+# しまなみ海道のコースポイント
+- id: "019b5a52-0000-7000-8000-000000000017"
+  route_id: "019b5a50-0000-7000-8000-000000000005"
+  step_order: 0
+  seg_dist_m: 0.0
+  cum_dist_m: 0.0
+  duration: 0.0
+  instruction: "尾道からスタート"
+  road_name: "しまなみ海道"
+  maneuver_type: "depart"
+  modifier: null
+  location: "SRID=4326;POINT(139.7000 35.6800)"
+  bearing_before: null
+  bearing_after: 45
+
+- id: "019b5a52-0000-7000-8000-000000000018"
+  route_id: "019b5a50-0000-7000-8000-000000000005"
+  step_order: 1
+  seg_dist_m: 2700.0
+  cum_dist_m: 2700.0
+  duration: 600.0
+  instruction: "橋を渡って直進"
+  road_name: "しまなみ海道"
+  maneuver_type: "continue"
+  modifier: "straight"
+  location: "SRID=4326;POINT(139.7100 35.6850)"
+  bearing_before: 45
+  bearing_after: 45
+
+- id: "019b5a52-0000-7000-8000-000000000019"
+  route_id: "019b5a50-0000-7000-8000-000000000005"
+  step_order: 2
+  seg_dist_m: 2700.0
+  cum_dist_m: 5400.0
+  duration: 600.0
+  instruction: "次の島へ"
+  road_name: "しまなみ海道"
+  maneuver_type: "continue"
+  modifier: "straight"
+  location: "SRID=4326;POINT(139.7150 35.6875)"
+  bearing_before: 45
+  bearing_after: 45
+
+- id: "019b5a52-0000-7000-8000-000000000020"
+  route_id: "019b5a50-0000-7000-8000-000000000005"
+  step_order: 3
+  seg_dist_m: 2600.0
+  cum_dist_m: 8000.0
+  duration: 600.0
+  instruction: "今治到着、ゴール"
+  road_name: "しまなみ海道"
+  maneuver_type: "arrive"
+  modifier: null
+  location: "SRID=4326;POINT(139.7200 35.6900)"
+  bearing_before: 45
+  bearing_after: null
+
+# Tokyo Cycling Routeのコースポイント（ILIKEテスト用）
+- id: "019b5a52-0000-7000-8000-000000000021"
+  route_id: "019b5a50-0000-7000-8000-000000000006"
+  step_order: 0
+  seg_dist_m: 0.0
+  cum_dist_m: 0.0
+  duration: 0.0
+  instruction: "Start at Tokyo Station"
+  road_name: "Marunouchi"
+  maneuver_type: "depart"
+  modifier: null
+  location: "SRID=4326;POINT(139.7670 35.6814)"
+  bearing_before: null
+  bearing_after: 60
+
+- id: "019b5a52-0000-7000-8000-000000000022"
+  route_id: "019b5a50-0000-7000-8000-000000000006"
+  step_order: 1
+  seg_dist_m: 3500.0
+  cum_dist_m: 3500.0
+  duration: 630.0
+  instruction: "Continue straight ahead"
+  road_name: "Sotobori-dori"
+  maneuver_type: "continue"
+  modifier: "straight"
+  location: "SRID=4326;POINT(139.7720 35.6840)"
+  bearing_before: 60
+  bearing_after: 60
+
+- id: "019b5a52-0000-7000-8000-000000000023"
+  route_id: "019b5a50-0000-7000-8000-000000000006"
+  step_order: 2
+  seg_dist_m: 3000.0
+  cum_dist_m: 6500.0
+  duration: 540.0
+  instruction: "Turn left"
+  road_name: "Harumi-dori"
+  maneuver_type: "turn"
+  modifier: "left"
+  location: "SRID=4326;POINT(139.7745 35.6852)"
+  bearing_before: 60
+  bearing_after: 330
+
+- id: "019b5a52-0000-7000-8000-000000000024"
+  route_id: "019b5a50-0000-7000-8000-000000000006"
+  step_order: 3
+  seg_dist_m: 3500.0
+  cum_dist_m: 10000.0
+  duration: 630.0
+  instruction: "Arrive at destination"
+  road_name: "Harumi-dori"
+  maneuver_type: "arrive"
+  modifier: null
+  location: "SRID=4326;POINT(139.7760 35.6860)"
+  bearing_before: 330
+  bearing_after: null

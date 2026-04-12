@@ -15,7 +15,6 @@
   polyline: "gvxxE_n~sYvQo_@~WoK~WnKfEnd@_X~Wg^gEwQwV"
   created_at: "2024-01-15 10:30:00"
   updated_at: "2024-01-15 10:30:00"
-  deleted_at: null
   visibility: 2
 
 # 多摩川サイクリングロード
@@ -35,7 +34,6 @@
   polyline: "wgjxEw{esYvQ_q@vQo}@vQo}@vQo}@vQo}@vQo}@vQo}@"
   created_at: "2024-01-16 08:00:00"
   updated_at: "2024-01-16 08:00:00"
-  deleted_at: null
   visibility: 2
 
 # 湘南海岸ルート
@@ -55,7 +53,6 @@
   polyline: "{envEgpirYkHgr@wQo}@wQo}@_Xo}@wQo}@oKo}@"
   created_at: "2024-02-20 15:00:00"
   updated_at: "2024-02-20 15:00:00"
-  deleted_at: null
   visibility: 2
 
 # ロングライドルート
@@ -78,11 +75,11 @@
   deleted_at: null
   visibility: 1
 
-# プライベートルート（削除済み）
+# プライベートルート
 - id: "019b5a50-0000-7000-8000-000000000005"
   user_id: "70d6037a-b67b-4aa8-b5a3-da393b514f24"
-  name: "テスト用削除ルート"
-  description: "削除テスト用のルート"
+  name: "しまなみ海道"
+  description: "瀬戸内海の島々を結ぶ絶景サイクリングルート。"
   highlighted_photo_id: 0
   distance: 8000.0
   duration: 1800.0
@@ -95,5 +92,23 @@
   polyline: "_wwxE_dtsYg^o}@g^o}@"
   created_at: "2024-01-10 12:00:00"
   updated_at: "2024-01-15 14:00:00"
-  deleted_at: "2024-01-15 14:00:00"
   visibility: 0
+
+# 英字の名前のルート（ILIKEテスト用）
+- id: "019b5a50-0000-7000-8000-000000000006"
+  user_id: "70d6037a-b67b-4aa8-b5a3-da393b514f24"
+  name: "Tokyo Cycling Route"
+  description: "A scenic cycling route around central Tokyo."
+  highlighted_photo_id: 0
+  distance: 10000.0
+  duration: 1800.0
+  elevation_gain: 15.0
+  elevation_loss: 15.0
+  path_geom: "SRID=4326;LINESTRING(139.7670 35.6814, 139.7720 35.6840, 139.7760 35.6860)"
+  bbox: "SRID=4326;POLYGON((139.7670 35.6814, 139.7760 35.6814, 139.7760 35.6860, 139.7670 35.6860, 139.7670 35.6814))"
+  first_point: "SRID=4326;POINT(139.7670 35.6814)"
+  last_point: "SRID=4326;POINT(139.7760 35.6860)"
+  polyline: "atxxEarosYaHgr@_E_q@"
+  created_at: "2024-04-01 09:00:00"
+  updated_at: "2024-04-01 09:00:00"
+  visibility: 2

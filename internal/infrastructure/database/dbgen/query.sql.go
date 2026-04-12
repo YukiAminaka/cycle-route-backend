@@ -323,7 +323,7 @@ func (q *Queries) GetCoursePointsByRouteID(ctx context.Context, routeID uuid.UUI
 }
 
 const getRouteByID = `-- name: GetRouteByID :one
-SELECT id, user_id, name, description, highlighted_photo_id, distance, duration, elevation_gain, elevation_loss, path_geom, bbox, first_point, last_point, polyline, created_at, updated_at, deleted_at, visibility FROM routes WHERE id = $1
+SELECT id, user_id, name, description, highlighted_photo_id, distance, duration, elevation_gain, elevation_loss, path_geom, bbox, first_point, last_point, polyline, created_at, updated_at, visibility FROM routes WHERE id = $1
 `
 
 func (q *Queries) GetRouteByID(ctx context.Context, id uuid.UUID) (Route, error) {
@@ -346,14 +346,13 @@ func (q *Queries) GetRouteByID(ctx context.Context, id uuid.UUID) (Route, error)
 		&i.Polyline,
 		&i.CreatedAt,
 		&i.UpdatedAt,
-		&i.DeletedAt,
 		&i.Visibility,
 	)
 	return i, err
 }
 
 const getRoutesByUserID = `-- name: GetRoutesByUserID :many
-SELECT id, user_id, name, description, highlighted_photo_id, distance, duration, elevation_gain, elevation_loss, path_geom, bbox, first_point, last_point, polyline, created_at, updated_at, deleted_at, visibility FROM routes WHERE user_id = $1
+SELECT id, user_id, name, description, highlighted_photo_id, distance, duration, elevation_gain, elevation_loss, path_geom, bbox, first_point, last_point, polyline, created_at, updated_at, visibility FROM routes WHERE user_id = $1
 `
 
 func (q *Queries) GetRoutesByUserID(ctx context.Context, userID uuid.UUID) ([]Route, error) {
@@ -382,7 +381,6 @@ func (q *Queries) GetRoutesByUserID(ctx context.Context, userID uuid.UUID) ([]Ro
 			&i.Polyline,
 			&i.CreatedAt,
 			&i.UpdatedAt,
-			&i.DeletedAt,
 			&i.Visibility,
 		); err != nil {
 			return nil, err
@@ -483,7 +481,7 @@ func (q *Queries) GetWaypointsByRouteID(ctx context.Context, routeID uuid.UUID) 
 }
 
 const searchRoutesByUserID = `-- name: SearchRoutesByUserID :many
-SELECT id, user_id, name, description, highlighted_photo_id, distance, duration, elevation_gain, elevation_loss, path_geom, bbox, first_point, last_point, polyline, created_at, updated_at, deleted_at, visibility FROM routes
+SELECT id, user_id, name, description, highlighted_photo_id, distance, duration, elevation_gain, elevation_loss, path_geom, bbox, first_point, last_point, polyline, created_at, updated_at, visibility FROM routes
 WHERE user_id = $1
   AND (cardinality($2::TEXT[]) = 0 OR name ILIKE ANY($2::TEXT[]))
   AND ($3 IS NULL OR visibility = $3)
@@ -531,7 +529,6 @@ func (q *Queries) SearchRoutesByUserID(ctx context.Context, arg SearchRoutesByUs
 			&i.Polyline,
 			&i.CreatedAt,
 			&i.UpdatedAt,
-			&i.DeletedAt,
 			&i.Visibility,
 		); err != nil {
 			return nil, err

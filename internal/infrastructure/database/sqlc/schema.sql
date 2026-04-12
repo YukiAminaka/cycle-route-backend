@@ -40,7 +40,6 @@ CREATE TABLE routes (
   polyline            TEXT NOT NULL,                -- エンコード済みポリライン（静的地図画像で使う）
   created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
-  deleted_at          TIMESTAMPTZ,         --　削除日時
   visibility          SMALLINT NOT NULL DEFAULT 1 CHECK (visibility IN (0,1,2)) -- 公開範囲0:private,1:unlisted,2:public
 );
 

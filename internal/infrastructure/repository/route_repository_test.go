@@ -112,7 +112,7 @@ func TestRouteRepository_GetRoutesByUserID(t *testing.T) {
 		{
 			name:      "ユーザーIDで複数のルートが取得できること",
 			userID:    "70d6037a-b67b-4aa8-b5a3-da393b514f24",
-			wantCount: 3, // 皇居、多摩川、削除済み（削除済みは除外される想定）
+			wantCount: 4, // 皇居、多摩川、しまなみ海道、Tokyo Cycling Route
 			wantErr:   false,
 		},
 		{
@@ -166,7 +166,7 @@ func TestRouteRepository_CountRoutesByUserID(t *testing.T) {
 		{
 			name:      "ユーザーのルート数をカウントできること",
 			userID:    "70d6037a-b67b-4aa8-b5a3-da393b514f24",
-			wantCount: 3,
+			wantCount: 4,
 			wantErr:   false,
 		},
 		{

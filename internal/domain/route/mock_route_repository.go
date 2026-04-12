@@ -113,6 +113,21 @@ func (mr *MockIRouteRepositoryMockRecorder) SaveRoute(ctx, route any) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveRoute", reflect.TypeOf((*MockIRouteRepository)(nil).SaveRoute), ctx, route)
 }
 
+// SearchRoutesByUserID mocks base method.
+func (m *MockIRouteRepository) SearchRoutesByUserID(ctx context.Context, criteria *RouteSearchCriteria) ([]*Route, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SearchRoutesByUserID", ctx, criteria)
+	ret0, _ := ret[0].([]*Route)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SearchRoutesByUserID indicates an expected call of SearchRoutesByUserID.
+func (mr *MockIRouteRepositoryMockRecorder) SearchRoutesByUserID(ctx, criteria any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchRoutesByUserID", reflect.TypeOf((*MockIRouteRepository)(nil).SearchRoutesByUserID), ctx, criteria)
+}
+
 // UpdateRoute mocks base method.
 func (m *MockIRouteRepository) UpdateRoute(ctx context.Context, route *Route) error {
 	m.ctrl.T.Helper()

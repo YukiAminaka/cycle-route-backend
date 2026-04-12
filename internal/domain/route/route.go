@@ -617,3 +617,59 @@ func (r *Route) UpdateRouteGeometry(
 
 	return nil
 }
+
+type RouteSearchCriteria struct {
+	userID      string
+	keywords    []string
+	visibility  *int16
+	minDistance *float64
+	maxDistance *float64
+}
+
+func NewRouteSearchCriteria(
+	userID string,
+	keywords []string,
+	visibility *int16,
+	minDistance *float64,
+	maxDistance *float64) (*RouteSearchCriteria, error) {
+
+	if userID == "" {
+		return nil, errors.New("userID is required")
+	}
+	if minDistance != nil && *minDistance < 0 {
+		return nil, errors.New("minDistance must be non-negative")
+	}
+	if maxDistance != nil && *maxDistance < 0 {
+		return nil, errors.New("maxDistance must be non-negative")
+	}
+
+	return &RouteSearchCriteria{
+		userID:      userID,
+		keywords:    keywords,
+		visibility:  visibility,
+		minDistance: minDistance,
+		maxDistance: maxDistance,
+	}, nil
+}
+
+func (c RouteSearchCriteria) UserID() string {
+	return c.userID
+}
+
+func (c RouteSearchCriteria) Keywords() []string {
+	cp := make([]string, len(c.keywords))
+	copy(cp, c.keywords)
+	return cp
+}
+
+func (c RouteSearchCriteria) Visibility() *int16 {
+	return c.visibility
+}
+
+func (c RouteSearchCriteria) MinDistance() *float64 {
+	return c.minDistance
+}
+
+func (c RouteSearchCriteria) MaxDistance() *float64 {
+	return c.maxDistance
+}

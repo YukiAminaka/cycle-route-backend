@@ -485,24 +485,24 @@ func (q *Queries) GetWaypointsByRouteID(ctx context.Context, routeID uuid.UUID) 
 const searchRoutesByUserID = `-- name: SearchRoutesByUserID :many
 SELECT id, user_id, name, description, highlighted_photo_id, distance, duration, elevation_gain, elevation_loss, path_geom, bbox, first_point, last_point, polyline, created_at, updated_at, deleted_at, visibility FROM routes
 WHERE user_id = $1
-  AND ($2::TEXT = '' OR name ILIKE '%' || $2 || '%')
-  AND ($3::TEXT = '' OR visibility = $3)
+  AND (cardinality($2::TEXT[]) = 0 OR name ILIKE ANY($2::TEXT[]))
+  AND ($3 IS NULL OR visibility = $3)
   AND ($4 IS NULL OR distance >= $4)
   AND ($5 IS NULL OR distance <= $5)
 `
 
 type SearchRoutesByUserIDParams struct {
-	UserID      uuid.UUID   `json:"user_id"`
-	Name        string      `json:"name"`
-	Visibility  string      `json:"visibility"`
-	MinDistance interface{} `json:"min_distance"`
-	MaxDistance interface{} `json:"max_distance"`
+	UserID       uuid.UUID   `json:"user_id"`
+	NameKeywords []string    `json:"name_keywords"`
+	Visibility   interface{} `json:"visibility"`
+	MinDistance  interface{} `json:"min_distance"`
+	MaxDistance  interface{} `json:"max_distance"`
 }
 
 func (q *Queries) SearchRoutesByUserID(ctx context.Context, arg SearchRoutesByUserIDParams) ([]Route, error) {
 	rows, err := q.db.Query(ctx, searchRoutesByUserID,
 		arg.UserID,
-		arg.Name,
+		arg.NameKeywords,
 		arg.Visibility,
 		arg.MinDistance,
 		arg.MaxDistance,

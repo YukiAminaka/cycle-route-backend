@@ -151,6 +151,58 @@ func (r *routeRepositoryImpl) GetRoutesByUserID(ctx context.Context, userID stri
 	return result, nil
 }
 
+func (r *routeRepositoryImpl) SearchRoutesByUserID(ctx context.Context, criteria *route.RouteSearchCriteria) ([]*route.Route, error) {
+	uid, err := uuid.Parse(criteria.UserID())
+	if err != nil {
+		return nil, fmt.Errorf("invalid user id: %w", err)
+	}
+
+	// キーワードに % を付与してILIKE用に変換
+	keywords := criteria.Keywords()
+	nameKeywords := make([]string, len(keywords))
+	for i, k := range keywords {
+		nameKeywords[i] = "%" + k + "%"
+	}
+
+	rows, err := r.queries.SearchRoutesByUserID(ctx, dbgen.SearchRoutesByUserIDParams{
+		UserID:       uid,
+		NameKeywords: nameKeywords,
+		Visibility:   criteria.Visibility(),
+		MinDistance:  criteria.MinDistance(),
+		MaxDistance:  criteria.MaxDistance(),
+	})
+	if err != nil {
+		return nil, err
+	}
+	result := make([]*route.Route, 0, len(rows))
+	for _, rd := range rows {
+		routeModel, err := route.ReconstructRoute(
+			rd.ID.String(),
+			rd.UserID.String(),
+			rd.Name,
+			rd.Description,
+			rd.HighlightedPhotoID,
+			rd.Distance,
+			rd.Duration,
+			rd.ElevationGain,
+			rd.ElevationLoss,
+			route.Geometry{Geometry: rd.PathGeom.Geometry},
+			route.Geometry{Geometry: rd.Bbox.Geometry},
+			route.Geometry{Geometry: rd.FirstPoint.Geometry},
+			route.Geometry{Geometry: rd.LastPoint.Geometry},
+			rd.Polyline,
+			rd.Visibility,
+			rd.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+			rd.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		)
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, routeModel)
+	}
+	return result, nil
+}
+
 func (r *routeRepositoryImpl) CountRoutesByUserID(ctx context.Context, userID string) (int64, error) {
 	uid, err := uuid.Parse(userID)
 	if err != nil {

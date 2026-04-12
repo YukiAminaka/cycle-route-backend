@@ -2,6 +2,7 @@ package route
 
 import (
 	"context"
+	"strings"
 
 	routeDomain "github.com/YukiAminaka/cycle-route-backend/internal/domain/route"
 	userDomain "github.com/YukiAminaka/cycle-route-backend/internal/domain/user"
@@ -10,7 +11,7 @@ import (
 
 type IGetRouteUsecase interface {
 	GetRouteByID(ctx context.Context, routeID string) (*RouteDetaileDto, error)
-	GetRoutesByUserID(ctx context.Context, userID string) ([]*RouteListItemDto, error)
+	GetRoutesByUserID(ctx context.Context, input SearchRoutesInputDto) ([]*RouteListItemDto, error)
 }
 
 type getRouteUsecase struct {
@@ -85,6 +86,14 @@ type RouteListItemDto struct {
 	UpdatedAt          string
 }
 
+// ルート検索用の入力DTO
+type SearchRoutesInputDto struct {
+    KratosID    string
+    Keyword     string   // "A B" のような生の検索文字列
+    Visibility  *int16
+    MinDistance *float64
+    MaxDistance *float64
+}
 
 func (u *getRouteUsecase) GetRouteByID(ctx context.Context, routeID string) (*RouteDetaileDto, error) {
 	route, err := u.routeRepo.GetRouteByID(ctx, routeID)
@@ -101,16 +110,22 @@ func (u *getRouteUsecase) GetRouteByID(ctx context.Context, routeID string) (*Ro
 	return u.convertToOutputDto(route, user.Name()), nil
 }
 
-func (u *getRouteUsecase) GetRoutesByUserID(ctx context.Context, kratosID string) ([]*RouteListItemDto, error) {
+func (u *getRouteUsecase) GetRoutesByUserID(ctx context.Context, input SearchRoutesInputDto) ([]*RouteListItemDto, error) {
 	// KratosIDからユーザー情報を取得
-	userEntity, err := u.userRepo.GetUserByKratosID(ctx, kratosID)
+	userEntity, err := u.userRepo.GetUserByKratosID(ctx, input.KratosID)
 	if err != nil {
 		return nil, err
 	}
 
 	userID := userEntity.ID().String()
+	keywords := strings.Fields(input.Keyword) // "A B" -> ["A", "B"]
 
-	routes, err := u.routeRepo.GetRoutesByUserID(ctx, userID)
+	criteria ,err := routeDomain.NewRouteSearchCriteria(userID, keywords, input.Visibility, input.MinDistance, input.MaxDistance)
+	if err != nil {
+		return nil, err
+	}
+
+	routes, err := u.routeRepo.SearchRoutesByUserID(ctx, criteria)
 	if err != nil {
 		return nil, err
 	}

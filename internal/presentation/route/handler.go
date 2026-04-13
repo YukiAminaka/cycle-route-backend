@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
+	domainerror "github.com/YukiAminaka/cycle-route-backend/internal/domain/error"
 	"github.com/YukiAminaka/cycle-route-backend/internal/pkg/geojson"
 	"github.com/YukiAminaka/cycle-route-backend/internal/pkg/geometry"
 	"github.com/YukiAminaka/cycle-route-backend/internal/presentation/response"
@@ -443,7 +444,7 @@ func (h *Handler) GetRoutesByUserID(c *gin.Context) {
 		}
 		minDistancePtr = &minDistance
 	}
-	
+
 	var maxDistancePtr *float64
 	if v := c.Query("max_distance"); v != "" {
 		maxDistance, err := strconv.ParseFloat(v, 64)
@@ -453,7 +454,6 @@ func (h *Handler) GetRoutesByUserID(c *gin.Context) {
 		}
 		maxDistancePtr = &maxDistance
 	}
-
 
 	kratosIDValue, exists := c.Get("kratos_id")
 	if !exists {
@@ -467,7 +467,6 @@ func (h *Handler) GetRoutesByUserID(c *gin.Context) {
 		return
 	}
 
-
 	input := routeUsecase.SearchRoutesInputDto{
 		KratosID:    kratosID,
 		Keyword:     keyword,
@@ -478,6 +477,10 @@ func (h *Handler) GetRoutesByUserID(c *gin.Context) {
 
 	dtos, err := h.getRouteUsecase.GetRoutesByUserID(c.Request.Context(), input)
 	if err != nil {
+		if errors.Is(err, domainerror.ErrValidation) {
+			response.ReturnBadRequest(c, err)
+			return
+		}
 		response.ReturnStatusInternalServerError(c, err)
 		return
 	}

@@ -3,6 +3,7 @@ package route
 import (
 	"errors"
 
+	domainerror "github.com/YukiAminaka/cycle-route-backend/internal/domain/error"
 	"github.com/google/uuid"
 	"github.com/paulmach/orb"
 )
@@ -634,13 +635,19 @@ func NewRouteSearchCriteria(
 	maxDistance *float64) (*RouteSearchCriteria, error) {
 
 	if userID == "" {
-		return nil, errors.New("userID is required")
+		return nil, domainerror.New("userID is required", domainerror.ErrValidation)
+	}
+	if visibility != nil && (*visibility < 0 || *visibility > 2) {
+		return nil, domainerror.New("visibility must be one of 0, 1, or 2", domainerror.ErrValidation)
 	}
 	if minDistance != nil && *minDistance < 0 {
-		return nil, errors.New("minDistance must be non-negative")
+		return nil, domainerror.New("minDistance must be non-negative", domainerror.ErrValidation)
 	}
 	if maxDistance != nil && *maxDistance < 0 {
-		return nil, errors.New("maxDistance must be non-negative")
+		return nil, domainerror.New("maxDistance must be non-negative", domainerror.ErrValidation)
+	}
+	if minDistance != nil && maxDistance != nil && *minDistance > *maxDistance {
+		return nil, domainerror.New("minDistance must be less than or equal to maxDistance", domainerror.ErrValidation)
 	}
 
 	return &RouteSearchCriteria{

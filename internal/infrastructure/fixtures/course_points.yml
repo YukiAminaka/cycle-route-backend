@@ -339,3 +339,60 @@
   location: "SRID=4326;POINT(139.7760 35.6860)"
   bearing_before: 330
   bearing_after: null
+
+# 多摩川-都民の森ルートのコースポイント
+- id: "019b5a52-0000-7000-8000-000000000025"
+  route_id: "019b5a50-0000-7000-8000-000000000007"
+  step_order: 0
+  seg_dist_m: 0.0
+  cum_dist_m: 0.0
+  duration: 0.0
+  instruction: "二子玉川からスタート"
+  road_name: "多摩川サイクリングロード"
+  maneuver_type: "depart"
+  modifier: null
+  location: "SRID=4326;POINT(139.6270 35.6110)"
+  bearing_before: null
+  bearing_after: 300
+
+- id: "019b5a52-0000-7000-8000-000000000026"
+  route_id: "019b5a50-0000-7000-8000-000000000007"
+  step_order: 1
+  seg_dist_m: 20000.0
+  cum_dist_m: 20000.0
+  duration: 3600.0
+  instruction: "多摩川上流へ直進"
+  road_name: "多摩川サイクリングロード"
+  maneuver_type: "continue"
+  modifier: "straight"
+  location: "SRID=4326;POINT(139.4500 35.6500)"
+  bearing_before: 300
+  bearing_after: 300
+
+- id: "019b5a52-0000-7000-8000-000000000027"
+  route_id: "019b5a50-0000-7000-8000-000000000007"
+  step_order: 2
+  seg_dist_m: 20000.0
+  cum_dist_m: 40000.0
+  duration: 3600.0
+  instruction: "都民の森方面へ登り"
+  road_name: "都道33号"
+  maneuver_type: "continue"
+  modifier: "straight"
+  location: "SRID=4326;POINT(139.2500 35.7200)"
+  bearing_before: 300
+  bearing_after: 300
+
+- id: "019b5a52-0000-7000-8000-000000000028"
+  route_id: "019b5a50-0000-7000-8000-000000000007"
+  step_order: 3
+  seg_dist_m: 10000.0
+  cum_dist_m: 50000.0
+  duration: 1800.0
+  instruction: "都民の森到着、ゴール"
+  road_name: "都民の森"
+  maneuver_type: "arrive"
+  modifier: null
+  location: "SRID=4326;POINT(139.1600 35.7700)"
+  bearing_before: 300
+  bearing_after: null

@@ -91,9 +91,9 @@ SELECT * FROM routes WHERE user_id = $1;
 SELECT * FROM routes
 WHERE user_id = sqlc.arg(user_id)
   AND (cardinality(sqlc.arg(name_keywords)::TEXT[]) = 0 OR name ILIKE ANY(sqlc.arg(name_keywords)::TEXT[]))
-  AND (sqlc.arg(visibility) IS NULL OR visibility = sqlc.arg(visibility))
-  AND (sqlc.arg(min_distance) IS NULL OR distance >= sqlc.arg(min_distance))
-  AND (sqlc.arg(max_distance) IS NULL OR distance <= sqlc.arg(max_distance));
+  AND (sqlc.arg(visibility)::SMALLINT < 0 OR visibility = sqlc.arg(visibility)::SMALLINT)
+  AND (sqlc.arg(min_distance)::DOUBLE PRECISION < 0 OR distance >= sqlc.arg(min_distance)::DOUBLE PRECISION)
+  AND (sqlc.arg(max_distance)::DOUBLE PRECISION < 0 OR distance <= sqlc.arg(max_distance)::DOUBLE PRECISION);
   
 
 -- name: CountRoutesByUserID :one

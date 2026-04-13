@@ -15,7 +15,7 @@
   polyline: "gvxxE_n~sYvQo_@~WoK~WnKfEnd@_X~Wg^gEwQwV"
   created_at: "2024-01-15 10:30:00"
   updated_at: "2024-01-15 10:30:00"
-  visibility: 2
+  visibility: 1
 
 # 多摩川サイクリングロード
 - id: "019b5a50-0000-7000-8000-000000000002"
@@ -34,6 +34,25 @@
   polyline: "wgjxEw{esYvQ_q@vQo}@vQo}@vQo}@vQo}@vQo}@vQo}@"
   created_at: "2024-01-16 08:00:00"
   updated_at: "2024-01-16 08:00:00"
+  visibility: 1
+
+# 多摩川-都民の森ルート（多摩川キーワード複数ヒットテスト用）
+- id: "019b5a50-0000-7000-8000-000000000007"
+  user_id: "70d6037a-b67b-4aa8-b5a3-da393b514f24"
+  name: "多摩川-都民の森ルート"
+  description: "多摩川サイクリングロードから都民の森へ向かうルート。自然豊かな景色が楽しめる。"
+  highlighted_photo_id: 0
+  distance: 50000.0
+  duration: 9000.0
+  elevation_gain: 500.0
+  elevation_loss: 50.0
+  path_geom: "SRID=4326;LINESTRING(139.6270 35.6110, 139.4500 35.6500, 139.1600 35.7700)"
+  bbox: "SRID=4326;POLYGON((139.1600 35.6110, 139.6270 35.6110, 139.6270 35.7700, 139.1600 35.7700, 139.1600 35.6110))"
+  first_point: "SRID=4326;POINT(139.6270 35.6110)"
+  last_point: "SRID=4326;POINT(139.1600 35.7700)"
+  polyline: "wgjxEw{esYnnCf|Sb~Hk_X"
+  created_at: "2024-05-01 07:00:00"
+  updated_at: "2024-05-01 07:00:00"
   visibility: 2
 
 # 湘南海岸ルート
@@ -72,7 +91,6 @@
   polyline: " _{hwE_zmqYg^g^g^g^g^g^g^g^g^g^g^g^g^g^"
   created_at: "2024-03-10 06:00:00"
   updated_at: "2024-03-10 06:00:00"
-  deleted_at: null
   visibility: 1
 
 # プライベートルート
@@ -111,4 +129,4 @@
   polyline: "atxxEarosYaHgr@_E_q@"
   created_at: "2024-04-01 09:00:00"
   updated_at: "2024-04-01 09:00:00"
-  visibility: 2
+  visibility: 1

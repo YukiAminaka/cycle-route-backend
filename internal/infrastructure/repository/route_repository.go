@@ -164,12 +164,25 @@ func (r *routeRepositoryImpl) SearchRoutesByUserID(ctx context.Context, criteria
 		nameKeywords[i] = "%" + k + "%"
 	}
 
+	visibility := int16(-1)
+	if v := criteria.Visibility(); v != nil {
+		visibility = *v
+	}
+	minDistance := float64(-1)
+	if d := criteria.MinDistance(); d != nil {
+		minDistance = *d
+	}
+	maxDistance := float64(-1)
+	if d := criteria.MaxDistance(); d != nil {
+		maxDistance = *d
+	}
+
 	rows, err := r.queries.SearchRoutesByUserID(ctx, dbgen.SearchRoutesByUserIDParams{
 		UserID:       uid,
 		NameKeywords: nameKeywords,
-		Visibility:   criteria.Visibility(),
-		MinDistance:  criteria.MinDistance(),
-		MaxDistance:  criteria.MaxDistance(),
+		Visibility:   visibility,
+		MinDistance:  minDistance,
+		MaxDistance:  maxDistance,
 	})
 	if err != nil {
 		return nil, err

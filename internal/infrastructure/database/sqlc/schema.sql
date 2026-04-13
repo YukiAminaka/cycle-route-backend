@@ -40,7 +40,7 @@ CREATE TABLE routes (
   polyline            TEXT NOT NULL,                -- エンコード済みポリライン（静的地図画像で使う）
   created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
-  visibility          SMALLINT NOT NULL DEFAULT 1 CHECK (visibility IN (0,1,2)) -- 公開範囲0:private,1:unlisted,2:public
+  visibility          SMALLINT NOT NULL DEFAULT 1 CHECK (visibility IN (0,1,2)) -- 公開範囲0:非公開,1:公開,2:友達のみ
 );
 
 -- トリップの写真

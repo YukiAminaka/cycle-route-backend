@@ -421,6 +421,7 @@ func (h *Handler) GetRoutesByUserID(c *gin.Context) {
 	keyword := c.Query("keyword")
 	// min_elevation := c.Query("min_elevation")
 	// max_elevation := c.Query("max_elevation")
+	// author := c.Query("author")
 
 	var visibilityPtr *int16
 	if v := c.Query("visibility"); v != "" {

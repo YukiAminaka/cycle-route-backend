@@ -509,6 +509,14 @@ resource "google_cloud_run_v2_job" "kratos_migrate" {
 
       max_retries = 1
 
+      vpc_access {
+        network_interfaces {
+          network    = var.vpc_network_id
+          subnetwork = var.vpc_subnetwork_id
+        }
+        egress = "PRIVATE_RANGES_ONLY"
+      }
+
       containers {
         image = var.kratos_image
         args  = ["-c", "/etc/config/kratos/kratos.prod.yml", "migrate", "sql", "up", "-e", "--yes"]

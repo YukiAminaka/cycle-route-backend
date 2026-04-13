@@ -112,7 +112,7 @@ func TestRouteRepository_GetRoutesByUserID(t *testing.T) {
 		{
 			name:      "ユーザーIDで複数のルートが取得できること",
 			userID:    "70d6037a-b67b-4aa8-b5a3-da393b514f24",
-			wantCount: 3, // 皇居、多摩川、削除済み（削除済みは除外される想定）
+			wantCount: 5, // 皇居、多摩川、多摩川-都民の森、しまなみ海道、Tokyo Cycling Route
 			wantErr:   false,
 		},
 		{
@@ -151,6 +151,189 @@ func TestRouteRepository_GetRoutesByUserID(t *testing.T) {
 	}
 }
 
+func TestRouteRepository_SearchRoutesByUserID(t *testing.T) {
+	q := GetTestQueries()
+	routeRepository := NewRouteRepository(q)
+	ctx := context.Background()
+	resetTestData(t)
+
+	tests := []struct {
+		name      string
+		userID    string
+		keywords   []string
+		visibility *int16
+		minDistance *float64
+		maxDistance *float64
+		wantCount int
+		wantErr   bool
+	}{
+		{
+			name:      "キーワード、公開範囲、距離の指定が無い場合対象ユーザーの全ルートが検索できる",
+			userID:    "70d6037a-b67b-4aa8-b5a3-da393b514f24",
+			keywords:   []string{},
+			visibility: nil,
+			minDistance: nil,
+			maxDistance: nil,
+			wantCount: 5, // 皇居、多摩川、多摩川-都民の森、しまなみ海道、Tokyo Cycling Route
+			wantErr:   false,
+		},
+		{
+			name:      "キーワードでルートが検索できる",
+			userID:    "70d6037a-b67b-4aa8-b5a3-da393b514f24",
+			keywords:   []string{"皇居"},
+			wantCount: 1,
+			wantErr:   false,
+		},
+		{
+			name:      "キーワードに一致する複数のルートが検索できる",
+			userID:    "70d6037a-b67b-4aa8-b5a3-da393b514f24",
+			keywords:   []string{"多摩川"},
+			wantCount: 2, // 多摩川サイクリングロード、多摩川-都民の森ルート
+			wantErr:   false,
+		},
+		{
+			name:      "キーワードを複数指定した場合、いずれかに一致するルートが検索できる",
+			userID:    "70d6037a-b67b-4aa8-b5a3-da393b514f24",
+			keywords:  []string{"多摩川", "しまなみ"},
+			wantCount: 3, // 多摩川サイクリングロード、多摩川-都民の森ルート、しまなみ海道
+			wantErr:   false,
+		},
+		{
+			name:      "キーワードが英字の場合に大文字小文字を区別せず検索できる",
+			userID:    "70d6037a-b67b-4aa8-b5a3-da393b514f24",
+			keywords:  []string{"tokyo"},
+			wantCount: 1, // Tokyo Cycling Route
+			wantErr:   false,
+		},
+		{
+			name:      "キーワードに一致するルートがない場合は空配列を返す",
+			userID:    "70d6037a-b67b-4aa8-b5a3-da393b514f24",
+			keywords:  []string{"nonexistent-keyword"},
+			wantCount: 0,
+			wantErr:   false,
+		},
+		{
+			name:       "非公開ルートが検索できる",
+			userID:     "70d6037a-b67b-4aa8-b5a3-da393b514f24",
+			keywords:   []string{},
+			visibility: new(int16(0)),
+			wantCount:  1, // しまなみ海道
+			wantErr:    false,
+		},
+		{
+			name:       "公開ルートが検索できる",
+			userID:     "70d6037a-b67b-4aa8-b5a3-da393b514f24",
+			keywords:   []string{},
+			visibility: new(int16(1)),
+			wantCount:  3, // 皇居一周ルート、多摩川サイクリングロード、Tokyo Cycling Route
+			wantErr:    false,
+		},
+		{
+			name:       "友達にのみ公開のルートが検索できる",
+			userID:     "70d6037a-b67b-4aa8-b5a3-da393b514f24",
+			keywords:   []string{},
+			visibility: new(int16(2)),
+			wantCount:  1, // 多摩川-都民の森ルート
+			wantErr:    false,
+		},
+		{
+			name:        "距離の下限と上限を指定してルートが検索できる",
+			userID:      "70d6037a-b67b-4aa8-b5a3-da393b514f24",
+			keywords:    []string{},
+			minDistance: new(5000.0),
+			maxDistance: new(10000.0),
+			wantCount:   3, // 皇居一周ルート(5000)、しまなみ海道(8000)、Tokyo Cycling Route(10000)
+			wantErr:     false,
+		},
+		{
+			name:        "距離の下限のみ指定してルートが検索できる",
+			userID:      "70d6037a-b67b-4aa8-b5a3-da393b514f24",
+			keywords:    []string{},
+			minDistance: new(6000.0),
+			maxDistance: nil,
+			wantCount:   4,
+			wantErr:     false,
+		},
+		{
+			name:        "距離の上限のみ指定してルートが検索できる",
+			userID:      "70d6037a-b67b-4aa8-b5a3-da393b514f24",
+			keywords:    []string{},
+			minDistance: nil,
+			maxDistance: new(10000.0),
+			wantCount:   3, // 皇居一周ルート(5000)、しまなみ海道(8000)、Tokyo Cycling Route(10000)
+			wantErr:     false,
+		},
+		{
+			name:        "距離の範囲に一致するルートがない場合は空配列を返す",
+			userID:      "70d6037a-b67b-4aa8-b5a3-da393b514f24",
+			keywords:    []string{},
+			minDistance: new(20000.0),
+			maxDistance: new(30000.0),
+			wantCount:   0,
+			wantErr:     false,
+		},
+		{
+			name:       "キーワードと公開範囲を組み合わせて検索できる",
+			userID:     "70d6037a-b67b-4aa8-b5a3-da393b514f24",
+			keywords:   []string{"多摩川"},
+			visibility: new(int16(1)),
+			wantCount:  1, // 多摩川サイクリングロード(公開)のみ。多摩川-都民の森は友達のみ(2)なので対象外
+			wantErr:    false,
+		},
+		{
+			name:        "キーワードと距離範囲を組み合わせて検索できる",
+			userID:      "70d6037a-b67b-4aa8-b5a3-da393b514f24",
+			keywords:    []string{"多摩川"},
+			minDistance: new(10000.0),
+			wantCount:   2, // 多摩川サイクリングロード(15000)、多摩川-都民の森ルート(50000)
+			wantErr:     false,
+		},
+		{
+			name:        "キーワード・公開範囲・距離すべてを組み合わせて検索できる",
+			userID:      "70d6037a-b67b-4aa8-b5a3-da393b514f24",
+			keywords:    []string{"多摩川"},
+			visibility:  new(int16(1)),
+			minDistance: new(10000.0),
+			wantCount:   1, // 多摩川サイクリングロード(公開、15000)のみ
+			wantErr:     false,
+		},
+		{
+			name:      "ユーザーIDが存在しない場合は空配列を返す",
+			userID:    "00000000-0000-0000-0000-000000000000",
+			keywords:  []string{},
+			wantCount: 0,
+			wantErr:   false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			criteria, err := routeDomain.NewRouteSearchCriteria(tt.userID, tt.keywords, tt.visibility, tt.minDistance, tt.maxDistance)
+			if err != nil {
+				t.Fatalf("failed to create search criteria: %v", err)
+				return
+			}
+
+			got, err := routeRepository.SearchRoutesByUserID(ctx, criteria)
+
+			if tt.wantErr {
+				if err == nil {
+					t.Error("expected error but got nil")
+				}
+				return
+			}
+
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+
+			if len(got) != tt.wantCount {
+				t.Errorf("count mismatch: want %d, got %d", tt.wantCount, len(got))
+			}
+		})
+	}
+}
+
 func TestRouteRepository_CountRoutesByUserID(t *testing.T) {
 	q := GetTestQueries()
 	routeRepository := NewRouteRepository(q)
@@ -166,7 +349,7 @@ func TestRouteRepository_CountRoutesByUserID(t *testing.T) {
 		{
 			name:      "ユーザーのルート数をカウントできること",
 			userID:    "70d6037a-b67b-4aa8-b5a3-da393b514f24",
-			wantCount: 3,
+			wantCount: 5,
 			wantErr:   false,
 		},
 		{

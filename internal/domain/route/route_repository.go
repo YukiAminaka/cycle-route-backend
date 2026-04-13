@@ -6,6 +6,7 @@ import (
 
 type IRouteRepository interface {
 	GetRoutesByUserID(ctx context.Context, userID string) ([]*Route, error)
+	SearchRoutesByUserID(ctx context.Context, criteria *RouteSearchCriteria) ([]*Route, error)
 	CountRoutesByUserID(ctx context.Context, userID string) (int64, error)
 	GetRouteByID(ctx context.Context, id string) (*Route, error)
 	SaveRoute(ctx context.Context, route *Route) error

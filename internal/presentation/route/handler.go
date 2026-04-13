@@ -4,7 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 
+	domainerror "github.com/YukiAminaka/cycle-route-backend/internal/domain/error"
 	"github.com/YukiAminaka/cycle-route-backend/internal/pkg/geojson"
 	"github.com/YukiAminaka/cycle-route-backend/internal/pkg/geometry"
 	"github.com/YukiAminaka/cycle-route-backend/internal/presentation/response"
@@ -417,26 +419,68 @@ func (h *Handler) DeleteRoute(c *gin.Context) {
 //	@Failure	500				{object}	response.ErrorResponse
 //	@Router		/routes [get]
 func (h *Handler) GetRoutesByUserID(c *gin.Context) {
-	// keyword := c.Query("keyword")
-	// min_distance := c.Query("min_distance")
-	// max_distance := c.Query("max_distance")
+	keyword := c.Query("keyword")
 	// min_elevation := c.Query("min_elevation")
 	// max_elevation := c.Query("max_elevation")
-	// visibility := c.Query("visibility")
 	// author := c.Query("author")
+
+	var visibilityPtr *int16
+	if v := c.Query("visibility"); v != "" {
+		visibility, err := strconv.ParseInt(v, 10, 16)
+		if err != nil {
+			response.ReturnBadRequest(c, errors.New("invalid visibility"))
+			return
+		}
+		v16 := int16(visibility)
+		visibilityPtr = &v16
+	}
+
+	var minDistancePtr *float64
+	if v := c.Query("min_distance"); v != "" {
+		minDistance, err := strconv.ParseFloat(v, 64)
+		if err != nil {
+			response.ReturnBadRequest(c, errors.New("invalid min_distance"))
+			return
+		}
+		minDistancePtr = &minDistance
+	}
+
+	var maxDistancePtr *float64
+	if v := c.Query("max_distance"); v != "" {
+		maxDistance, err := strconv.ParseFloat(v, 64)
+		if err != nil {
+			response.ReturnBadRequest(c, errors.New("invalid max_distance"))
+			return
+		}
+		maxDistancePtr = &maxDistance
+	}
+
 	kratosIDValue, exists := c.Get("kratos_id")
 	if !exists {
 		response.ReturnStatusUnauthorized(c, errors.New("user not authenticated"))
 		return
 	}
+
 	kratosID, ok := kratosIDValue.(string)
 	if !ok {
 		response.ReturnStatusInternalServerError(c, errors.New("invalid kratos_id type"))
 		return
 	}
 
-	dtos, err := h.getRouteUsecase.GetRoutesByUserID(c.Request.Context(), kratosID)
+	input := routeUsecase.SearchRoutesInputDto{
+		KratosID:    kratosID,
+		Keyword:     keyword,
+		Visibility:  visibilityPtr,
+		MinDistance: minDistancePtr,
+		MaxDistance: maxDistancePtr,
+	}
+
+	dtos, err := h.getRouteUsecase.GetRoutesByUserID(c.Request.Context(), input)
 	if err != nil {
+		if errors.Is(err, domainerror.ErrValidation) {
+			response.ReturnBadRequest(c, err)
+			return
+		}
 		response.ReturnStatusInternalServerError(c, err)
 		return
 	}

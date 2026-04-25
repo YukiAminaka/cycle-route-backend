@@ -96,6 +96,48 @@ WHERE user_id = sqlc.arg(user_id)
   AND (sqlc.arg(max_distance)::DOUBLE PRECISION < 0 OR distance <= sqlc.arg(max_distance)::DOUBLE PRECISION);
   
 
+-- name: ExploreRoutes :many
+SELECT
+  filtered_routes.id,
+  filtered_routes.user_id,
+  filtered_routes.name,
+  filtered_routes.description,
+  filtered_routes.highlighted_photo_id,
+  filtered_routes.distance,
+  filtered_routes.duration,
+  filtered_routes.elevation_gain,
+  filtered_routes.elevation_loss,
+  filtered_routes.path_geom,
+  filtered_routes.bbox,
+  filtered_routes.first_point,
+  filtered_routes.last_point,
+  filtered_routes.polyline,
+  filtered_routes.created_at,
+  filtered_routes.updated_at,
+  filtered_routes.visibility,
+  filtered_routes.total_count,
+  users.name AS user_name
+FROM (
+    SELECT *, COUNT(*) OVER() AS total_count  
+    FROM routes
+    WHERE visibility = 1
+    AND (sqlc.arg(radius_m)::float8 < 0 OR ST_DWithin(
+        routes.first_point::geography,
+        sqlc.arg(location)::geography,
+        sqlc.arg(radius_m)::float8
+    ))
+    AND (cardinality(sqlc.arg(name_keywords)::TEXT[]) = 0 OR name ILIKE ANY(sqlc.arg(name_keywords)::TEXT[]))
+    AND (sqlc.arg(min_distance)::DOUBLE PRECISION < 0 OR distance >= sqlc.arg(min_distance)::DOUBLE PRECISION)
+    AND (sqlc.arg(max_distance)::DOUBLE PRECISION < 0 OR distance <= sqlc.arg(max_distance)::DOUBLE PRECISION)
+) AS filtered_routes
+INNER JOIN users ON filtered_routes.user_id = users.id
+ORDER BY
+  CASE WHEN sqlc.arg(radius_m)::float8 < 0 THEN 0
+       ELSE ST_Distance(filtered_routes.first_point::geography, sqlc.arg(location)::geography)
+  END
+LIMIT sqlc.arg(limit_count)::INT
+OFFSET sqlc.arg(offset_count)::INT;
+
 -- name: CountRoutesByUserID :one
 SELECT COUNT(*) FROM routes WHERE user_id = $1;
 

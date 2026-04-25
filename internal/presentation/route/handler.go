@@ -12,6 +12,7 @@ import (
 	"github.com/YukiAminaka/cycle-route-backend/internal/presentation/response"
 	routeUsecase "github.com/YukiAminaka/cycle-route-backend/internal/usecase/route"
 	"github.com/gin-gonic/gin"
+	"github.com/paulmach/orb"
 )
 
 type Handler struct {
@@ -507,6 +508,142 @@ func (h *Handler) GetRoutesByUserID(c *gin.Context) {
 
 	res := RouteListResponse{
 		Routes: routes,
+	}
+
+	response.ReturnStatusOK(c, res)
+}
+
+func (h *Handler) ExploreRoutes(c *gin.Context) {
+	keyword := c.Query("q")
+	latitude := c.Query("lat")
+	longitude := c.Query("lng")
+	radius := c.Query("r")
+	min_distance := c.Query("min_distance")
+	max_distance := c.Query("max_distance")
+	offsetStr := c.Query("offset")
+
+	var latitudePtr, longitudePtr *float64
+	var radiusPtr *int32
+	if latitude != ""{
+		lat, err := strconv.ParseFloat(latitude, 64)
+		if err != nil {
+			response.ReturnBadRequest(c, errors.New("invalid latitude"))
+			return
+		}
+		latitudePtr = &lat
+	}
+
+	if longitude != ""{
+		lng, err := strconv.ParseFloat(longitude, 64)
+		if err != nil {
+			response.ReturnBadRequest(c, errors.New("invalid longitude"))
+			return
+		}
+		longitudePtr = &lng
+	}
+
+	var location *orb.Point
+	if (latitudePtr != nil && longitudePtr != nil) {
+		location = &orb.Point{
+			*longitudePtr,
+			*latitudePtr,
+		}
+	}
+
+	if radius != "" {
+		r, err := strconv.ParseInt(radius, 10, 32)
+		if err != nil {
+			response.ReturnBadRequest(c, errors.New("invalid radius"))
+			return
+		}
+		r32 := int32(r)
+		radiusPtr = &r32
+	}
+
+	var minDistancePtr *float64
+	if min_distance != "" {
+		minDistance, err := strconv.ParseFloat(max_distance, 64)
+		if err != nil {
+			response.ReturnBadRequest(c, errors.New("invalid min_distance"))
+			return
+		}
+		minDistancePtr = &minDistance
+	}
+
+	var maxDistancePtr *float64
+	if max_distance != "" {
+		maxDistance, err := strconv.ParseFloat(max_distance, 64)
+		if err != nil {
+			response.ReturnBadRequest(c, errors.New("invalid max_distance"))
+			return
+		}
+		maxDistancePtr = &maxDistance
+	}
+
+	var offset int32
+	if offsetStr != "" {
+		o, err := strconv.ParseInt(offsetStr, 10, 32)
+		if err != nil {
+			response.ReturnBadRequest(c, errors.New("invalid offset"))
+			return
+		}
+		if o < 0 {
+			response.ReturnBadRequest(c, errors.New("offset must be non-negative"))
+			return
+		}
+		offset = int32(o)
+	}
+
+
+
+	_, exists := c.Get("kratos_id")
+	if !exists {
+		response.ReturnStatusUnauthorized(c, errors.New("user not authenticated"))
+		return
+	}
+
+	input := routeUsecase.ExploreRoutesInputDto{
+		Keyword:     keyword,
+		Location:    location,
+		Radius:      radiusPtr,
+		MinDistance: minDistancePtr,
+		MaxDistance: maxDistancePtr,
+		Offset:      offset,
+	}
+
+	dtos, err := h.getRouteUsecase.ExploreRoutes(c.Request.Context(), input)
+	if err != nil {
+		if errors.Is(err, domainerror.ErrValidation) {
+			response.ReturnBadRequest(c, err)
+			return
+		}
+		response.ReturnStatusInternalServerError(c, err)
+		return
+	}
+
+	routes := make([]RouteResponseModel, len(dtos.Items))
+	for i, dto := range dtos.Items {
+		routes[i] = RouteResponseModel{
+			ID:                 dto.ID,
+			UserID:             dto.UserID,
+			UserName:           dto.UserName,
+			Name:               dto.Name,
+			Description:        dto.Description,
+			HighlightedPhotoID: dto.HighlightedPhotoID,
+			Distance:           dto.Distance,
+			Duration:           dto.Duration,
+			ElevationGain:      dto.ElevationGain,
+			ElevationLoss:      dto.ElevationLoss,
+			Visibility:         dto.Visibility,
+			Polyline:           dto.Polyline,
+			CreatedAt:          dto.CreatedAt,
+			UpdatedAt:          dto.UpdatedAt,
+		}
+	}
+
+	res := RouteListResponse{
+		Routes: routes,
+		TotalCount: dtos.TotalCount,
 	}
 
 	response.ReturnStatusOK(c, res)

@@ -6,6 +6,7 @@ type RouteResponse struct {
 
 type RouteListResponse struct {
 	Routes []RouteResponseModel `json:"routes"`
+	TotalCount int64            `json:"total_count"`
 }
 
 type RouteResponseModel struct {

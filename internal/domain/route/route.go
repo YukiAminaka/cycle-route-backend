@@ -619,6 +619,29 @@ func (r *Route) UpdateRouteGeometry(
 	return nil
 }
 
+type ExploreRouteResult struct {
+	Route      *Route
+	UserName   string
+	TotalCount int64
+}
+
+func ReconstructExploreRouteResult(route *Route, userName string, totalCount int64) (*ExploreRouteResult, error) {
+
+	if route == nil {
+		return nil, errors.New("route is nil")
+	}
+
+	if userName == "" {
+		return nil, errors.New("userName is required")
+	}
+
+	return &ExploreRouteResult{
+		Route:      route,
+		UserName:   userName,
+		TotalCount: totalCount,
+	}, nil
+}
+
 type RouteSearchCriteria struct {
 	userID      string
 	keywords    []string
@@ -679,4 +702,81 @@ func (c RouteSearchCriteria) MinDistance() *float64 {
 
 func (c RouteSearchCriteria) MaxDistance() *float64 {
 	return c.maxDistance
+}
+
+
+type ExploreRoutesCriteria struct {
+	keywords    []string
+	location    *Geometry
+	radius      *float64
+	minDistance *float64
+	maxDistance *float64
+	limit       int32
+	offset      int32
+}
+
+func NewExploreRoutesCriteria(
+	keywords []string,
+	location *Geometry,
+	radius *float64,
+	minDistance *float64,
+	maxDistance *float64,
+	limit int32,
+	offset int32) (*ExploreRoutesCriteria, error) {
+
+	if (location == nil) != (radius == nil) {
+		return nil, domainerror.New("location and radius must be provided together", domainerror.ErrValidation)
+	}
+	if radius != nil && *radius < 0 {
+		return nil, domainerror.New("radius must be non-negative", domainerror.ErrValidation)
+	}
+	if minDistance != nil && *minDistance < 0 {
+		return nil, domainerror.New("minDistance must be non-negative", domainerror.ErrValidation)
+	}
+	if maxDistance != nil && *maxDistance < 0 {
+		return nil, domainerror.New("maxDistance must be non-negative", domainerror.ErrValidation)
+	}
+	if minDistance != nil && maxDistance != nil && *minDistance > *maxDistance {
+		return nil, domainerror.New("minDistance must be less than or equal to maxDistance", domainerror.ErrValidation)
+	}
+
+	return &ExploreRoutesCriteria{
+		keywords:    keywords,
+		location:    location,
+		radius:      radius,
+		minDistance: minDistance,
+		maxDistance: maxDistance,
+		limit:       limit,
+		offset:      offset,
+	}, nil
+}
+
+func (c ExploreRoutesCriteria) Keywords() []string {
+	cp := make([]string, len(c.keywords))
+	copy(cp, c.keywords)
+	return cp
+}
+
+func (c ExploreRoutesCriteria) Location() *Geometry {
+	return c.location
+}
+
+func (c ExploreRoutesCriteria) Radius() *float64 {
+	return c.radius
+}
+
+func (c ExploreRoutesCriteria) MinDistance() *float64 {
+	return c.minDistance
+}
+
+func (c ExploreRoutesCriteria) MaxDistance() *float64 {
+	return c.maxDistance
+}
+
+func (c ExploreRoutesCriteria) Limit() int32 {
+	return c.limit
+}
+
+func (c ExploreRoutesCriteria) Offset() int32 {
+	return c.offset
 }

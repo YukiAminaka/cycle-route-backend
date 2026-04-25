@@ -216,6 +216,76 @@ func (r *routeRepositoryImpl) SearchRoutesByUserID(ctx context.Context, criteria
 	return result, nil
 }
 
+func (r *routeRepositoryImpl) ExploreRoutes(ctx context.Context, criteria *route.ExploreRoutesCriteria) ([]*route.ExploreRouteResult, error) {
+	// LIKE検索用に変換
+	keywords := criteria.Keywords()
+	nameKeywords := make([]string, len(keywords))
+	for i, k := range keywords {
+		nameKeywords[i] = "%" + k + "%"
+	}
+
+	minDistance := float64(-1)
+	if d := criteria.MinDistance(); d != nil {
+		minDistance = *d
+	}
+	maxDistance := float64(-1)
+	if d := criteria.MaxDistance(); d != nil {
+		maxDistance = *d
+	}
+
+	// location/radius が nil の場合はセンチネル値を使用して範囲検索をスキップ
+	radiusM := float64(-1)
+	var location dbgen.OrbGeometry
+	if criteria.Location() != nil && criteria.Radius() != nil {
+		radiusM = *criteria.Radius()
+		location = dbgen.OrbGeometry{Geometry: criteria.Location().Geometry}
+	}
+
+	rows, err := r.queries.ExploreRoutes(ctx, dbgen.ExploreRoutesParams{
+		Location:     location,
+		RadiusM:      radiusM,
+		NameKeywords: nameKeywords,
+		MinDistance:  minDistance,
+		MaxDistance:  maxDistance,
+		LimitCount:   criteria.Limit(),
+		OffsetCount:  criteria.Offset(),
+	})
+	if err != nil {
+		return nil, err
+	}
+	result := make([]*route.ExploreRouteResult, 0, len(rows))
+	for _, rd := range rows {
+		routeModel, err := route.ReconstructRoute(
+			rd.ID.String(),
+			rd.UserID.String(),
+			rd.Name,
+			rd.Description,
+			rd.HighlightedPhotoID,
+			rd.Distance,
+			rd.Duration,
+			rd.ElevationGain,
+			rd.ElevationLoss,
+			route.Geometry{Geometry: rd.PathGeom.Geometry},
+			route.Geometry{Geometry: rd.Bbox.Geometry},
+			route.Geometry{Geometry: rd.FirstPoint.Geometry},
+			route.Geometry{Geometry: rd.LastPoint.Geometry},
+			rd.Polyline,
+			rd.Visibility,
+			rd.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+			rd.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		)
+		if err != nil {
+			return nil, err
+		}
+		exploreRouteResult, err := route.ReconstructExploreRouteResult(routeModel, rd.UserName, rd.TotalCount)
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, exploreRouteResult)
+	}
+	return result, nil
+}
+
 func (r *routeRepositoryImpl) CountRoutesByUserID(ctx context.Context, userID string) (int64, error) {
 	uid, err := uuid.Parse(userID)
 	if err != nil {

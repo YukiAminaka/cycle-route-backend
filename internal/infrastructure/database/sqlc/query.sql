@@ -123,7 +123,7 @@ FROM (
     WHERE visibility = 1
     AND (sqlc.arg(radius_m)::float8 < 0 OR ST_DWithin(
         routes.first_point::geography,
-        sqlc.arg(location)::geography,
+        ST_GeomFromEWKB(sqlc.arg(location))::geography,
         sqlc.arg(radius_m)::float8
     ))
     AND (cardinality(sqlc.arg(name_keywords)::TEXT[]) = 0 OR name ILIKE ANY(sqlc.arg(name_keywords)::TEXT[]))
@@ -133,7 +133,7 @@ FROM (
 INNER JOIN users ON filtered_routes.user_id = users.id
 ORDER BY
   CASE WHEN sqlc.arg(radius_m)::float8 < 0 THEN 0
-       ELSE ST_Distance(filtered_routes.first_point::geography, sqlc.arg(location)::geography)
+       ELSE ST_Distance(filtered_routes.first_point::geography, ST_GeomFromEWKB(sqlc.arg(location))::geography)
   END
 LIMIT sqlc.arg(limit_count)::INT
 OFFSET sqlc.arg(offset_count)::INT;

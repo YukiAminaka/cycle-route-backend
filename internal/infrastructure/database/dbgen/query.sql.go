@@ -312,7 +312,7 @@ FROM (
     WHERE visibility = 1
     AND ($1::float8 < 0 OR ST_DWithin(
         routes.first_point::geography,
-        $2::geography,
+        ST_GeomFromEWKB($2)::geography,
         $1::float8
     ))
     AND (cardinality($3::TEXT[]) = 0 OR name ILIKE ANY($3::TEXT[]))
@@ -322,7 +322,7 @@ FROM (
 INNER JOIN users ON filtered_routes.user_id = users.id
 ORDER BY
   CASE WHEN $1::float8 < 0 THEN 0
-       ELSE ST_Distance(filtered_routes.first_point::geography, $2::geography)
+       ELSE ST_Distance(filtered_routes.first_point::geography, ST_GeomFromEWKB($2)::geography)
   END
 LIMIT $7::INT
 OFFSET $6::INT
@@ -330,7 +330,7 @@ OFFSET $6::INT
 
 type ExploreRoutesParams struct {
 	RadiusM      float64     `json:"radius_m"`
-	Location     OrbGeometry `json:"location"`
+	Location     interface{} `json:"location"`
 	NameKeywords []string    `json:"name_keywords"`
 	MinDistance  float64     `json:"min_distance"`
 	MaxDistance  float64     `json:"max_distance"`

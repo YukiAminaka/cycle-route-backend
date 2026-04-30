@@ -15,16 +15,16 @@ func TestRouteRepository_GetRouteByID(t *testing.T) {
 	resetTestData(t)
 
 	tests := []struct {
-		name           string
-		routeID        string
-		wantID         string
-		wantUserID     string
-		wantName       string
-		wantDistance   float64
-		wantDuration   float64
-		wantCPCount    int // コースポイント数
-		wantWPCount    int // ウェイポイント数
-		wantErr        bool
+		name         string
+		routeID      string
+		wantID       string
+		wantUserID   string
+		wantName     string
+		wantDistance float64
+		wantDuration float64
+		wantCPCount  int // コースポイント数
+		wantWPCount  int // ウェイポイント数
+		wantErr      bool
 	}{
 		{
 			name:         "IDによって皇居一周ルートが取得できること",
@@ -158,36 +158,36 @@ func TestRouteRepository_SearchRoutesByUserID(t *testing.T) {
 	resetTestData(t)
 
 	tests := []struct {
-		name      string
-		userID    string
-		keywords   []string
-		visibility *int16
+		name        string
+		userID      string
+		keywords    []string
+		visibility  *int16
 		minDistance *float64
 		maxDistance *float64
-		wantCount int
-		wantErr   bool
+		wantCount   int
+		wantErr     bool
 	}{
 		{
-			name:      "キーワード、公開範囲、距離の指定が無い場合対象ユーザーの全ルートが検索できる",
-			userID:    "70d6037a-b67b-4aa8-b5a3-da393b514f24",
-			keywords:   []string{},
-			visibility: nil,
+			name:        "キーワード、公開範囲、距離の指定が無い場合対象ユーザーの全ルートが検索できる",
+			userID:      "70d6037a-b67b-4aa8-b5a3-da393b514f24",
+			keywords:    []string{},
+			visibility:  nil,
 			minDistance: nil,
 			maxDistance: nil,
-			wantCount: 5, // 皇居、多摩川、多摩川-都民の森、しまなみ海道、Tokyo Cycling Route
-			wantErr:   false,
+			wantCount:   5, // 皇居、多摩川、多摩川-都民の森、しまなみ海道、Tokyo Cycling Route
+			wantErr:     false,
 		},
 		{
 			name:      "キーワードでルートが検索できる",
 			userID:    "70d6037a-b67b-4aa8-b5a3-da393b514f24",
-			keywords:   []string{"皇居"},
+			keywords:  []string{"皇居"},
 			wantCount: 1,
 			wantErr:   false,
 		},
 		{
 			name:      "キーワードに一致する複数のルートが検索できる",
 			userID:    "70d6037a-b67b-4aa8-b5a3-da393b514f24",
-			keywords:   []string{"多摩川"},
+			keywords:  []string{"多摩川"},
 			wantCount: 2, // 多摩川サイクリングロード、多摩川-都民の森ルート
 			wantErr:   false,
 		},
@@ -315,6 +315,198 @@ func TestRouteRepository_SearchRoutesByUserID(t *testing.T) {
 			}
 
 			got, err := routeRepository.SearchRoutesByUserID(ctx, criteria)
+
+			if tt.wantErr {
+				if err == nil {
+					t.Error("expected error but got nil")
+				}
+				return
+			}
+
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+
+			if len(got) != tt.wantCount {
+				t.Errorf("count mismatch: want %d, got %d", tt.wantCount, len(got))
+			}
+		})
+	}
+}
+
+func tokyoStation() *routeDomain.Geometry {
+	// 東京駅付近 (139.767, 35.681)
+	return &routeDomain.Geometry{Geometry: orb.Point{139.767, 35.681}}
+}
+
+// テストに使用する公開ルート(visibility=1)の first_point と東京駅からの概算距離:
+//   皇居一周ルート       (139.756, 35.677) 約  1.1km
+//   Tokyo Cycling Route  (139.842, 35.655) 約  7.4km
+//   多摩川サイクリングロード (139.662, 35.587) 約 14.2km
+//   ヤビツ峠チャレンジ    (139.226, 35.371) 約 60km
+
+func TestRouteRepository_ExploreRoutes(t *testing.T) {
+	q := GetTestQueries()
+	routeRepository := NewRouteRepository(q)
+	ctx := context.Background()
+	resetTestData(t)
+
+	tests := []struct {
+		name        string
+		keywords    []string
+		location    *routeDomain.Geometry
+		radius      *float64
+		minDistance *float64
+		maxDistance *float64
+		offset      int32
+		limit       int32
+		wantCount   int
+		wantErr     bool
+	}{
+		// ---- キーワード検索 ----
+		{
+			name:      "条件指定なしの場合公開ルートが全件検索できる",
+			keywords:  []string{},
+			limit:     10,
+			wantCount: 4, // 皇居・多摩川・ヤビツ峠・Tokyo Cycling Route (visibility=1のみ)
+		},
+		{
+			name:      "キーワードでルートが検索できる",
+			keywords:  []string{"皇居"},
+			limit:     10,
+			wantCount: 1,
+		},
+		{
+			name:      "公開されていないルートはキーワードに一致しても返らない",
+			keywords:  []string{"多摩川"},
+			limit:     10,
+			wantCount: 1, // 多摩川サイクリングロード(visibility=1)のみ。多摩川-都民の森(visibility=2)は除外
+		},
+		{
+			name:      "複数キーワードはOR条件で検索できる",
+			keywords:  []string{"多摩川", "tokyo"},
+			limit:     10,
+			wantCount: 2, // 多摩川サイクリングロード + Tokyo Cycling Route
+		},
+		{
+			name:      "キーワードが英字の場合に大文字小文字を区別せず検索できる",
+			keywords:  []string{"tokyo"},
+			limit:     10,
+			wantCount: 1, // Tokyo Cycling Route
+		},
+		{
+			name:      "キーワードに一致するルートがない場合は空配列を返す",
+			keywords:  []string{"nonexistent-keyword"},
+			limit:     10,
+			wantCount: 0,
+		},
+		// ---- ルート距離フィルタ ----
+		{
+			name:        "ルート距離の下限と上限を指定して検索できる",
+			keywords:    []string{},
+			location:    tokyoStation(),
+			radius:      new(100000.0),
+			minDistance: new(5000.0),
+			maxDistance: new(10000.0),
+			limit:       10,
+			wantCount:   2, // 皇居(5000) + Tokyo Cycling Route(10000)
+		},
+		{
+			name:        "ルート距離の下限のみ指定して検索できる",
+			keywords:    []string{},
+			location:    tokyoStation(),
+			radius:      new(100000.0),
+			minDistance: new(6000.0),
+			limit:       10,
+			wantCount:   3, // 多摩川(15000) + ヤビツ峠(40000) + Tokyo Cycling Route(10000)
+		},
+		{
+			name:        "ルート距離の上限のみ指定して検索できる",
+			keywords:    []string{},
+			location:    tokyoStation(),
+			radius:      new(100000.0),
+			maxDistance: new(10000.0),
+			limit:       10,
+			wantCount:   2, // 皇居(5000) + Tokyo Cycling Route(10000)
+		},
+		{
+			name:        "ルート距離範囲に一致するルートがない場合は空配列を返す",
+			keywords:    []string{},
+			location:    tokyoStation(),
+			radius:      new(100000.0),
+			minDistance: new(20000.0),
+			maxDistance: new(30000.0),
+			limit:       10,
+			wantCount:   0,
+		},
+		// ---- 基準地点からの距離検索 ----
+		{
+			name:      "基準点から2km以内のルートが検索できる",
+			keywords:  []string{},
+			location:  tokyoStation(),
+			radius:    new(2000.0),
+			limit:     10,
+			wantCount: 1, // 皇居のみ(約1.1km)
+		},
+		{
+			name:      "基準点から10km以内のルートが検索できる",
+			keywords:  []string{},
+			location:  tokyoStation(),
+			radius:    new(10000.0),
+			limit:     10,
+			wantCount: 2, // 皇居(約1.1km) + Tokyo Cycling Route(約7.4km)
+		},
+		{
+			name:      "基準点から20km以内のルートが検索できる",
+			keywords:  []string{},
+			location:  tokyoStation(),
+			radius:    new(20000.0),
+			limit:     10,
+			wantCount: 3, // 皇居(約1.1km) + 多摩川(約14.2km) + Tokyo Cycling Route(約7.4km)
+		},
+		{
+			name:      "基準点の範囲内にルートがない場合は空配列を返す",
+			keywords:  []string{},
+			location:  &routeDomain.Geometry{Geometry: orb.Point{135.0, 34.0}}, // 大阪付近
+			radius:    new(1000.0),
+			limit:     10,
+			wantCount: 0,
+		},
+		// ---- 組み合わせ ----
+		{
+			name:      "基準点の距離とキーワードを組み合わせて検索できる",
+			keywords:  []string{"多摩川"},
+			location:  tokyoStation(),
+			radius:    new(20000.0),
+			limit:     10,
+			wantCount: 1, // 多摩川サイクリングロード(約14.2km)のみ
+		},
+		{
+			name:        "基準点の距離とルート距離フィルタを組み合わせて検索できる",
+			keywords:    []string{},
+			location:    tokyoStation(),
+			radius:      new(20000.0),
+			minDistance: new(10000.0),
+			limit:       10,
+			wantCount:   2, // 多摩川(15000m, 約14.2km) + Tokyo Cycling Route(10000m, 約7.4km)
+		},
+		{
+			name:      "limitによって返却件数が制限される",
+			keywords:  []string{},
+			limit:     2,
+			wantCount: 2,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			criteria, err := routeDomain.NewExploreRoutesCriteria(tt.keywords, tt.location, tt.radius, tt.minDistance, tt.maxDistance, tt.limit, tt.offset)
+			if err != nil {
+				t.Fatalf("failed to create search criteria: %v", err)
+				return
+			}
+
+			got, err := routeRepository.ExploreRoutes(ctx, criteria)
 
 			if tt.wantErr {
 				if err == nil {
@@ -582,7 +774,7 @@ func TestRouteRepository_UpdateRoute(t *testing.T) {
 	}
 	firstPoint := routeDomain.Geometry{Geometry: orb.Point{139.7528, 35.6850}}
 	lastPoint := routeDomain.Geometry{Geometry: orb.Point{139.7600, 35.6780}}
-	bbox := CalculateBbox(pathGeom.Geometry) 
+	bbox := CalculateBbox(pathGeom.Geometry)
 
 	// bboxは既存のルートから取得（データベースで自動生成されたもの）
 	updatedRoute, err := routeDomain.ReconstructRoute(
@@ -591,15 +783,15 @@ func TestRouteRepository_UpdateRoute(t *testing.T) {
 		"更新された皇居一周ルート",
 		"更新された説明文",
 		nil,
-		6000.0,  // 距離を変更
-		1200.0,  // 時間を変更
+		6000.0, // 距離を変更
+		1200.0, // 時間を変更
 		30.0,
 		30.0,
 		pathGeom,
 		routeDomain.Geometry{Geometry: bbox.Geometry},
 		firstPoint,
 		lastPoint,
-		"gvxxE_n~sYvQo_@~WoK",//SELECT ST_AsEncodedPolyline(ST_SimplifyPreserveTopology(GeomFromEWKT('SRID=4326;LINESTRING(139.7528 35.6850,139.7580 35.6820,139.7600 35.6780)'), 0.0001));
+		"gvxxE_n~sYvQo_@~WoK", //SELECT ST_AsEncodedPolyline(ST_SimplifyPreserveTopology(GeomFromEWKT('SRID=4326;LINESTRING(139.7528 35.6850,139.7580 35.6820,139.7600 35.6780)'), 0.0001));
 		2,
 		existingRoute.CreatedAt(), // 既存の作成日時を使用
 		existingRoute.UpdatedAt(), // 既存の更新日時を使用
@@ -623,7 +815,7 @@ func TestRouteRepository_UpdateRoute(t *testing.T) {
 		new("更新された道路"),
 		new("depart"),
 		nil,
-		&routeDomain.Geometry{Geometry:orb.Point{139.7528, 35.6850}},
+		&routeDomain.Geometry{Geometry: orb.Point{139.7528, 35.6850}},
 		nil,
 		new(int32(90)),
 	)
@@ -673,8 +865,8 @@ func TestRouteRepository_UpdateRoute(t *testing.T) {
 			if updated.Duration() != tt.route.Duration() {
 				t.Errorf("Duration mismatch: want %f, got %f", tt.route.Duration(), updated.Duration())
 			}
-			if updated.Bbox().Geometry != nil &&  tt.route.Bbox().Geometry != nil {
-				if !orb.Equal(updated.Bbox().Geometry,tt.route.Bbox().Geometry) {
+			if updated.Bbox().Geometry != nil && tt.route.Bbox().Geometry != nil {
+				if !orb.Equal(updated.Bbox().Geometry, tt.route.Bbox().Geometry) {
 					t.Errorf("Bbox mismatch: want %v, got %v", tt.route.Bbox().Geometry, updated.Bbox().Geometry)
 				}
 			}

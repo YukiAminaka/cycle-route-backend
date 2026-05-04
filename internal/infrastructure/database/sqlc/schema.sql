@@ -1,6 +1,6 @@
 CREATE EXTENSION IF NOT EXISTS postgis;    -- PostGIS有効化
-CREATE EXTENSION IF NOT EXISTS btree_gist; -- 便利（排他制約や複合インデックス用）
-CREATE EXTENSION IF NOT EXISTS pg_trgm;    -- 名前/説明/検索用
+CREATE EXTENSION IF NOT EXISTS btree_gist; -- 排他制約や複合インデックス用
+CREATE EXTENSION IF NOT EXISTS pg_trgm;    -- LIKE検索の高速化
 
 
 CREATE TABLE users (                   
@@ -19,7 +19,7 @@ CREATE TABLE users (
     geom geometry(Point,4326),                   -- 位置
     first_name TEXT,                             -- 名
     last_name TEXT,                              -- 姓
-    email TEXT UNIQUE,                           -- メールアドレス（ユニーク）
+    email TEXT UNIQUE,                           -- メールアドレス
     has_set_location BOOLEAN NOT NULL DEFAULT FALSE       -- 位置情報設定済みフラグ
 );
 

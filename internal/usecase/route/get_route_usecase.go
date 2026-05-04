@@ -12,6 +12,7 @@ import (
 type IGetRouteUsecase interface {
 	GetRouteByID(ctx context.Context, routeID string) (*RouteDetaileDto, error)
 	GetRoutesByUserID(ctx context.Context, input SearchRoutesInputDto) ([]*RouteListItemDto, error)
+	ExploreRoutes(ctx context.Context, input ExploreRoutesInputDto) (*RouteListDto, error)
 }
 
 type getRouteUsecase struct {
@@ -69,6 +70,11 @@ type RouteDetaileDto struct {
 	Waypoints          []WaypointOutput
 }
 
+type RouteListDto struct {
+	Items      []*RouteListItemDto
+	TotalCount int64
+}
+
 type RouteListItemDto struct {
 	ID                 string
 	UserID             string
@@ -93,6 +99,16 @@ type SearchRoutesInputDto struct {
     Visibility  *int16
     MinDistance *float64
     MaxDistance *float64
+}
+
+type ExploreRoutesInputDto struct {
+	Keyword     string
+	Location    *orb.Point
+	Radius      *int32
+	MinDistance *float64
+	MaxDistance *float64
+	Limit       int32
+	Offset      int32
 }
 
 func (u *getRouteUsecase) GetRouteByID(ctx context.Context, routeID string) (*RouteDetaileDto, error) {
@@ -142,6 +158,50 @@ func (u *getRouteUsecase) GetRoutesByUserID(ctx context.Context, input SearchRou
 	}
 
 	return outputs, nil
+}
+
+func (u *getRouteUsecase) ExploreRoutes(ctx context.Context, input ExploreRoutesInputDto) (*RouteListDto, error) {
+	keywords := strings.Fields(input.Keyword) // "A B" -> ["A", "B"]
+
+	var radius *float64
+	if input.Radius != nil {
+		r := float64(*input.Radius) * 1000 // km -> m
+		radius = &r
+	}
+
+	var location *routeDomain.Geometry
+	if input.Location != nil {
+		location = &routeDomain.Geometry{Geometry: *input.Location}
+	}
+
+	limit := input.Limit
+	if limit <= 0 {
+		limit = 20
+	}
+
+	criteria, err := routeDomain.NewExploreRoutesCriteria(keywords, location, radius, input.MinDistance, input.MaxDistance, limit, input.Offset)
+	if err != nil {
+		return nil, err
+	}
+
+	routes, err := u.routeRepo.ExploreRoutes(ctx, criteria)
+	if err != nil {
+		return nil, err
+	}
+
+	var totalCount int64
+	items := make([]*RouteListItemDto, len(routes))
+	for i, r := range routes {
+		items[i] = u.convertToSummaryOutputDto(r.Route, r.UserName)
+		if i == 0 {
+			totalCount = r.TotalCount
+		}
+	}
+
+	return &RouteListDto{
+		Items:      items,
+		TotalCount: totalCount,
+	}, nil
 }
 
 func (u *getRouteUsecase) convertToOutputDto(route *routeDomain.Route, userName string) *RouteDetaileDto {

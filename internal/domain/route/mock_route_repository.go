@@ -69,6 +69,21 @@ func (mr *MockIRouteRepositoryMockRecorder) DeleteRoute(ctx, id any) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteRoute", reflect.TypeOf((*MockIRouteRepository)(nil).DeleteRoute), ctx, id)
 }
 
+// ExploreRoutes mocks base method.
+func (m *MockIRouteRepository) ExploreRoutes(ctx context.Context, criteria *ExploreRoutesCriteria) ([]*ExploreRouteResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ExploreRoutes", ctx, criteria)
+	ret0, _ := ret[0].([]*ExploreRouteResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ExploreRoutes indicates an expected call of ExploreRoutes.
+func (mr *MockIRouteRepositoryMockRecorder) ExploreRoutes(ctx, criteria any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExploreRoutes", reflect.TypeOf((*MockIRouteRepository)(nil).ExploreRoutes), ctx, criteria)
+}
+
 // GetRouteByID mocks base method.
 func (m *MockIRouteRepository) GetRouteByID(ctx context.Context, id string) (*Route, error) {
 	m.ctrl.T.Helper()

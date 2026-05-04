@@ -61,4 +61,5 @@ func routeRoute(r *gin.RouterGroup, q *dbgen.Queries, pool *pgxpool.Pool, k *mid
 	group.PUT("/:route_id", k.Session(), h.UpdateRoute)
 	group.DELETE("/:route_id", k.Session(), h.DeleteRoute)
 	group.GET("/:route_id/gpx", k.Session(), h.ExportRouteGPX)
+	group.GET("/explore",k.Session(), h.ExploreRoutes)
 }

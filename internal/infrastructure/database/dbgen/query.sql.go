@@ -7,6 +7,7 @@ package dbgen
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -282,6 +283,129 @@ DELETE FROM waypoints WHERE route_id = $1
 func (q *Queries) DeleteWaypointsByRouteID(ctx context.Context, routeID uuid.UUID) error {
 	_, err := q.db.Exec(ctx, deleteWaypointsByRouteID, routeID)
 	return err
+}
+
+const exploreRoutes = `-- name: ExploreRoutes :many
+SELECT
+  filtered_routes.id,
+  filtered_routes.user_id,
+  filtered_routes.name,
+  filtered_routes.description,
+  filtered_routes.highlighted_photo_id,
+  filtered_routes.distance,
+  filtered_routes.duration,
+  filtered_routes.elevation_gain,
+  filtered_routes.elevation_loss,
+  filtered_routes.path_geom,
+  filtered_routes.bbox,
+  filtered_routes.first_point,
+  filtered_routes.last_point,
+  filtered_routes.polyline,
+  filtered_routes.created_at,
+  filtered_routes.updated_at,
+  filtered_routes.visibility,
+  filtered_routes.total_count,
+  users.name AS user_name
+FROM (
+    SELECT id, user_id, name, description, highlighted_photo_id, distance, duration, elevation_gain, elevation_loss, path_geom, bbox, first_point, last_point, polyline, created_at, updated_at, visibility, COUNT(*) OVER() AS total_count  
+    FROM routes
+    WHERE visibility = 1
+    AND ($1::float8 < 0 OR ST_DWithin(
+        routes.first_point::geography,
+        ST_GeomFromEWKB($2)::geography,
+        $1::float8
+    ))
+    AND (cardinality($3::TEXT[]) = 0 OR name ILIKE ANY($3::TEXT[]))
+    AND ($4::DOUBLE PRECISION < 0 OR distance >= $4::DOUBLE PRECISION)
+    AND ($5::DOUBLE PRECISION < 0 OR distance <= $5::DOUBLE PRECISION)
+) AS filtered_routes
+INNER JOIN users ON filtered_routes.user_id = users.id
+ORDER BY
+  CASE WHEN $1::float8 < 0 THEN 0
+       ELSE ST_Distance(filtered_routes.first_point::geography, ST_GeomFromEWKB($2)::geography)
+  END
+LIMIT $7::INT
+OFFSET $6::INT
+`
+
+type ExploreRoutesParams struct {
+	RadiusM      float64     `json:"radius_m"`
+	Location     interface{} `json:"location"`
+	NameKeywords []string    `json:"name_keywords"`
+	MinDistance  float64     `json:"min_distance"`
+	MaxDistance  float64     `json:"max_distance"`
+	OffsetCount  int32       `json:"offset_count"`
+	LimitCount   int32       `json:"limit_count"`
+}
+
+type ExploreRoutesRow struct {
+	ID                 uuid.UUID   `json:"id"`
+	UserID             uuid.UUID   `json:"user_id"`
+	Name               string      `json:"name"`
+	Description        string      `json:"description"`
+	HighlightedPhotoID *int64      `json:"highlighted_photo_id"`
+	Distance           float64     `json:"distance"`
+	Duration           float64     `json:"duration"`
+	ElevationGain      float64     `json:"elevation_gain"`
+	ElevationLoss      float64     `json:"elevation_loss"`
+	PathGeom           OrbGeometry `json:"path_geom"`
+	Bbox               OrbGeometry `json:"bbox"`
+	FirstPoint         OrbGeometry `json:"first_point"`
+	LastPoint          OrbGeometry `json:"last_point"`
+	Polyline           string      `json:"polyline"`
+	CreatedAt          time.Time   `json:"created_at"`
+	UpdatedAt          time.Time   `json:"updated_at"`
+	Visibility         int16       `json:"visibility"`
+	TotalCount         int64       `json:"total_count"`
+	UserName           string      `json:"user_name"`
+}
+
+func (q *Queries) ExploreRoutes(ctx context.Context, arg ExploreRoutesParams) ([]ExploreRoutesRow, error) {
+	rows, err := q.db.Query(ctx, exploreRoutes,
+		arg.RadiusM,
+		arg.Location,
+		arg.NameKeywords,
+		arg.MinDistance,
+		arg.MaxDistance,
+		arg.OffsetCount,
+		arg.LimitCount,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ExploreRoutesRow
+	for rows.Next() {
+		var i ExploreRoutesRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.Name,
+			&i.Description,
+			&i.HighlightedPhotoID,
+			&i.Distance,
+			&i.Duration,
+			&i.ElevationGain,
+			&i.ElevationLoss,
+			&i.PathGeom,
+			&i.Bbox,
+			&i.FirstPoint,
+			&i.LastPoint,
+			&i.Polyline,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Visibility,
+			&i.TotalCount,
+			&i.UserName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getCoursePointsByRouteID = `-- name: GetCoursePointsByRouteID :many

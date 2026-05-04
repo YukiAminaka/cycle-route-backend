@@ -119,6 +119,8 @@ components:
             $ref: '#/components/schemas/route.RouteResponseModel'
           type: array
           uniqueItems: false
+        total_count:
+          type: integer
       type: object
     route.RouteResponse:
       properties:
@@ -626,6 +628,79 @@ paths:
       security:
       - CookieAuth: []
       summary: ルートをGPX形式でエクスポートする
+      tags:
+      - routes
+  /routes/explore:
+    get:
+      parameters:
+      - description: Keyword to search in route names
+        in: query
+        name: q
+        schema:
+          type: string
+      - description: Latitude of the reference point
+        in: query
+        name: lat
+        schema:
+          type: number
+      - description: Longitude of the reference point
+        in: query
+        name: lng
+        schema:
+          type: number
+      - description: Search radius (meters)
+        in: query
+        name: r
+        schema:
+          type: integer
+      - description: Minimum distance filter (kilometers)
+        in: query
+        name: min_distance
+        schema:
+          type: number
+      - description: Maximum distance filter (kilometers)
+        in: query
+        name: max_distance
+        schema:
+          type: number
+      - description: Pagination offset
+        in: query
+        name: offset
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/route.RouteListResponse'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/response.ErrorResponse'
+          description: Bad Request
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/response.ErrorResponse'
+          description: Unauthorized
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/response.ErrorResponse'
+          description: Internal Server Error
+      security:
+      - CookieAuth: []
+      summary: ルートを探索する
       tags:
       - routes
   /users:

@@ -24,6 +24,14 @@ sql:
               type: "OrbGeometry"
               pointer: true
             nullable: true
+          - db_type: "geography"
+            go_type:
+              type: "OrbGeometry"
+          - db_type: "geography"
+            go_type:
+              type: "OrbGeometry"
+              pointer: true
+            nullable: true
           - db_type: timestamptz
             go_type:
               import: time

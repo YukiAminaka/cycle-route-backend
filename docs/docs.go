@@ -154,6 +154,95 @@ const docTemplate = `{
                 }
             }
         },
+        "/routes/explore": {
+            "get": {
+                "security": [
+                    {
+                        "CookieAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "routes"
+                ],
+                "summary": "ルートを探索する",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Keyword to search in route names",
+                        "name": "q",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "description": "Latitude of the reference point",
+                        "name": "lat",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "description": "Longitude of the reference point",
+                        "name": "lng",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Search radius (meters)",
+                        "name": "r",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "description": "Minimum distance filter (kilometers)",
+                        "name": "min_distance",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "description": "Maximum distance filter (kilometers)",
+                        "name": "max_distance",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Pagination offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/route.RouteListResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/routes/{route_id}": {
             "get": {
                 "consumes": [
@@ -684,6 +773,9 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/route.RouteResponseModel"
                     }
+                },
+                "total_count": {
+                    "type": "integer"
                 }
             }
         },

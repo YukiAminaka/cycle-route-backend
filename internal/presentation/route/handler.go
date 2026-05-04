@@ -543,7 +543,7 @@ func (h *Handler) ExploreRoutes(c *gin.Context) {
 
 	var latitudePtr, longitudePtr *float64
 	var radiusPtr *int32
-	if latitude != ""{
+	if latitude != "" {
 		lat, err := strconv.ParseFloat(latitude, 64)
 		if err != nil {
 			response.ReturnBadRequest(c, errors.New("invalid latitude"))
@@ -552,7 +552,7 @@ func (h *Handler) ExploreRoutes(c *gin.Context) {
 		latitudePtr = &lat
 	}
 
-	if longitude != ""{
+	if longitude != "" {
 		lng, err := strconv.ParseFloat(longitude, 64)
 		if err != nil {
 			response.ReturnBadRequest(c, errors.New("invalid longitude"))
@@ -581,7 +581,7 @@ func (h *Handler) ExploreRoutes(c *gin.Context) {
 
 	var minDistancePtr *float64
 	if min_distance != "" {
-		minDistance, err := strconv.ParseFloat(max_distance, 64)
+		minDistance, err := strconv.ParseFloat(min_distance, 64)
 		if err != nil {
 			response.ReturnBadRequest(c, errors.New("invalid min_distance"))
 			return

@@ -513,6 +513,25 @@ func (h *Handler) GetRoutesByUserID(c *gin.Context) {
 	response.ReturnStatusOK(c, res)
 }
 
+// ExploreRoutes godoc
+//
+//	@Summary	ルートを探索する
+//	@Tags		routes
+//	@Accept		json
+//	@Produce	json
+//	@Security	CookieAuth
+//	@Param		q				query		string	false	"Keyword to search in route names"
+//	@Param		lat				query		number	false	"Latitude of the reference point"
+//	@Param		lng				query		number	false	"Longitude of the reference point"
+//	@Param		r				query		integer	false	"Search radius (meters)"
+//	@Param		min_distance	query		number	false	"Minimum distance filter (kilometers)"
+//	@Param		max_distance	query		number	false	"Maximum distance filter (kilometers)"
+//	@Param		offset			query		integer	false	"Pagination offset"
+//	@Success	200				{object}	RouteListResponse
+//	@Failure	400				{object}	response.ErrorResponse
+//	@Failure	401				{object}	response.ErrorResponse
+//	@Failure	500				{object}	response.ErrorResponse
+//	@Router		/routes/explore [get]
 func (h *Handler) ExploreRoutes(c *gin.Context) {
 	keyword := c.Query("q")
 	latitude := c.Query("lat")

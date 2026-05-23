@@ -145,7 +145,7 @@ resource "google_cloud_run_v2_service" "kratos_public" {
 
     scaling {
       min_instance_count = 0
-      max_instance_count = 2
+      max_instance_count = 1
     }
 
     vpc_access {
@@ -332,7 +332,7 @@ resource "google_cloud_run_v2_service" "kratos_admin" {
 
     scaling {
       min_instance_count = 0
-      max_instance_count = 2
+      max_instance_count = 1
     }
 
     vpc_access {
@@ -700,7 +700,7 @@ resource "google_cloud_run_v2_service" "api" {
 
     scaling {
       min_instance_count = 0
-      max_instance_count = 2
+      max_instance_count = 1
     }
 
     vpc_access {
@@ -797,7 +797,7 @@ resource "google_cloud_run_v2_service" "frontend" {
 
     scaling {
       min_instance_count = 0
-      max_instance_count = 2
+      max_instance_count = 1
     }
 
     vpc_access {

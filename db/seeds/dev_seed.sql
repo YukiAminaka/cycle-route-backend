@@ -1,7 +1,8 @@
-INSERT INTO users VALUES (
+INSERT INTO users (id, kratos_id, name, highlighted_photo_id, locale, created_at, updated_at, description, locality, administrative_area, country_code, postal_code, geom, first_name, last_name, email, has_set_location) VALUES
+(
   '70d6037a-b67b-4aa8-b5a3-da393b514f24',
   '019b5a3b-9854-787d-8877-e1732595d5b8',
-  'testuser',
+  'testuser1',
   NULL,
   'ja',
   '2024-01-15 10:00:00',
@@ -14,6 +15,25 @@ INSERT INTO users VALUES (
   'SRID=4326;POINT(139.7024 35.6598)',
   '太郎',
   '山田',
-  'test@example.com',
+  'test1@example.com',
+  true
+),
+(
+  'd1c9e8f2-3b5a-4c9e-8f1a-2b6d7e8f9a0b',
+  '019b5a3b-9854-787d-8877-e1732595d5b9',
+  'testuser2',
+  NULL,
+  'en',
+  '2024-01-16 11:00:00',
+  '2024-01-16 11:00:00',
+  'I enjoy cycling around Tokyo. Weekend rider.',
+  'Shibuya',
+  'Tokyo',
+  'JP',
+  '150-0002',
+  'SRID=4326;POINT(139.7024 35.6598)',
+  'John',
+  'Doe',
+  'test2@example.com',
   true
 );

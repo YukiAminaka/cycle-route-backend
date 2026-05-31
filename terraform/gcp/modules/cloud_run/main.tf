@@ -168,6 +168,7 @@ resource "google_cloud_run_v2_service" "kratos_public" {
           cpu    = "1"
           memory = "512Mi"
         }
+        cpu_idle = true # Request-based billingを維持
       }
 
       env {
@@ -355,6 +356,7 @@ resource "google_cloud_run_v2_service" "kratos_admin" {
           cpu    = "1"
           memory = "512Mi"
         }
+        cpu_idle = true
       }
 
       env {
@@ -723,6 +725,7 @@ resource "google_cloud_run_v2_service" "api" {
           cpu    = "1"
           memory = "512Mi"
         }
+        cpu_idle = true
       }
 
       env {
@@ -820,6 +823,7 @@ resource "google_cloud_run_v2_service" "frontend" {
           cpu    = "1"
           memory = "512Mi"
         }
+        cpu_idle = true
       }
 
       env {

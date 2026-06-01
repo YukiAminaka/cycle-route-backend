@@ -3,6 +3,9 @@ package user
 import (
 	"errors"
 
+	domainerror "github.com/YukiAminaka/cycle-route-backend/internal/domain/error"
+	userDomain "github.com/YukiAminaka/cycle-route-backend/internal/domain/user"
+	pkgGeojson "github.com/YukiAminaka/cycle-route-backend/internal/pkg/geojson"
 	"github.com/YukiAminaka/cycle-route-backend/internal/pkg/geometry"
 	"github.com/YukiAminaka/cycle-route-backend/internal/presentation/response"
 	"github.com/YukiAminaka/cycle-route-backend/internal/presentation/validator"
@@ -15,16 +18,19 @@ import (
 type Handler struct {
 	createUserUsecase userUsecase.ICreateUserUsecase
 	getUserUsecase    userUsecase.IGetUserByIDUsecase
+	updateUserUsecase userUsecase.IUpdateUserUsecase
 }
 
 // NewHandler はHandlerを作成する
 func NewHandler(
 	createUserUsecase userUsecase.ICreateUserUsecase,
 	getUserUsecase userUsecase.IGetUserByIDUsecase,
+	updateUserUsecase userUsecase.IUpdateUserUsecase,
 ) *Handler {
 	return &Handler{
 		createUserUsecase: createUserUsecase,
 		getUserUsecase:    getUserUsecase,
+		updateUserUsecase: updateUserUsecase,
 	}
 }
 
@@ -179,4 +185,117 @@ func (h *Handler) CreateUser(c *gin.Context) {
 		},
 	}
 	response.ReturnStatusCreated(c, res)
+}
+
+// UpdateUserProfile godoc
+//	@Summary	ユーザープロフィールを更新する
+//	@Tags		users
+//	@Accept		json
+//	@Produce	json
+//	@Security	CookieAuth
+//	@Param		id		path	string						true	"User ID"
+//	@Param		request	body	UpdateUserProfileRequest	true	"Update User Profile Request"
+//	@Success	204
+//	@Failure	400	{object}	response.ErrorResponse
+//	@Failure	401	{object}	response.ErrorResponse
+//	@Failure	500	{object}	response.ErrorResponse
+//	@Router		/users/{id}/profile [put]
+func (h *Handler) UpdateUserProfile(c *gin.Context) {
+	kratosIDValue, exists := c.Get("kratos_id")
+	if !exists {
+		response.ReturnStatusUnauthorized(c, errors.New("user not authenticated"))
+		return
+	}
+	kratosID, ok := kratosIDValue.(string)
+	if !ok {
+		response.ReturnStatusInternalServerError(c, errors.New("invalid kratos_id type"))
+		return
+	}
+
+	var req UpdateUserProfileRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.ReturnBadRequest(c, err)
+		return
+	}
+
+	input := userUsecase.UpdateUserUseCaseInputDto{
+		Name:        req.Name,
+		Description: req.Description,
+		FirstName:   req.FirstName,
+		LastName:    req.LastName,
+	}
+
+	if err := h.updateUserUsecase.UpdateUserProfile(c.Request.Context(), kratosID, input); err != nil {
+		if errors.Is(err, domainerror.ErrValidation) {
+			response.ReturnBadRequest(c, err)
+			return
+		}
+		response.ReturnStatusInternalServerError(c, err)
+		return
+	}
+
+	response.ReturnStatusNoContent(c)
+}
+
+// UpdateUserLocation godoc
+//	@Summary	ユーザーの位置情報を更新する
+//	@Tags		users
+//	@Accept		json
+//	@Produce	json
+//	@Security	CookieAuth
+//	@Param		id		path	string						true	"User ID"
+//	@Param		request	body	UpdateUserLocationRequest	true	"Update User Location Request"
+//	@Success	204
+//	@Failure	400	{object}	response.ErrorResponse
+//	@Failure	401	{object}	response.ErrorResponse
+//	@Failure	500	{object}	response.ErrorResponse
+//	@Router		/users/{id}/location [put]
+func (h *Handler) UpdateUserLocation(c *gin.Context) {
+	kratosIDValue, exists := c.Get("kratos_id")
+	if !exists {
+		response.ReturnStatusUnauthorized(c, errors.New("user not authenticated"))
+		return
+	}
+	kratosID, ok := kratosIDValue.(string)
+	if !ok {
+		response.ReturnStatusInternalServerError(c, errors.New("invalid kratos_id type"))
+		return
+	}
+
+	var req UpdateUserLocationRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.ReturnBadRequest(c, err)
+		return
+	}
+
+	validate := validator.GetValidator()
+	if err := validate.Struct(req); err != nil {
+		response.ReturnStatusBadRequest(c, err)
+		return
+	}
+
+	point, err := pkgGeojson.ParseToPoint(req.Geom)
+	if err != nil {
+		response.ReturnBadRequest(c, errors.New("invalid geom GeoJSON: "+err.Error()))
+		return
+	}
+
+	input := userUsecase.UpdateUserLocationUseCaseInputDto{
+		Locality:           req.Locality,
+		AdministrativeArea: req.AdministrativeArea,
+		CountryCode:        req.CountryCode,
+		PostalCode:         req.PostalCode,
+		Geom:               &userDomain.Geometry{Geometry: point},
+	}
+
+	if err := h.updateUserUsecase.UpdateUserLocation(c.Request.Context(), kratosID, input); err != nil {
+		if errors.Is(err, domainerror.ErrValidation) {
+			response.ReturnBadRequest(c, err)
+			return
+		}
+		response.ReturnStatusInternalServerError(c, err)
+		return
+	}
+
+	response.ReturnStatusNoContent(c)
 }

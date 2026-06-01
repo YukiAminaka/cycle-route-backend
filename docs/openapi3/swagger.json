@@ -428,6 +428,46 @@
                 },
                 "type": "object"
             },
+            "user.UpdateUserLocationRequest": {
+                "properties": {
+                    "administrative_area": {
+                        "type": "string"
+                    },
+                    "country_code": {
+                        "type": "string"
+                    },
+                    "geom": {
+                        "type": "string"
+                    },
+                    "locality": {
+                        "type": "string"
+                    },
+                    "postal_code": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "geom"
+                ],
+                "type": "object"
+            },
+            "user.UpdateUserProfileRequest": {
+                "properties": {
+                    "description": {
+                        "type": "string"
+                    },
+                    "first_name": {
+                        "type": "string"
+                    },
+                    "last_name": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
             "user.UserResponse": {
                 "properties": {
                     "user": {
@@ -1290,6 +1330,164 @@
                     }
                 },
                 "summary": "ユーザーの公開プロフィールを取得する",
+                "tags": [
+                    "users"
+                ]
+            }
+        },
+        "/users/{id}/location": {
+            "put": {
+                "parameters": [
+                    {
+                        "description": "User ID",
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "oneOf": [
+                                    {
+                                        "type": "object"
+                                    },
+                                    {
+                                        "$ref": "#/components/schemas/user.UpdateUserLocationRequest",
+                                        "summary": "request",
+                                        "description": "Update User Location Request"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "description": "Update User Location Request",
+                    "required": true
+                },
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/response.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/response.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/response.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Internal Server Error"
+                    }
+                },
+                "security": [
+                    {
+                        "CookieAuth": []
+                    }
+                ],
+                "summary": "ユーザーの位置情報を更新する",
+                "tags": [
+                    "users"
+                ]
+            }
+        },
+        "/users/{id}/profile": {
+            "put": {
+                "parameters": [
+                    {
+                        "description": "User ID",
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "oneOf": [
+                                    {
+                                        "type": "object"
+                                    },
+                                    {
+                                        "$ref": "#/components/schemas/user.UpdateUserProfileRequest",
+                                        "summary": "request",
+                                        "description": "Update User Profile Request"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "description": "Update User Profile Request",
+                    "required": true
+                },
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/response.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/response.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/response.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Internal Server Error"
+                    }
+                },
+                "security": [
+                    {
+                        "CookieAuth": []
+                    }
+                ],
+                "summary": "ユーザープロフィールを更新する",
                 "tags": [
                     "users"
                 ]

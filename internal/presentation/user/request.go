@@ -19,9 +19,9 @@ type UpdateUserProfileRequest struct {
 
 // UpdateUserLocationRequest はユーザー位置情報更新のリクエスト
 type UpdateUserLocationRequest struct {
-	Locality           *string `json:"locality,omitempty"`
-	AdministrativeArea *string `json:"administrative_area,omitempty"`
-	CountryCode        *string `json:"country_code,omitempty"`
-	PostalCode         *string `json:"postal_code,omitempty"`
-	Geom               string  `json:"geom" validate:"required"`
+	Locality           string `json:"locality" validate:"required"`
+	AdministrativeArea string `json:"administrative_area" validate:"required"`
+	CountryCode        string `json:"country_code" validate:"required"`
+	PostalCode         string `json:"postal_code" validate:"required"`
+	Geom               string `json:"geom" validate:"required"`
 }

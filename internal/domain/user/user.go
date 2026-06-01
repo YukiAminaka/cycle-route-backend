@@ -223,32 +223,32 @@ func (u *User) UpdateProfile(
 
 // ユーザーの位置情報を設定
 func (u *User) SetLocation(
-	locality *string,
-	administrativeArea *string,
-	countryCode *string,
-	postalCode *string,
-	geom *Geometry,
+	locality string,
+	administrativeArea string,
+	countryCode string,
+	postalCode string,
+	geom Geometry,
 ) error {
-	if locality != nil && strings.TrimSpace(*locality) == "" {
+	if strings.TrimSpace(locality) == "" {
 		return domainerror.New("locality must not be empty", domainerror.ErrValidation)
 	}
-	if administrativeArea != nil && strings.TrimSpace(*administrativeArea) == "" {
+	if strings.TrimSpace(administrativeArea) == "" {
 		return domainerror.New("administrativeArea must not be empty", domainerror.ErrValidation)
 	}
-	if countryCode != nil && strings.TrimSpace(*countryCode) == "" {
+	if strings.TrimSpace(countryCode) == "" {
 		return domainerror.New("countryCode must not be empty", domainerror.ErrValidation)
 	}
-	if postalCode != nil && strings.TrimSpace(*postalCode) == "" {
+	if strings.TrimSpace(postalCode) == "" {
 		return domainerror.New("postalCode must not be empty", domainerror.ErrValidation)
 	}
-	if geom != nil && geom.Geometry.GeoJSONType() != "Point" {
+	if geom.Geometry.GeoJSONType() != "Point" {
 		return domainerror.New("geom must be a Point", domainerror.ErrValidation)
 	}
-	u.locality = locality
-	u.administrativeArea = administrativeArea
-	u.countryCode = countryCode
-	u.postalCode = postalCode
-	u.geom = geom
+	u.locality = &locality
+	u.administrativeArea = &administrativeArea
+	u.countryCode = &countryCode
+	u.postalCode = &postalCode
+	u.geom = &geom
 	u.hasSetLocation = true
 	return nil
 }

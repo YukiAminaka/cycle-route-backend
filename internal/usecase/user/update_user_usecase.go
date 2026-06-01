@@ -29,11 +29,11 @@ type UpdateUserUseCaseInputDto struct {
 }
 
 type UpdateUserLocationUseCaseInputDto struct {
-	Locality           *string
-	AdministrativeArea *string
-	CountryCode        *string
-	PostalCode         *string
-	Geom               *userDomain.Geometry
+	Locality           string
+	AdministrativeArea string
+	CountryCode        string
+	PostalCode         string
+	Geom               userDomain.Geometry
 }
 
 func (u *updateUserUsecase) UpdateUserProfile(ctx context.Context, kratosID string, dto UpdateUserUseCaseInputDto) error {

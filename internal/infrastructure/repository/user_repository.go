@@ -241,7 +241,7 @@ func (r *userRepositoryImpl) UpdateUser(ctx context.Context, userDomain *user.Us
 
 func (r *userRepositoryImpl) UpdateUserProfile(ctx context.Context, userDomain *user.User) error {
 	// UserIDをuuid.UUIDに変換
-	uuid, err := uuid.Parse(userDomain.ID().String())
+	id, err := uuid.Parse(userDomain.ID().String())
 	if err != nil {
 		return fmt.Errorf("invalid user id: %w", err)
 	}
@@ -251,7 +251,7 @@ func (r *userRepositoryImpl) UpdateUserProfile(ctx context.Context, userDomain *
 		Description:        userDomain.Description(),
 		FirstName:      userDomain.FirstName(),
 		LastName:       userDomain.LastName(),
-		ID:             uuid,
+		ID:             id,
 	}); err != nil {
 		return err
 	}
@@ -261,7 +261,7 @@ func (r *userRepositoryImpl) UpdateUserProfile(ctx context.Context, userDomain *
 
 func (r *userRepositoryImpl) UpdateUserLocation(ctx context.Context, userDomain *user.User) error {
 	// UserIDをuuid.UUIDに変換
-	uuid, err := uuid.Parse(userDomain.ID().String())
+	id, err := uuid.Parse(userDomain.ID().String())
 	if err != nil {
 		return fmt.Errorf("invalid user id: %w", err)
 	}
@@ -272,7 +272,7 @@ func (r *userRepositoryImpl) UpdateUserLocation(ctx context.Context, userDomain 
 		CountryCode:        userDomain.CountryCode(),
 		PostalCode:         userDomain.PostalCode(),
 		Geom:               dbgen.OrbGeometry{Geometry: userDomain.Geom().Geometry},
-		ID:             uuid,
+		ID:             id,
 	}); err != nil {
 		return err
 	}

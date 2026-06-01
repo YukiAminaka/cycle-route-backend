@@ -285,7 +285,7 @@ func (h *Handler) UpdateUserLocation(c *gin.Context) {
 		AdministrativeArea: req.AdministrativeArea,
 		CountryCode:        req.CountryCode,
 		PostalCode:         req.PostalCode,
-		Geom:               &userDomain.Geometry{Geometry: point},
+		Geom:               userDomain.Geometry{Geometry: point},
 	}
 
 	if err := h.updateUserUsecase.UpdateUserLocation(c.Request.Context(), kratosID, input); err != nil {

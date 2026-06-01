@@ -793,3 +793,63 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 	)
 	return i, err
 }
+
+const updateUserLocation = `-- name: UpdateUserLocation :exec
+UPDATE users SET
+    locality = $1,
+    administrative_area = $2,
+    country_code = $3,
+    postal_code = $4,
+    geom = ST_GeomFromEWKB($5),
+    has_set_location = true
+WHERE id = $6
+`
+
+type UpdateUserLocationParams struct {
+	Locality           *string     `json:"locality"`
+	AdministrativeArea *string     `json:"administrative_area"`
+	CountryCode        *string     `json:"country_code"`
+	PostalCode         *string     `json:"postal_code"`
+	Geom               interface{} `json:"geom"`
+	ID                 uuid.UUID   `json:"id"`
+}
+
+func (q *Queries) UpdateUserLocation(ctx context.Context, arg UpdateUserLocationParams) error {
+	_, err := q.db.Exec(ctx, updateUserLocation,
+		arg.Locality,
+		arg.AdministrativeArea,
+		arg.CountryCode,
+		arg.PostalCode,
+		arg.Geom,
+		arg.ID,
+	)
+	return err
+}
+
+const updateUserProfile = `-- name: UpdateUserProfile :exec
+UPDATE users SET
+    name = $1,
+    first_name = $2,
+    last_name = $3,
+    description = $4
+WHERE id = $5
+`
+
+type UpdateUserProfileParams struct {
+	Name        string    `json:"name"`
+	FirstName   *string   `json:"first_name"`
+	LastName    *string   `json:"last_name"`
+	Description *string   `json:"description"`
+	ID          uuid.UUID `json:"id"`
+}
+
+func (q *Queries) UpdateUserProfile(ctx context.Context, arg UpdateUserProfileParams) error {
+	_, err := q.db.Exec(ctx, updateUserProfile,
+		arg.Name,
+		arg.FirstName,
+		arg.LastName,
+		arg.Description,
+		arg.ID,
+	)
+	return err
+}

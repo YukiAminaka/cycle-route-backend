@@ -10,4 +10,6 @@ type IUserRepository interface {
 	GetUserByKratosID(ctx context.Context, kratosID string) (*User, error)
 	CreateUser(ctx context.Context, user *User) (*User, error)
 	UpdateUser(ctx context.Context, user *User) (*User, error)
+	UpdateUserProfile(ctx context.Context, user *User) error
+	UpdateUserLocation(ctx context.Context, user *User) error
 }

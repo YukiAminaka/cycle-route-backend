@@ -238,3 +238,44 @@ func (r *userRepositoryImpl) UpdateUser(ctx context.Context, userDomain *user.Us
 
 	return ud, nil
 }
+
+func (r *userRepositoryImpl) UpdateUserProfile(ctx context.Context, userDomain *user.User) error {
+	// UserIDをuuid.UUIDに変換
+	uuid, err := uuid.Parse(userDomain.ID().String())
+	if err != nil {
+		return fmt.Errorf("invalid user id: %w", err)
+	}
+
+	if err := r.queries.UpdateUserProfile(ctx, dbgen.UpdateUserProfileParams{
+		Name:               userDomain.Name(),
+		Description:        userDomain.Description(),
+		FirstName:      userDomain.FirstName(),
+		LastName:       userDomain.LastName(),
+		ID:             uuid,
+	}); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *userRepositoryImpl) UpdateUserLocation(ctx context.Context, userDomain *user.User) error {
+	// UserIDをuuid.UUIDに変換
+	uuid, err := uuid.Parse(userDomain.ID().String())
+	if err != nil {
+		return fmt.Errorf("invalid user id: %w", err)
+	}
+
+	if err := r.queries.UpdateUserLocation(ctx, dbgen.UpdateUserLocationParams{
+		Locality:           userDomain.Locality(),
+		AdministrativeArea: userDomain.AdministrativeArea(),
+		CountryCode:        userDomain.CountryCode(),
+		PostalCode:         userDomain.PostalCode(),
+		Geom:               dbgen.OrbGeometry{Geometry: userDomain.Geom().Geometry},
+		ID:             uuid,
+	}); err != nil {
+		return err
+	}
+
+	return nil
+}

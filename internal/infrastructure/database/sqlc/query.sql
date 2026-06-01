@@ -35,7 +35,25 @@ UPDATE users SET
     highlighted_photo_id = sqlc.arg(highlighted_photo_id),
     locale = sqlc.arg(locale)
 WHERE id = sqlc.arg(id)
-RETURNING *; 
+RETURNING *;
+
+-- name: UpdateUserProfile :exec
+UPDATE users SET
+    name = sqlc.arg(name),
+    first_name = sqlc.arg(first_name),
+    last_name = sqlc.arg(last_name),
+    description = sqlc.arg(description)
+WHERE id = sqlc.arg(id);
+
+-- name: UpdateUserLocation :exec
+UPDATE users SET
+    locality = sqlc.arg(locality),
+    administrative_area = sqlc.arg(administrative_area),
+    country_code = sqlc.arg(country_code),
+    postal_code = sqlc.arg(postal_code),
+    geom = ST_GeomFromEWKB(sqlc.arg(geom)),
+    has_set_location = true
+WHERE id = sqlc.arg(id);
 
 -- name: GetUserByID :one
 SELECT * FROM users WHERE id = $1;

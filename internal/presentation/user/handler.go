@@ -199,7 +199,7 @@ func (h *Handler) CreateUser(c *gin.Context) {
 //	@Failure	400	{object}	response.ErrorResponse
 //	@Failure	401	{object}	response.ErrorResponse
 //	@Failure	500	{object}	response.ErrorResponse
-//	@Router		/users/{id}/profile [put]
+//	@Router		/users/settings/profile [put]
 func (h *Handler) UpdateUserProfile(c *gin.Context) {
 	kratosIDValue, exists := c.Get("kratos_id")
 	if !exists {
@@ -249,7 +249,7 @@ func (h *Handler) UpdateUserProfile(c *gin.Context) {
 //	@Failure	400	{object}	response.ErrorResponse
 //	@Failure	401	{object}	response.ErrorResponse
 //	@Failure	500	{object}	response.ErrorResponse
-//	@Router		/users/{id}/location [put]
+//	@Router		/users/settings/location [put]
 func (h *Handler) UpdateUserLocation(c *gin.Context) {
 	kratosIDValue, exists := c.Get("kratos_id")
 	if !exists {

@@ -299,7 +299,11 @@ definitions:
       postal_code:
         type: string
     required:
+    - administrative_area
+    - country_code
     - geom
+    - locality
+    - postal_code
     type: object
   user.UpdateUserProfileRequest:
     properties:
@@ -694,7 +698,31 @@ paths:
       summary: ユーザーの公開プロフィールを取得する
       tags:
       - users
-  /users/{id}/location:
+  /users/me:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.LoginUserResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - CookieAuth: []
+      summary: ログインユーザーを取得する
+      tags:
+      - users
+  /users/settings/location:
     put:
       consumes:
       - application/json
@@ -732,7 +760,7 @@ paths:
       summary: ユーザーの位置情報を更新する
       tags:
       - users
-  /users/{id}/profile:
+  /users/settings/profile:
     put:
       consumes:
       - application/json
@@ -768,30 +796,6 @@ paths:
       security:
       - CookieAuth: []
       summary: ユーザープロフィールを更新する
-      tags:
-      - users
-  /users/me:
-    get:
-      consumes:
-      - application/json
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/user.LoginUserResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/response.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/response.ErrorResponse'
-      security:
-      - CookieAuth: []
-      summary: ログインユーザーを取得する
       tags:
       - users
 securityDefinitions:

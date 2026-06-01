@@ -454,7 +454,11 @@ const docTemplate = `{
                     }
                 },
                 "required": [
-                    "geom"
+                    "administrative_area",
+                    "country_code",
+                    "geom",
+                    "locality",
+                    "postal_code"
                 ],
                 "type": "object"
             },
@@ -1272,77 +1276,7 @@ const docTemplate = `{
                 ]
             }
         },
-        "/users/{id}": {
-            "get": {
-                "parameters": [
-                    {
-                        "description": "User ID",
-                        "in": "path",
-                        "name": "id",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/user.UserResponse"
-                                }
-                            }
-                        },
-                        "description": "OK"
-                    },
-                    "400": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/response.ErrorResponse"
-                                }
-                            }
-                        },
-                        "description": "Bad Request"
-                    },
-                    "404": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/response.ErrorResponse"
-                                }
-                            }
-                        },
-                        "description": "Not Found"
-                    },
-                    "500": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/response.ErrorResponse"
-                                }
-                            }
-                        },
-                        "description": "Internal Server Error"
-                    }
-                },
-                "summary": "ユーザーの公開プロフィールを取得する",
-                "tags": [
-                    "users"
-                ]
-            }
-        },
-        "/users/{id}/location": {
+        "/users/settings/location": {
             "put": {
                 "parameters": [
                     {
@@ -1421,7 +1355,7 @@ const docTemplate = `{
                 ]
             }
         },
-        "/users/{id}/profile": {
+        "/users/settings/profile": {
             "put": {
                 "parameters": [
                     {
@@ -1495,6 +1429,76 @@ const docTemplate = `{
                     }
                 ],
                 "summary": "ユーザープロフィールを更新する",
+                "tags": [
+                    "users"
+                ]
+            }
+        },
+        "/users/{id}": {
+            "get": {
+                "parameters": [
+                    {
+                        "description": "User ID",
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/user.UserResponse"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/response.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/response.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/response.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Internal Server Error"
+                    }
+                },
+                "summary": "ユーザーの公開プロフィールを取得する",
                 "tags": [
                     "users"
                 ]

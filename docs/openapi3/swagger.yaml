@@ -306,7 +306,11 @@ components:
         postal_code:
           type: string
       required:
+      - administrative_area
+      - country_code
       - geom
+      - locality
+      - postal_code
       type: object
     user.UpdateUserProfileRequest:
       properties:
@@ -806,7 +810,38 @@ paths:
       summary: ユーザーの公開プロフィールを取得する
       tags:
       - users
-  /users/{id}/location:
+  /users/me:
+    get:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user.LoginUserResponse'
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/response.ErrorResponse'
+          description: Unauthorized
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/response.ErrorResponse'
+          description: Internal Server Error
+      security:
+      - CookieAuth: []
+      summary: ログインユーザーを取得する
+      tags:
+      - users
+  /users/settings/location:
     put:
       parameters:
       - description: User ID
@@ -852,7 +887,7 @@ paths:
       summary: ユーザーの位置情報を更新する
       tags:
       - users
-  /users/{id}/profile:
+  /users/settings/profile:
     put:
       parameters:
       - description: User ID
@@ -896,37 +931,6 @@ paths:
       security:
       - CookieAuth: []
       summary: ユーザープロフィールを更新する
-      tags:
-      - users
-  /users/me:
-    get:
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/user.LoginUserResponse'
-          description: OK
-        "401":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/response.ErrorResponse'
-          description: Unauthorized
-        "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/response.ErrorResponse'
-          description: Internal Server Error
-      security:
-      - CookieAuth: []
-      summary: ログインユーザーを取得する
       tags:
       - users
 servers:

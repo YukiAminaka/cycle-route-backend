@@ -99,3 +99,31 @@ func (mr *MockIUserRepositoryMockRecorder) UpdateUser(ctx, user any) *gomock.Cal
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUser", reflect.TypeOf((*MockIUserRepository)(nil).UpdateUser), ctx, user)
 }
+
+// UpdateUserLocation mocks base method.
+func (m *MockIUserRepository) UpdateUserLocation(ctx context.Context, user *User) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateUserLocation", ctx, user)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateUserLocation indicates an expected call of UpdateUserLocation.
+func (mr *MockIUserRepositoryMockRecorder) UpdateUserLocation(ctx, user any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUserLocation", reflect.TypeOf((*MockIUserRepository)(nil).UpdateUserLocation), ctx, user)
+}
+
+// UpdateUserProfile mocks base method.
+func (m *MockIUserRepository) UpdateUserProfile(ctx context.Context, user *User) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateUserProfile", ctx, user)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateUserProfile indicates an expected call of UpdateUserProfile.
+func (mr *MockIUserRepositoryMockRecorder) UpdateUserProfile(ctx, user any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUserProfile", reflect.TypeOf((*MockIUserRepository)(nil).UpdateUserProfile), ctx, user)
+}

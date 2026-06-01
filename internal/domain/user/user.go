@@ -1,19 +1,12 @@
 package user
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 
+	domainerror "github.com/YukiAminaka/cycle-route-backend/internal/domain/error"
 	"github.com/google/uuid"
 	"github.com/paulmach/orb"
-)
-
-var (
-	// ErrInvalidName はユーザー名が無効な場合のエラー
-	ErrInvalidName = errors.New("name must not be empty")
-	// ErrInvalidEmail はメールアドレスが無効な場合のエラー
-	ErrInvalidEmail = errors.New("email must not be empty")
 )
 
 // UserID はユーザーの一意な識別子
@@ -68,15 +61,15 @@ func newUser(
 ) (*User, error) {
 	// バリデーション
 	if strings.TrimSpace(kratosID) == "" {
-		return nil, ErrInvalidName
+		return nil, domainerror.New("kratosID must not be empty", domainerror.ErrValidation)
 	}
 
 	if strings.TrimSpace(name) == "" {
-		return nil, ErrInvalidName
+		return nil, domainerror.New("name must not be empty", domainerror.ErrValidation)
 	}
 
 	if email != nil && strings.TrimSpace(*email) == "" {
-		return nil, ErrInvalidEmail
+		return nil, domainerror.New("email must not be empty", domainerror.ErrValidation)
 	}
 
 	return &User{
@@ -199,9 +192,7 @@ func (u *User) HasSetLocation() bool {
 	return u.hasSetLocation
 }
 
-// ビジネスロジックメソッド
-
-// ユーザーのプロフィール情報を更新します
+// ユーザーのプロフィール情報を更新
 func (u *User) UpdateProfile(
 	name *string,
 	description *string,
@@ -210,7 +201,7 @@ func (u *User) UpdateProfile(
 ) error {
 	if name != nil {
 		if strings.TrimSpace(*name) == "" {
-			return ErrInvalidName
+			return domainerror.New("name must not be empty", domainerror.ErrValidation)
 		}
 		u.name = *name
 	}
@@ -232,18 +223,34 @@ func (u *User) UpdateProfile(
 
 // ユーザーの位置情報を設定
 func (u *User) SetLocation(
-	locality *string,
-	administrativeArea *string,
-	countryCode *string,
-	postalCode *string,
-	geom *Geometry,
-) {
-	u.locality = locality
-	u.administrativeArea = administrativeArea
-	u.countryCode = countryCode
-	u.postalCode = postalCode
-	u.geom = geom
+	locality string,
+	administrativeArea string,
+	countryCode string,
+	postalCode string,
+	geom Geometry,
+) error {
+	if strings.TrimSpace(locality) == "" {
+		return domainerror.New("locality must not be empty", domainerror.ErrValidation)
+	}
+	if strings.TrimSpace(administrativeArea) == "" {
+		return domainerror.New("administrativeArea must not be empty", domainerror.ErrValidation)
+	}
+	if strings.TrimSpace(countryCode) == "" {
+		return domainerror.New("countryCode must not be empty", domainerror.ErrValidation)
+	}
+	if strings.TrimSpace(postalCode) == "" {
+		return domainerror.New("postalCode must not be empty", domainerror.ErrValidation)
+	}
+	if geom.Geometry.GeoJSONType() != "Point" {
+		return domainerror.New("geom must be a Point", domainerror.ErrValidation)
+	}
+	u.locality = &locality
+	u.administrativeArea = &administrativeArea
+	u.countryCode = &countryCode
+	u.postalCode = &postalCode
+	u.geom = &geom
 	u.hasSetLocation = true
+	return nil
 }
 
 // SetHighlightedPhoto はハイライト写真を設定します

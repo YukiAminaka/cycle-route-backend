@@ -286,6 +286,36 @@ definitions:
       postal_code:
         type: string
     type: object
+  user.UpdateUserLocationRequest:
+    properties:
+      administrative_area:
+        type: string
+      country_code:
+        type: string
+      geom:
+        type: string
+      locality:
+        type: string
+      postal_code:
+        type: string
+    required:
+    - administrative_area
+    - country_code
+    - geom
+    - locality
+    - postal_code
+    type: object
+  user.UpdateUserProfileRequest:
+    properties:
+      description:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      name:
+        type: string
+    type: object
   user.UserResponse:
     properties:
       user:
@@ -690,6 +720,82 @@ paths:
       security:
       - CookieAuth: []
       summary: ログインユーザーを取得する
+      tags:
+      - users
+  /users/settings/location:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update User Location Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/user.UpdateUserLocationRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - CookieAuth: []
+      summary: ユーザーの位置情報を更新する
+      tags:
+      - users
+  /users/settings/profile:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update User Profile Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/user.UpdateUserProfileRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - CookieAuth: []
+      summary: ユーザープロフィールを更新する
       tags:
       - users
 securityDefinitions:

@@ -1,6 +1,12 @@
 import http from "k6/http";
 import { check, fail } from "k6";
+import { SharedArray } from "k6/data";
 import { URL } from "https://jslib.k6.io/url/1.0.0/index.js";
+import papaparse from "https://jslib.k6.io/papaparse/5.1.1/index.js";
+
+const users = new SharedArray("users", function () {
+  return papaparse.parse(open("./user.csv"), { header: true, skipEmptyLines: true }).data;
+});
 
 export const options = {
   thresholds: {
@@ -63,51 +69,29 @@ function check_status_ok(res) {
 }
 
 function login() {
+  const user = users[__VU % users.length];
+
   // Step 1: ログインフローを作成する
-  const flowRes = http.get(
-    `${__ENV.KRATOS_PUBLIC_URL}/self-service/login/api`,
-    {
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-    },
-  );
+  const flowRes = http.get(`${__ENV.KRATOS_PUBLIC_URL}/self-service/login/api`, {
+    headers: { Accept: "application/json" },
+  });
 
-  check(flowRes, { "flow created": (r) => r.status === 200 });
+  check_status_ok(flowRes);
 
-  const flow = JSON.parse(flowRes.body);
-  const flowId = flow.id;
-  const actionUrl = flow.ui.action;
+  const actionUrl = flowRes.json("ui.action");
 
   // Step 2: ログインフローを送信する
   const loginRes = http.post(
     actionUrl,
     JSON.stringify({
       method: "password",
-      identifier: "your-email@example.com",
-      password: "your-password",
+      identifier: user.identifier,
+      password: user.password,
     }),
-    {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    },
+    { headers: { "Content-Type": "application/json", Accept: "application/json" } },
   );
 
   check(loginRes, { "login successful": (r) => r.status === 200 });
 
-  const session = JSON.parse(loginRes.body);
-  const sessionToken = session.session_token;
-
-  // Step 3: セッショントークンを使って認証済みリクエストを送信する
-  const protectedRes = http.get(`${__ENV.KRATOS_PUBLIC_URL}/sessions/whoami`, {
-    headers: {
-      Authorization: `Bearer ${sessionToken}`,
-      Accept: "application/json",
-    },
-  });
-
-  check(protectedRes, { "authenticated request ok": (r) => r.status === 200 });
+  return loginRes.json("session_token");
 }

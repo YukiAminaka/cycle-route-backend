@@ -727,11 +727,6 @@ paths:
       consumes:
       - application/json
       parameters:
-      - description: User ID
-        in: path
-        name: id
-        required: true
-        type: string
       - description: Update User Location Request
         in: body
         name: request
@@ -765,11 +760,6 @@ paths:
       consumes:
       - application/json
       parameters:
-      - description: User ID
-        in: path
-        name: id
-        required: true
-        type: string
       - description: Update User Profile Request
         in: body
         name: request

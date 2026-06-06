@@ -1278,17 +1278,6 @@ const docTemplate = `{
         },
         "/users/settings/location": {
             "put": {
-                "parameters": [
-                    {
-                        "description": "User ID",
-                        "in": "path",
-                        "name": "id",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
                 "requestBody": {
                     "content": {
                         "application/json": {
@@ -1357,17 +1346,6 @@ const docTemplate = `{
         },
         "/users/settings/profile": {
             "put": {
-                "parameters": [
-                    {
-                        "description": "User ID",
-                        "in": "path",
-                        "name": "id",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
                 "requestBody": {
                     "content": {
                         "application/json": {

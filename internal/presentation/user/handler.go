@@ -193,7 +193,6 @@ func (h *Handler) CreateUser(c *gin.Context) {
 //	@Accept		json
 //	@Produce	json
 //	@Security	CookieAuth
-//	@Param		id		path	string						true	"User ID"
 //	@Param		request	body	UpdateUserProfileRequest	true	"Update User Profile Request"
 //	@Success	204
 //	@Failure	400	{object}	response.ErrorResponse
@@ -243,7 +242,6 @@ func (h *Handler) UpdateUserProfile(c *gin.Context) {
 //	@Accept		json
 //	@Produce	json
 //	@Security	CookieAuth
-//	@Param		id		path	string						true	"User ID"
 //	@Param		request	body	UpdateUserLocationRequest	true	"Update User Location Request"
 //	@Success	204
 //	@Failure	400	{object}	response.ErrorResponse

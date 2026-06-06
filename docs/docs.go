@@ -574,13 +574,6 @@ const docTemplate = `{
                 "summary": "ユーザーの位置情報を更新する",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
                         "description": "Update User Location Request",
                         "name": "request",
                         "in": "body",
@@ -633,13 +626,6 @@ const docTemplate = `{
                 ],
                 "summary": "ユーザープロフィールを更新する",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
                     {
                         "description": "Update User Profile Request",
                         "name": "request",

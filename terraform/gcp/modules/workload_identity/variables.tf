@@ -28,8 +28,3 @@ variable "frontend_cloud_run_service_account_email" {
   description = "Email of the frontend Cloud Run service account that GitHub Actions (frontend) needs to act as"
   type        = string
 }
-
-variable "terraform_state_bucket" {
-  description = "Terraform state を保存する GCS バケット名"
-  type        = string
-}

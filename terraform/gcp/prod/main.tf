@@ -103,8 +103,6 @@ module "workload_identity" {
 
   frontend_cloud_run_service_account_email = module.cloud_run.frontend_service_account_email
 
-  terraform_state_bucket = "rideline-489422-terraform-state"
-
   depends_on = [google_project_service.apis]
 }
 

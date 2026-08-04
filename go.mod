@@ -4,6 +4,7 @@ go 1.26
 
 require (
 	github.com/caarlos0/env/v11 v11.4.0
+	github.com/doug-martin/goqu/v9 v9.19.0
 	github.com/gin-contrib/cors v1.7.6
 	github.com/gin-gonic/gin v1.11.0
 	github.com/go-playground/validator/v10 v10.30.1

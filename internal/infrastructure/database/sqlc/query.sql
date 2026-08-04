@@ -105,13 +105,13 @@ SELECT * FROM routes WHERE id = $1;
 -- name: GetRoutesByUserID :many
 SELECT * FROM routes WHERE user_id = $1;
 
--- name: SearchRoutesByUserID :many
-SELECT * FROM routes
-WHERE user_id = sqlc.arg(user_id)
-  AND (cardinality(sqlc.arg(name_keywords)::TEXT[]) = 0 OR name ILIKE ANY(sqlc.arg(name_keywords)::TEXT[]))
-  AND (sqlc.arg(visibility)::SMALLINT < 0 OR visibility = sqlc.arg(visibility)::SMALLINT)
-  AND (sqlc.arg(min_distance)::DOUBLE PRECISION < 0 OR distance >= sqlc.arg(min_distance)::DOUBLE PRECISION)
-  AND (sqlc.arg(max_distance)::DOUBLE PRECISION < 0 OR distance <= sqlc.arg(max_distance)::DOUBLE PRECISION);
+-- -- name: SearchRoutesByUserID :many
+-- SELECT * FROM routes
+-- WHERE user_id = sqlc.arg(user_id)
+--   AND (cardinality(sqlc.arg(name_keywords)::TEXT[]) = 0 OR name ILIKE ANY(sqlc.arg(name_keywords)::TEXT[]))
+--   AND (sqlc.arg(visibility)::SMALLINT < 0 OR visibility = sqlc.arg(visibility)::SMALLINT)
+--   AND (sqlc.arg(min_distance)::DOUBLE PRECISION < 0 OR distance >= sqlc.arg(min_distance)::DOUBLE PRECISION)
+--   AND (sqlc.arg(max_distance)::DOUBLE PRECISION < 0 OR distance <= sqlc.arg(max_distance)::DOUBLE PRECISION);
   
 
 -- name: ExploreRoutes :many

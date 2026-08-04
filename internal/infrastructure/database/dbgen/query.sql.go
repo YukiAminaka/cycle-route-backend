@@ -286,6 +286,8 @@ func (q *Queries) DeleteWaypointsByRouteID(ctx context.Context, routeID uuid.UUI
 }
 
 const exploreRoutes = `-- name: ExploreRoutes :many
+  
+
 SELECT
   filtered_routes.id,
   filtered_routes.user_id,
@@ -360,6 +362,14 @@ type ExploreRoutesRow struct {
 	UserName           string      `json:"user_name"`
 }
 
+// -- name: SearchRoutesByUserID :many
+// SELECT * FROM routes
+// WHERE user_id = sqlc.arg(user_id)
+//
+//	AND (cardinality(sqlc.arg(name_keywords)::TEXT[]) = 0 OR name ILIKE ANY(sqlc.arg(name_keywords)::TEXT[]))
+//	AND (sqlc.arg(visibility)::SMALLINT < 0 OR visibility = sqlc.arg(visibility)::SMALLINT)
+//	AND (sqlc.arg(min_distance)::DOUBLE PRECISION < 0 OR distance >= sqlc.arg(min_distance)::DOUBLE PRECISION)
+//	AND (sqlc.arg(max_distance)::DOUBLE PRECISION < 0 OR distance <= sqlc.arg(max_distance)::DOUBLE PRECISION);
 func (q *Queries) ExploreRoutes(ctx context.Context, arg ExploreRoutesParams) ([]ExploreRoutesRow, error) {
 	rows, err := q.db.Query(ctx, exploreRoutes,
 		arg.RadiusM,
@@ -593,67 +603,6 @@ func (q *Queries) GetWaypointsByRouteID(ctx context.Context, routeID uuid.UUID) 
 			&i.RouteID,
 			&i.Location,
 			&i.CreatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const searchRoutesByUserID = `-- name: SearchRoutesByUserID :many
-SELECT id, user_id, name, description, highlighted_photo_id, distance, duration, elevation_gain, elevation_loss, path_geom, bbox, first_point, last_point, polyline, created_at, updated_at, visibility FROM routes
-WHERE user_id = $1
-  AND (cardinality($2::TEXT[]) = 0 OR name ILIKE ANY($2::TEXT[]))
-  AND ($3::SMALLINT < 0 OR visibility = $3::SMALLINT)
-  AND ($4::DOUBLE PRECISION < 0 OR distance >= $4::DOUBLE PRECISION)
-  AND ($5::DOUBLE PRECISION < 0 OR distance <= $5::DOUBLE PRECISION)
-`
-
-type SearchRoutesByUserIDParams struct {
-	UserID       uuid.UUID `json:"user_id"`
-	NameKeywords []string  `json:"name_keywords"`
-	Visibility   int16     `json:"visibility"`
-	MinDistance  float64   `json:"min_distance"`
-	MaxDistance  float64   `json:"max_distance"`
-}
-
-func (q *Queries) SearchRoutesByUserID(ctx context.Context, arg SearchRoutesByUserIDParams) ([]Route, error) {
-	rows, err := q.db.Query(ctx, searchRoutesByUserID,
-		arg.UserID,
-		arg.NameKeywords,
-		arg.Visibility,
-		arg.MinDistance,
-		arg.MaxDistance,
-	)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []Route
-	for rows.Next() {
-		var i Route
-		if err := rows.Scan(
-			&i.ID,
-			&i.UserID,
-			&i.Name,
-			&i.Description,
-			&i.HighlightedPhotoID,
-			&i.Distance,
-			&i.Duration,
-			&i.ElevationGain,
-			&i.ElevationLoss,
-			&i.PathGeom,
-			&i.Bbox,
-			&i.FirstPoint,
-			&i.LastPoint,
-			&i.Polyline,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-			&i.Visibility,
 		); err != nil {
 			return nil, err
 		}

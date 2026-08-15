@@ -147,6 +147,55 @@ func (q *Queries) SearchRoutesByUserID(ctx context.Context, arg SearchRoutesByUs
 	return items, nil
 }
 
+// SELECT
+//   "filtered_routes"."id",
+//   "filtered_routes"."user_id",
+//   "filtered_routes"."name",
+//   "filtered_routes"."description",
+//   "filtered_routes"."highlighted_photo_id",
+//   "filtered_routes"."distance",
+//   "filtered_routes"."duration",
+//   "filtered_routes"."elevation_gain",
+//   "filtered_routes"."elevation_loss",
+//   "filtered_routes"."path_geom",
+//   "filtered_routes"."bbox",
+//   "filtered_routes"."first_point",
+//   "filtered_routes"."last_point",
+//   "filtered_routes"."polyline",
+//   "filtered_routes"."created_at",
+//   "filtered_routes"."updated_at",
+//   "filtered_routes"."visibility",
+//   "filtered_routes"."total_count",
+//   "users"."name" AS "user_name"
+// FROM (
+//   SELECT
+//     "id",
+//     "user_id",
+//     "name",
+//     "description",
+//     "highlighted_photo_id",
+//     "distance",
+//     "duration",
+//     "elevation_gain",
+//     "elevation_loss",
+//     "path_geom",
+//     "bbox",
+//     "first_point",
+//     "last_point",
+//     "polyline",
+//     "created_at",
+//     "updated_at",
+//     "visibility",
+//     COUNT(*) OVER () AS "total_count"
+//   FROM "routes"
+//   WHERE (("visibility" = $1) AND ST_DWithin(first_point :: geography, ST_GeomFromEWKB($2) :: geography, $3) AND (("name" ILIKE $4) OR ("name" ILIKE $5)) AND ("distance" >= $6) AND ("distance" <= $7))
+// ) AS "filtered_routes"
+// INNER JOIN "users"
+// ON ("filtered_routes"."user_id" = "users"."id")
+// ORDER BY ST_Distance(filtered_routes.first_point :: geography, ST_GeomFromEWKB($8) :: geography) ASC
+// LIMIT $9
+// OFFSET $10
+
 func (q *Queries) ExploreRoutes(ctx context.Context, arg ExploreRoutesParams) ([]ExploreRoutesRow, error) {
 	dialect := goqu.Dialect("postgres")
 

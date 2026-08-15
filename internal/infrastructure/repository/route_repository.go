@@ -211,20 +211,11 @@ func (r *routeRepositoryImpl) ExploreRoutes(ctx context.Context, criteria *route
 		nameKeywords[i] = "%" + k + "%"
 	}
 
-	minDistance := float64(-1)
-	if d := criteria.MinDistance(); d != nil {
-		minDistance = *d
-	}
-	maxDistance := float64(-1)
-	if d := criteria.MaxDistance(); d != nil {
-		maxDistance = *d
-	}
-
-	// location/radius が nil の場合はセンチネル値を使用して範囲検索をスキップ
-	radiusM := float64(-1)
+	// location/radius が nil の場合は範囲検索をスキップ
+	var radiusM *float64
 	var location dbgen.OrbGeometry
 	if criteria.Location() != nil && criteria.Radius() != nil {
-		radiusM = *criteria.Radius()
+		radiusM = criteria.Radius()
 		location = dbgen.OrbGeometry{Geometry: criteria.Location().Geometry}
 	}
 
@@ -232,8 +223,8 @@ func (r *routeRepositoryImpl) ExploreRoutes(ctx context.Context, criteria *route
 		Location:     location,
 		RadiusM:      radiusM,
 		NameKeywords: nameKeywords,
-		MinDistance:  minDistance,
-		MaxDistance:  maxDistance,
+		MinDistance:  criteria.MinDistance(),
+		MaxDistance:  criteria.MaxDistance(),
 		LimitCount:   criteria.Limit(),
 		OffsetCount:  criteria.Offset(),
 	})

@@ -5,7 +5,7 @@ CREATE EXTENSION IF NOT EXISTS pg_trgm;    -- LIKE検索の高速化
 
 CREATE TABLE users (                   
     id UUID PRIMARY KEY,                         -- ユーザーID（UUIDv7）
-    kratos_id UUID UNIQUE NOT NULL,              -- Ory KratosのユーザーID
+    kratos_id UUID UNIQUE NOT NULL,              -- Ory KratosのユーザーID (UUIDv4)
     name TEXT NOT NULL,                          -- ユーザー名
     highlighted_photo_id BIGINT DEFAULT 0,       -- ハイライト写真ID
     locale VARCHAR(10) DEFAULT 'ja',             -- 言語設定

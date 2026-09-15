@@ -80,6 +80,25 @@ resource "google_project_iam_member" "kratos_cloudsql_client" {
 }
 
 # ============================================================
+# Telemetry IAM
+# ============================================================
+
+# Telemetry API にトレースデータを書き込むための権限
+resource "google_project_iam_member" "api_telemetry_traces_writer" {
+  project = var.project_id
+  role    = "roles/telemetry.tracesWriter"
+  member  = "serviceAccount:${google_service_account.api.email}"
+}
+
+# Telemetry API はquota projectに対するserviceusage.services.use権限も要求する
+resource "google_project_iam_member" "api_service_usage_consumer" {
+  project = var.project_id
+  role    = "roles/serviceusage.serviceUsageConsumer"
+  member  = "serviceAccount:${google_service_account.api.email}"
+}
+
+
+# ============================================================
 # Secret Manager IAM
 # ============================================================
 
@@ -714,7 +733,9 @@ resource "google_cloud_run_v2_service" "api" {
     }
 
     containers {
+      name  = "api"
       image = var.api_image
+      depends_on = ["otel-collector"]
 
       ports {
         container_port = 8080
@@ -725,7 +746,9 @@ resource "google_cloud_run_v2_service" "api" {
           cpu    = "1"
           memory = "512Mi"
         }
-        cpu_idle = true
+
+        # OTel SDKとCollectorのバックグラウンド送信を動作させる
+        cpu_idle = false
       }
 
       env {
@@ -751,6 +774,66 @@ resource "google_cloud_run_v2_service" "api" {
             version = "latest"
           }
         }
+      }
+
+      env {
+        name  = "OTEL_EXPORTER_OTLP_ENDPOINT"
+        value = "http://localhost:4317"
+      }
+
+      env {
+        name  = "OTEL_EXPORTER_OTLP_PROTOCOL"
+        value = "grpc"
+      }
+
+      env {
+        name  = "OTEL_SERVICE_NAME"
+        value = "${var.project_name}-${var.environment}-api"
+      }
+
+      env {
+        name  = "OTEL_RESOURCE_ATTRIBUTES"
+        value = "deployment.environment.name=${var.environment}"
+      }
+
+    }
+
+    containers {
+      name  = "otel-collector"
+      image = var.otel_collector_image
+      args  = ["--config=/etc/otelcol-google/config.yaml"]
+
+      resources {
+        limits = {
+          cpu    = "1"
+          memory = "512Mi"
+        }
+        cpu_idle = false
+      }
+
+      startup_probe {
+        http_get {
+          path = "/"
+          port = 13133
+        }
+        timeout_seconds   = 5
+        period_seconds    = 5
+        failure_threshold = 12
+      }
+
+      liveness_probe {
+        http_get {
+          path = "/"
+          port = 13133
+        }
+        timeout_seconds   = 5
+        period_seconds    = 30
+        failure_threshold = 3
+      }
+
+      env {
+        name  = "GOOGLE_CLOUD_PROJECT"
+        value = var.project_id
       }
     }
   }

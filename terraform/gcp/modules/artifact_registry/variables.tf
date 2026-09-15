@@ -11,5 +11,5 @@ variable "region" {
 variable "repositories" {
   description = "List of repository names to create"
   type        = list(string)
-  default     = ["frontend", "api", "kratos"]
+  default     = ["frontend", "api", "kratos", "atlas", "otelcol"]
 }

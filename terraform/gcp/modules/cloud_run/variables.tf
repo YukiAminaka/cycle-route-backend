@@ -103,6 +103,11 @@ variable "kratos_image" {
   type        = string
 }
 
+variable "otel_collector_image" {
+  description = "OpenTelemetry Collector container image (including tag)"
+  type        = string
+}
+
 variable "vpc_network_id" {
   description = "VPC network ID for Direct VPC Egress"
   type        = string

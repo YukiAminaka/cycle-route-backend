@@ -35,6 +35,7 @@ resource "google_project_service" "apis" {
     "iam.googleapis.com",
     "iamcredentials.googleapis.com",
     "servicenetworking.googleapis.com", # Private Services Access用
+    "telemetry.googleapis.com",         # Telemetry APIを有効にする
   ])
 
   service            = each.value # 有効にするサービス
@@ -81,7 +82,7 @@ module "artifact_registry" {
 
   project_name = var.project_name
   region       = var.region
-  repositories = ["frontend", "api", "kratos", "atlas"]
+  repositories = ["frontend", "api", "kratos", "atlas", "otelcol"]
 
   depends_on = [google_project_service.apis]
 }
@@ -133,6 +134,7 @@ module "cloud_run" {
   frontend_image = "${module.artifact_registry.repository_urls["frontend"]}:latest"
   api_image      = "${module.artifact_registry.repository_urls["api"]}:latest"
   kratos_image   = "${module.artifact_registry.repository_urls["kratos"]}:latest"
+  otel_collector_image = "${module.artifact_registry.repository_urls["otelcol"]}:latest"
 
   vpc_network_id    = module.vpc.network_id
   vpc_subnetwork_id = module.vpc.subnetwork_id
